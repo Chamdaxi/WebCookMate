@@ -35,3 +35,4 @@ visualstudioexptteam.intellicode-api-usage-examples
 visualstudioexptteam.vscodeintellicode
 wix.vscode-import-cost
 xabikos.javascriptsnippets
+hello
