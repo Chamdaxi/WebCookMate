@@ -2,16 +2,134 @@
     ViewData["Title"] = "Trang chủ";
 }
 
-<!-- Today's Suggestion -->
-<div class="today-suggestion-title">Today's suggestion</div>
-<div class="today-suggestion-image">
-    <img src="~/images/recipes/today-suggestion.jpg" alt="Today's suggestion">
+<!-- Today's Suggestions -->
+<div class="today-suggestions-section">
+    <h2 class="section-title">Today's Suggestions</h2>
+    <div class="suggestions-grid">
+        <div class="suggestion-card">
+            <div class="suggestion-image">
+                <img src="~/images/recipes/today-suggestion.jpg" alt="Top Cooksnap">
+            </div>
+            <div class="suggestion-content">
+                <h3>Top Món Có Nhiều Cooksnap Nhất</h3>
+                <p>Công thức đã nhận được hơn 10 cooksnap</p>
+            </div>
+        </div>
+        
+        <div class="suggestion-card">
+            <div class="suggestion-image">
+                <img src="~/images/recipes/banhmi.jpg" alt="Premium Menu">
+            </div>
+            <div class="suggestion-content">
+                <h3>Thực Đơn Premium</h3>
+                <p>Thực đơn hàng tuần với những nguyên liệu theo mùa</p>
+            </div>
+        </div>
+        
+        <div class="suggestion-card">
+            <div class="suggestion-image">
+                <img src="~/images/recipes/phobo.jpeg" alt="Most Viewed">
+            </div>
+            <div class="suggestion-content">
+                <h3>Top Món Được Xem Nhiều Nhất</h3>
+                <p>Những công thức có lượt xem nhiều nhất, cập nhật mỗi ngày</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Meal Plan Today -->
-<div class="meal-plan-title">Meal Plan Today</div>
-<div class="meal-plan-items">
-    <div class="meal-item">Breakfast: Spaghetti</div>
-    <div class="meal-item">Lunch: Noodles</div>
-    <div class="meal-item">Dinner: Rice</div>
+<div class="meal-plan-section">
+    <h2 class="section-title">Meal Plan Today</h2>
+    <div class="meal-plan-cards">
+        <div class="meal-card">
+            <div class="meal-time">Breakfast</div>
+            <div class="meal-dish">Spaghetti Carbonara</div>
+            <div class="meal-time-info">8:00 AM</div>
+        </div>
+        <div class="meal-card">
+            <div class="meal-time">Lunch</div>
+            <div class="meal-dish">Vietnamese Noodles</div>
+            <div class="meal-time-info">12:30 PM</div>
+        </div>
+        <div class="meal-card">
+            <div class="meal-time">Dinner</div>
+            <div class="meal-dish">Grilled Salmon Rice</div>
+            <div class="meal-time-info">7:00 PM</div>
+        </div>
+    </div>
 </div>
+
+<!-- Quick Access -->
+<div class="quick-access-section">
+    <h2 class="section-title">Quick Access</h2>
+    <div class="quick-access-grid">
+        <a href="/Home/Chat" class="quick-access-item">
+            <div class="quick-access-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </div>
+            <div class="quick-access-text">
+                <h3>AI Chat</h3>
+                <p>Get cooking advice</p>
+            </div>
+        </a>
+        
+        <a href="/Home/FavoriteList" class="quick-access-item">
+            <div class="quick-access-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </div>
+            <div class="quick-access-text">
+                <h3>Favorites</h3>
+                <p>Your saved recipes</p>
+            </div>
+        </a>
+        
+        <a href="#" class="quick-access-item">
+            <div class="quick-access-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11H5a2 2 0 0 0-2 2v3c0 1.1.9 2 2 2h4m0-7h10a2 2 0 0 1 2 2v3c0 1.1-.9 2-2 2H9m0-7V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+                </svg>
+            </div>
+            <div class="quick-access-text">
+                <h3>Pantry</h3>
+                <p>Manage ingredients</p>
+            </div>
+        </a>
+        
+        <a href="#" class="quick-access-item">
+            <div class="quick-access-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+            </div>
+            <div class="quick-access-text">
+                <h3>Shopping List</h3>
+                <p>Plan your groceries</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Simple hover effects for suggestion cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const suggestionCards = document.querySelectorAll('.suggestion-card');
+            
+            suggestionCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+}

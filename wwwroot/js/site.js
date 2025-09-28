@@ -2,19 +2,25 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('WebCookmate đã sẵn sàng!');
     
-    // Smooth scrolling cho navigation links
+    // Smooth scrolling cho navigation links (chỉ cho anchor links)
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
             const targetId = this.getAttribute('href');
+            console.log('Nav link clicked:', targetId, this.textContent);
+            
+            // Chỉ prevent default cho anchor links (#)
             if (targetId.startsWith('#')) {
+                e.preventDefault();
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
                     targetElement.scrollIntoView({
                         behavior: 'smooth'
                     });
                 }
+            } else {
+                // Cho các link khác (như Home), để browser tự xử lý navigation
+                console.log('Allowing navigation to:', targetId);
             }
         });
     });
