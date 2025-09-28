@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Chat";
+    Layout = "~/Views/Shared/_ChatLayout.cshtml";
+}
+
+<!-- Chat Messages Area -->
+<div class="chat-messages" id="chatMessages">
+    <div class="welcome-message">
+        <h2>Chào mừng đến với CookMate!</h2>
+        <p>Hãy hỏi tôi bất cứ điều gì về nấu ăn, công thức, hoặc món ăn bạn muốn.</p>
+    </div>
+</div>
+
+<!-- Input Field -->
+<div class="input-container">
+    <div class="input-field" id="inputField">
+        <div class="plus-icon">+</div>
+        <input type="text" id="messageInput" placeholder="Hỏi bất cứ điều gì..." />
+        <div class="send-arrow" id="sendBtn">▶</div>
+    </div>
+</div>

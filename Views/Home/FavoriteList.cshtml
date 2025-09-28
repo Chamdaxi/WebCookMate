@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "Favorite List";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/favorites.css" asp-append-version="true" />
+}
+
+<!-- Main Content -->
+        <!-- Favorites Section -->
+        <div class="favorites-section">
+            <div class="favorites-header">
+                <div class="favorites-title">
+                    <h2>Favorites</h2>
+                    <div class="heart-icon">
+                        <svg width="58" height="58" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="sort-button">
+                    <span class="sort-text">Sort: Newest</span>
+                </div>
+            </div>
+
+            <!-- Favorite Items -->
+            <div class="favorite-items">
+                <!-- Breakfast Item -->
+                <div class="favorite-item">
+                    <div class="favorite-image">
+                        <img src="~/images/recipes/banhmi.jpg" alt="Banh mi">
+                    </div>
+                    <div class="favorite-content">
+                        <h3 class="favorite-title">Breakfast</h3>
+                        <p class="favorite-subtitle">Banh mi</p>
+                    </div>
+                </div>
+
+                <!-- Lunch Item -->
+                <div class="favorite-item">
+                    <div class="favorite-image">
+                        <img src="~/images/recipes/phobo.jpeg" alt="Pho">
+                    </div>
+                    <div class="favorite-content">
+                        <h3 class="favorite-title">Lunch</h3>
+                        <p class="favorite-subtitle">Pho</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button class="pagination-arrow prev">
+                <svg width="57" height="57" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15,18 9,12 15,6"></polyline>
+                </svg>
+            </button>
+            
+            <div class="pagination-numbers">
+                <button class="page-number active">1</button>
+                <button class="page-number">2</button>
+                <button class="page-number">3</button>
+            </div>
+            
+            <button class="pagination-arrow next">
+                <svg width="57" height="57" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9,18 15,12 9,6"></polyline>
+                </svg>
+            </button>
+        </div>

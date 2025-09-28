@@ -1,0 +1,278 @@
+/* Reset và base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #E0CEC8;
+    color: #000;
+    line-height: 1.6;
+}
+
+/* Home Text */
+.home-text {
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    color: #817B7B;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 10;
+    letter-spacing: 0.5px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 60px 40px 30px 40px;
+    background-color: #E0CEC8;
+    gap: 25px;
+}
+
+/* Header Top Row */
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-img {
+    width: 50px;
+    height: 50px;
+}
+
+.logo-text {
+    font-size: 48px;
+    font-weight: 600;
+    color: #000;
+    letter-spacing: -1px;
+}
+
+/* Search Bar */
+.search-bar {
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    align-self: flex-start;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #817B7B;
+    z-index: 2;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 2px solid #090808;
+    border-radius: 25px;
+    font-size: 16px;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    border-color: #007bff;
+}
+
+.search-input::placeholder {
+    color: #817B7B;
+}
+
+/* Notification Bell */
+.notification-bell {
+    color: #000;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    transform: scale(1.1);
+}
+
+.notification-bell:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: scale(1.2);
+}
+
+/* Navigation */
+.navigation {
+    background-color: #E0CEC8;
+    border-top: 1px solid #090808;
+    border-bottom: 1px solid #090808;
+    padding: 15px 0;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    gap: 40px;
+    margin: 0;
+    padding: 0 40px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #000;
+    font-size: 20px;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+.nav-link:hover {
+    color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.dropdown-arrow {
+    color: #000;
+    transition: transform 0.3s ease;
+}
+
+.nav-item:hover .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Main Content */
+.main-content {
+    padding: 25px;
+    background-color: #E0CEC8;
+    min-height: calc(100vh - 160px);
+}
+
+/* Today's Suggestion */
+.today-suggestion-title {
+    font-size: 28px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 15px;
+}
+
+.today-suggestion-image {
+    width: 100%;
+    max-width: 400px;
+    height: 250px;
+    margin-bottom: 30px;
+}
+
+.today-suggestion-image img {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    border: 2px solid rgba(0, 0, 0, 0.24);
+    object-fit: cover;
+}
+
+/* Meal Plan Today */
+.meal-plan-title {
+    font-size: 28px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 15px;
+}
+
+.meal-plan-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.meal-item {
+    font-size: 18px;
+    font-weight: 400;
+    color: #000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 50px 20px 20px 20px;
+    }
+
+    .search-bar {
+        margin: 0;
+        max-width: 100%;
+    }
+
+    .nav-menu {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .nav-link {
+        font-size: 18px;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    .today-suggestion-title,
+    .meal-plan-title {
+        font-size: 28px;
+    }
+
+    .meal-item {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-text {
+        left: 20px;
+        top: 15px;
+    }
+
+    .header {
+        padding: 40px 15px 15px 15px;
+    }
+
+    .logo-text {
+        font-size: 36px;
+    }
+
+    .nav-menu {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .today-suggestion-image {
+        height: 250px;
+    }
+}

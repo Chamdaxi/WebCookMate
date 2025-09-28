@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CookMate Chat</title>
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="menu-icon">
+                    <div class="menu-line"></div>
+                </div>
+                <h2 class="app-title">CookMate</h2>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="nav-item active" id="newChatBtn">
+                    <div class="nav-icon">
+                        <img src="~/images/icons/chat/Newchat.png" alt="New Chat" class="icon-img" />
+                    </div>
+                    <span>New chat</span>
+                </div>
+                
+                <div class="nav-item" id="searchChatBtn">
+                    <div class="nav-icon">
+                        <img src="~/images/icons/chat/Searchchat.png" alt="Search Chat" class="icon-img" />
+                    </div>
+                    <span>Search chat</span>
+                </div>
+                
+                <div class="nav-item" id="historyChatBtn">
+                    <div class="nav-icon">
+                        <img src="~/images/icons/chat/Historychat.png" alt="History Chat" class="icon-img" />
+                    </div>
+                    <span>History chat</span>
+                </div>
+            </div>
+
+            <!-- Chat History -->
+            <div class="chat-history" id="chatHistory" style="display: none;">
+                <h3>Recent Chats</h3>
+                <div class="history-list">
+                    <div class="history-item">Cách nấu phở bò</div>
+                    <div class="history-item">Công thức bánh mì</div>
+                    <div class="history-item">Món ăn Việt Nam</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
