@@ -30,5 +30,10 @@ namespace demo.Controllers
         {
             return View();
         }
+
+        public IActionResult MealPlan()
+        {
+            return View();
+        }
     }
 }
