@@ -1,0 +1,300 @@
+@{
+    ViewData["Title"] = "Meal Plan";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/mealplan.css" asp-append-version="true" />
+}
+
+<!-- Main Content -->
+<div class="mealplan-page">
+    <!-- Page Header -->
+    <div class="mealplan-header">
+        <h1 class="page-title">Meal Planning</h1>
+        <p class="page-subtitle">Lên lịch trình ăn uống hàng ngày của bạn</p>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="mealplan-content">
+        <!-- Calendar Section -->
+        <div class="calendar-section">
+        <div class="calendar-header">
+            <div class="calendar-icon">
+                <svg width="65" height="65" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </div>
+            <h2 class="calendar-title">Lịch</h2>
+        </div>
+        
+        <div class="calendar-container">
+            <div class="calendar-grid">
+                <div class="calendar-header-row">
+                    <div class="day-header">CN</div>
+                    <div class="day-header">Thứ2</div>
+                    <div class="day-header">Thứ3</div>
+                    <div class="day-header">Thứ4</div>
+                    <div class="day-header">Thứ5</div>
+                    <div class="day-header">Thứ6</div>
+                    <div class="day-header">Thứ7</div>
+                </div>
+                
+                <div class="calendar-week">
+                    <div class="calendar-day">1</div>
+                    <div class="calendar-day">2</div>
+                    <div class="calendar-day">3</div>
+                    <div class="calendar-day">4</div>
+                    <div class="calendar-day">5</div>
+                    <div class="calendar-day">6</div>
+                    <div class="calendar-day">7</div>
+                </div>
+                
+                <div class="calendar-week">
+                    <div class="calendar-day">8</div>
+                    <div class="calendar-day">9</div>
+                    <div class="calendar-day">10</div>
+                    <div class="calendar-day">11</div>
+                    <div class="calendar-day">12</div>
+                    <div class="calendar-day">13</div>
+                    <div class="calendar-day">14</div>
+                </div>
+                
+                <div class="calendar-week">
+                    <div class="calendar-day">15</div>
+                    <div class="calendar-day">16</div>
+                    <div class="calendar-day">17</div>
+                    <div class="calendar-day">18</div>
+                    <div class="calendar-day">19</div>
+                    <div class="calendar-day">20</div>
+                    <div class="calendar-day">21</div>
+                </div>
+                
+                <div class="calendar-week">
+                    <div class="calendar-day">22</div>
+                    <div class="calendar-day">23</div>
+                    <div class="calendar-day">24</div>
+                    <div class="calendar-day">25</div>
+                    <div class="calendar-day">26</div>
+                    <div class="calendar-day">27</div>
+                    <div class="calendar-day">28</div>
+                </div>
+                
+                <div class="calendar-week">
+                    <div class="calendar-day">29</div>
+                    <div class="calendar-day">30</div>
+                    <div class="calendar-day"></div>
+                    <div class="calendar-day"></div>
+                    <div class="calendar-day"></div>
+                    <div class="calendar-day"></div>
+                    <div class="calendar-day"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meal Plan Details Section -->
+    <div class="mealplan-details-section">
+        <!-- Date Header -->
+        <div class="date-header">
+            <div class="date-icon">
+                <svg width="39" height="39" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </div>
+            <div class="date-info">
+                <h3 class="date-text">Ngày 11 10 2025</h3>
+                <p class="meal-type">Thực đơn tập gym</p>
+            </div>
+            <div class="meal-stats">
+                <div class="stat-item">
+                    <span class="stat-number">3</span>
+                    <span class="stat-label">Món ăn</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">1,200</span>
+                    <span class="stat-label">Calories</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meal Categories -->
+        <div class="meal-categories">
+            <!-- Breakfast -->
+            <div class="meal-category">
+                <h4 class="category-title">Bữa sáng</h4>
+                <div class="meal-items">
+                    <div class="meal-item">
+                        <div class="meal-checkbox">
+                            <input type="checkbox" id="beef" class="checkbox-input">
+                            <label for="beef" class="checkbox-label"></label>
+                        </div>
+                        <div class="meal-content">
+                            <h5 class="meal-name">Thịt bò</h5>
+                            <p class="meal-info">250g • 300 cal</p>
+                        </div>
+                        <div class="meal-image">
+                            <img src="~/images/recipes/today-suggestion.jpg" alt="Thịt bò">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lunch -->
+            <div class="meal-category">
+                <h4 class="category-title">Bữa trưa</h4>
+                <div class="meal-items">
+                    <div class="meal-item">
+                        <div class="meal-checkbox">
+                            <input type="checkbox" id="rice" class="checkbox-input">
+                            <label for="rice" class="checkbox-label"></label>
+                        </div>
+                        <div class="meal-content">
+                            <h5 class="meal-name">Cơm</h5>
+                            <p class="meal-info">200g • 400 cal</p>
+                        </div>
+                        <div class="meal-image">
+                            <img src="~/images/recipes/phobo.jpeg" alt="Cơm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dinner -->
+            <div class="meal-category">
+                <h4 class="category-title">Bữa tối</h4>
+                <div class="meal-items">
+                    <div class="meal-item">
+                        <div class="meal-checkbox">
+                            <input type="checkbox" id="eggs" class="checkbox-input">
+                            <label for="eggs" class="checkbox-label"></label>
+                        </div>
+                        <div class="meal-content">
+                            <h5 class="meal-name">Trứng luộc</h5>
+                            <p class="meal-info">2 quả • 140 cal</p>
+                        </div>
+                        <div class="meal-image">
+                            <img src="~/images/recipes/banhmi.jpg" alt="Trứng luộc">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="addMeal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Thêm món ăn
+            </button>
+            <button class="btn btn-secondary" onclick="saveMealPlan()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                    <polyline points="7,3 7,8 15,8"></polyline>
+                </svg>
+                Lưu kế hoạch
+            </button>
+        </div>
+    </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Calendar day selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarDays = document.querySelectorAll('.calendar-day');
+            
+            calendarDays.forEach(day => {
+                if (day.textContent.trim()) {
+                    day.addEventListener('click', function() {
+                        // Remove active class from all days
+                        calendarDays.forEach(d => d.classList.remove('active'));
+                        // Add active class to clicked day
+                        this.classList.add('active');
+                        
+                        // Update date header
+                        const dateText = document.querySelector('.date-text');
+                        if (dateText) {
+                            dateText.textContent = `Ngày ${this.textContent} 10 2025`;
+                        }
+                        
+                        // Update meal plan for selected day
+                        updateMealPlanForDay(this.textContent);
+                    });
+                }
+            });
+
+            // Meal item checkbox functionality
+            const mealCheckboxes = document.querySelectorAll('.checkbox-input');
+            
+            mealCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const mealItem = this.closest('.meal-item');
+                    if (this.checked) {
+                        mealItem.classList.add('completed');
+                    } else {
+                        mealItem.classList.remove('completed');
+                    }
+                    
+                    // Update meal stats
+                    updateMealStats();
+                });
+            });
+
+            // Set default active day (day 11)
+            const day11 = document.querySelector('.calendar-day');
+            if (day11 && day11.textContent.trim() === '11') {
+                day11.classList.add('active');
+            }
+            
+            // Initialize meal stats
+            updateMealStats();
+        });
+
+        // Update meal plan for selected day
+        function updateMealPlanForDay(day) {
+            console.log(`Loading meal plan for day ${day}`);
+            // Here you would typically load meal plan data from server
+            // For now, we'll just update the display
+        }
+
+        // Update meal statistics
+        function updateMealStats() {
+            const completedMeals = document.querySelectorAll('.meal-item.completed').length;
+            const totalMeals = document.querySelectorAll('.meal-item').length;
+            
+            const statNumber = document.querySelector('.stat-number');
+            if (statNumber) {
+                statNumber.textContent = `${completedMeals}/${totalMeals}`;
+            }
+        }
+
+        // Add new meal
+        function addMeal() {
+            alert('Tính năng thêm món ăn sẽ được phát triển trong phiên bản tiếp theo!');
+        }
+
+        // Save meal plan
+        function saveMealPlan() {
+            const completedMeals = document.querySelectorAll('.meal-item.completed').length;
+            const totalMeals = document.querySelectorAll('.meal-item').length;
+            
+            if (completedMeals === totalMeals) {
+                alert('Chúc mừng! Bạn đã hoàn thành tất cả các bữa ăn trong ngày! 🎉');
+            } else {
+                alert(`Đã lưu kế hoạch ăn uống! Bạn đã hoàn thành ${completedMeals}/${totalMeals} bữa ăn.`);
+            }
+        }
+    </script>
+}
