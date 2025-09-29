@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
-namespace WebCookmate.Controllers
+namespace demo.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         public IActionResult Index()
