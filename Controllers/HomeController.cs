@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace demo.Controllers
 {
-    [Authorize]
+    // [Authorize] - Tạm thời comment để test
     public class HomeController : Controller
     {
         public IActionResult Index()
