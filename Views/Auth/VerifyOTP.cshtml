@@ -1,0 +1,512 @@
+@{
+    ViewData["Title"] = "Xác Thực OTP";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CookMate</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E0CEC8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .otp-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 2px solid #090808;
+        }
+
+        .logo-section {
+            margin-bottom: 30px;
+        }
+
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+        }
+
+        .app-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .otp-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 20px 0 10px 0;
+        }
+
+        .otp-subtitle {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin: 0 0 30px 0;
+        }
+
+        .email-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .otp-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .otp-input.filled {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .otp-input.error {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .verify-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .verify-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .verify-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .resend-section {
+            margin-top: 20px;
+        }
+
+        .resend-text {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #007bff;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+        .resend-btn:hover {
+            color: #0056b3;
+        }
+
+        .resend-btn:disabled {
+            color: #6c757d;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .countdown {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: white;
+            color: #000;
+            border: 2px solid #090808;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @@media (max-width: 480px) {
+            .otp-container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .otp-input {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+            
+            .otp-input-container {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="@Url.Action("Login", "Auth")" class="back-btn">← Quay lại</a>
+
+    <div class="otp-container">
+        <div class="logo-section">
+            <img src="~/images/logos/chef-hat.png" alt="CookMate Logo" class="logo-img">
+            <h1 class="app-name">CookMate</h1>
+        </div>
+
+        <h2 class="otp-title">Xác Thực OTP</h2>
+        <p class="otp-subtitle">Nhập mã xác thực đã được gửi đến email của bạn</p>
+
+        <div class="email-display">
+            @Context.Session.GetString("OTPEmail")
+        </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="error-message">
+                @TempData["Error"]
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="success-message">
+                @TempData["Success"]
+            </div>
+        }
+
+        <form method="post" action="@Url.Action("VerifyOTP", "Auth")" id="otpForm">
+            <div class="otp-input-container">
+                <input type="text" class="otp-input" maxlength="1" data-index="0" required>
+                <input type="text" class="otp-input" maxlength="1" data-index="1" required>
+                <input type="text" class="otp-input" maxlength="1" data-index="2" required>
+                <input type="text" class="otp-input" maxlength="1" data-index="3" required>
+                <input type="text" class="otp-input" maxlength="1" data-index="4" required>
+                <input type="text" class="otp-input" maxlength="1" data-index="5" required>
+            </div>
+            
+            <input type="hidden" name="otp" id="otpValue">
+            
+            <button type="submit" class="verify-btn" id="verifyBtn" disabled>
+                Xác Thực
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+
+        <div class="resend-section">
+            <p class="resend-text">Không nhận được mã?</p>
+            <button class="resend-btn" id="resendBtn" onclick="resendOTP()">
+                Gửi lại mã OTP
+            </button>
+            <div id="countdown" class="countdown" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const otpInputs = document.querySelectorAll('.otp-input');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const otpValue = document.getElementById('otpValue');
+        const resendBtn = document.getElementById('resendBtn');
+        const countdown = document.getElementById('countdown');
+        const loading = document.getElementById('loading');
+
+        let countdownTimer = null;
+        let countdownSeconds = 60;
+
+        // Auto-focus first input
+        otpInputs[0].focus();
+
+        // Handle input events
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                const value = e.target.value;
+                
+                // Only allow numbers
+                if (!/^\d$/.test(value)) {
+                    e.target.value = '';
+                    return;
+                }
+
+                // Add filled class
+                if (value) {
+                    e.target.classList.add('filled');
+                    e.target.classList.remove('error');
+                } else {
+                    e.target.classList.remove('filled');
+                }
+
+                // Move to next input
+                if (value && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+
+                // Check if all inputs are filled
+                checkOTPComplete();
+            });
+
+            input.addEventListener('keydown', function(e) {
+                // Handle backspace
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+                
+                // Handle paste
+                if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    handlePaste(e);
+                }
+            });
+        });
+
+        function checkOTPComplete() {
+            const allFilled = Array.from(otpInputs).every(input => input.value);
+            verifyBtn.disabled = !allFilled;
+            
+            if (allFilled) {
+                updateOTPValue();
+            }
+        }
+
+        function updateOTPValue() {
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+            otpValue.value = otp;
+        }
+
+        function handlePaste(e) {
+            navigator.clipboard.readText().then(text => {
+                const digits = text.replace(/\D/g, '').slice(0, 6);
+                digits.split('').forEach((digit, index) => {
+                    if (otpInputs[index]) {
+                        otpInputs[index].value = digit;
+                        otpInputs[index].classList.add('filled');
+                    }
+                });
+                checkOTPComplete();
+            });
+        }
+
+        // Form submission
+        document.getElementById('otpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+            if (otp.length !== 6) {
+                showError('Vui lòng nhập đầy đủ 6 chữ số');
+                return;
+            }
+
+            // Show loading
+            loading.style.display = 'block';
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Đang xác thực...';
+
+            // Submit form
+            otpValue.value = otp;
+            setTimeout(() => {
+                this.submit();
+            }, 500);
+        });
+
+        function resendOTP() {
+            resendBtn.disabled = true;
+            resendBtn.textContent = 'Đang gửi...';
+            
+            // Start countdown
+            startCountdown();
+            
+            // Send request to resend OTP
+            fetch('@Url.Action("SendOTP", "Auth")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `email=${encodeURIComponent('@Context.Session.GetString("OTPEmail")')}`
+            })
+            .then(response => {
+                if (response.ok) {
+                    showSuccess('Mã OTP mới đã được gửi!');
+                    // Clear inputs
+                    otpInputs.forEach(input => {
+                        input.value = '';
+                        input.classList.remove('filled', 'error');
+                    });
+                    otpInputs[0].focus();
+                    checkOTPComplete();
+                } else {
+                    showError('Có lỗi xảy ra khi gửi lại mã OTP');
+                }
+            })
+            .catch(error => {
+                showError('Có lỗi xảy ra khi gửi lại mã OTP');
+            })
+            .finally(() => {
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Gửi lại mã OTP';
+            });
+        }
+
+        function startCountdown() {
+            countdownSeconds = 60;
+            countdown.style.display = 'block';
+            resendBtn.style.display = 'none';
+            
+            countdownTimer = setInterval(() => {
+                countdown.textContent = `Gửi lại sau ${countdownSeconds}s`;
+                countdownSeconds--;
+                
+                if (countdownSeconds < 0) {
+                    clearInterval(countdownTimer);
+                    countdown.style.display = 'none';
+                    resendBtn.style.display = 'inline';
+                }
+            }, 1000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            const container = document.querySelector('.otp-container');
+            const existingError = container.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            container.insertBefore(errorDiv, container.querySelector('.otp-title'));
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            
+            const container = document.querySelector('.otp-container');
+            const existingSuccess = container.querySelector('.success-message');
+            if (existingSuccess) {
+                existingSuccess.remove();
+            }
+            
+            container.insertBefore(successDiv, container.querySelector('.otp-title'));
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        // Auto-start countdown on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            startCountdown();
+        });
+    </script>
+</body>
+</html>

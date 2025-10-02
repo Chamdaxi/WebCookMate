@@ -8,6 +8,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Thêm services cho MVC
 builder.Services.AddControllersWithViews();
 
+// Thêm Session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Thêm Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -49,6 +57,9 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles(); // Hỗ trợ static files (CSS, JS, images)
 
 app.UseRouting();
+
+// Thêm Session middleware
+app.UseSession();
 
 // Thêm Authentication và Authorization
 app.UseAuthentication();

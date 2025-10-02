@@ -48,47 +48,90 @@ namespace demo.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult Register()
+        [HttpPost]
+        public IActionResult SendOTP(string email)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "Vui lòng nhập email";
+                return RedirectToAction("Login");
+            }
+
+            // Generate OTP (6 digits)
+            var otp = new Random().Next(100000, 999999).ToString();
+            
+            // Store OTP in session (in real app, store in database with expiration)
+            HttpContext.Session.SetString("OTP", otp);
+            HttpContext.Session.SetString("OTPEmail", email);
+            HttpContext.Session.SetString("OTPTime", DateTime.Now.AddMinutes(5).ToString());
+
+            // In real app, send email here
+            TempData["Success"] = $"Mã OTP đã được gửi đến {email}. Mã OTP: {otp} (Demo)";
+            
+            return RedirectToAction("VerifyOTP");
+        }
+
+        [HttpGet]
+        public IActionResult VerifyOTP()
+        {
+            var email = HttpContext.Session.GetString("OTPEmail");
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("Login");
+            }
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string fullName, string email, string password, string confirmPassword)
+        public async Task<IActionResult> VerifyOTP(string otp)
         {
-            if (string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            var storedOTP = HttpContext.Session.GetString("OTP");
+            var email = HttpContext.Session.GetString("OTPEmail");
+            var otpTime = HttpContext.Session.GetString("OTPTime");
+
+            if (string.IsNullOrEmpty(storedOTP) || string.IsNullOrEmpty(email))
             {
-                TempData["Error"] = "Vui lòng nhập đầy đủ thông tin";
+                TempData["Error"] = "Phiên OTP đã hết hạn";
+                return RedirectToAction("Login");
+            }
+
+            if (DateTime.Now > DateTime.Parse(otpTime ?? DateTime.Now.ToString()))
+            {
+                TempData["Error"] = "Mã OTP đã hết hạn";
+                HttpContext.Session.Remove("OTP");
+                HttpContext.Session.Remove("OTPEmail");
+                HttpContext.Session.Remove("OTPTime");
+                return RedirectToAction("Login");
+            }
+
+            if (otp != storedOTP)
+            {
+                TempData["Error"] = "Mã OTP không đúng";
                 return View();
             }
 
-            if (password != confirmPassword)
+            // OTP verified successfully
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
             {
-                TempData["Error"] = "Mật khẩu xác nhận không khớp";
-                return View();
+                // Create new user if doesn't exist
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = email.Split('@')[0] // Use email prefix as name
+                };
+                await _userManager.CreateAsync(user);
             }
 
-            var user = new ApplicationUser
-            {
-                UserName = email,
-                Email = email,
-                FullName = fullName
-            };
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            
+            // Clear OTP session
+            HttpContext.Session.Remove("OTP");
+            HttpContext.Session.Remove("OTPEmail");
+            HttpContext.Session.Remove("OTPTime");
 
-            var result = await _userManager.CreateAsync(user, password);
-            if (result.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                TempData["Error"] = error.Description;
-            }
-
-            return View();
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]

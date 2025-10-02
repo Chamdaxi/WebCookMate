@@ -167,7 +167,6 @@
 </head>
 <body>
     <div class="top-left-text">Đăng Nhập</div>
-    <button class="top-right-btn" onclick="location.href='@Url.Action("Register", "Auth")'">Sign in</button>
 
     <div class="login-container">
         <div class="logo-section">
@@ -213,27 +212,19 @@
     <!-- Email Login Modal -->
     <div id="emailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px;">
-            <h3 style="margin-top: 0; text-align: center;">Đăng Nhập</h3>
-            <form method="post" action="@Url.Action("Login", "Auth")">
-                <div style="margin-bottom: 15px;">
-                    <input type="email" name="email" placeholder="Email" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
-                </div>
+            <h3 style="margin-top: 0; text-align: center;">Đăng Nhập với Email</h3>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Nhập email để nhận mã OTP</p>
+            <form method="post" action="@Url.Action("SendOTP", "Auth")">
                 <div style="margin-bottom: 20px;">
-                    <input type="password" name="password" placeholder="Mật khẩu" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="rememberMe" value="true">
-                        Ghi nhớ đăng nhập
-                    </label>
+                    <input type="email" name="email" placeholder="Nhập email của bạn" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button type="submit" style="flex: 1; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">Đăng Nhập</button>
+                    <button type="submit" style="flex: 1; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">Gửi Mã OTP</button>
                     <button type="button" onclick="closeEmailModal()" style="flex: 1; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">Hủy</button>
                 </div>
             </form>
             <div style="text-align: center; margin-top: 15px;">
-                <a href="@Url.Action("Register", "Auth")" style="color: #007bff; text-decoration: none;">Chưa có tài khoản? Đăng ký ngay</a>
+                <p style="color: #666; font-size: 14px;">Mã OTP sẽ được gửi đến email của bạn</p>
             </div>
         </div>
     </div>
@@ -245,10 +236,16 @@
 
         function showEmailLogin() {
             document.getElementById('emailModal').style.display = 'block';
+            // Focus on email input
+            setTimeout(() => {
+                document.querySelector('#emailModal input[type="email"]').focus();
+            }, 100);
         }
 
         function closeEmailModal() {
             document.getElementById('emailModal').style.display = 'none';
+            // Clear form
+            document.querySelector('#emailModal form').reset();
         }
 
         // Đóng modal khi click outside
@@ -256,6 +253,28 @@
             if (e.target === this) {
                 closeEmailModal();
             }
+        });
+
+        // Handle form submission
+        document.querySelector('#emailModal form').addEventListener('submit', function(e) {
+            const email = this.querySelector('input[type="email"]').value;
+            if (!email) {
+                e.preventDefault();
+                alert('Vui lòng nhập email');
+                return;
+            }
+            
+            // Show loading
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Đang gửi...';
+            submitBtn.disabled = true;
+            
+            // Re-enable button after 3 seconds (in case of error)
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }, 3000);
         });
     </script>
 </body>
