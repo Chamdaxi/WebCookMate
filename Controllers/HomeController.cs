@@ -31,5 +31,10 @@ namespace demo.Controllers
             return View();
         }
 
+        public IActionResult ShoppingList()
+        {
+            return View();
+        }
+
     }
 }

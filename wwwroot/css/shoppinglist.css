@@ -1,0 +1,472 @@
+/* Shopping List Page */
+.shoppinglist-page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: calc(100vh - 200px);
+}
+
+/* Main Content */
+.shoppinglist-content {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border: 2px solid #090808;
+}
+
+/* Header Section */
+.shoppinglist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.shoppinglist-title {
+    font-size: 48px;
+    font-weight: 500;
+    color: #000;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.search-filter-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.search-input {
+    padding: 10px 15px;
+    border: 2px solid #090808;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    min-width: 200px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.category-filter {
+    padding: 10px 15px;
+    border: 2px solid #090808;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    background: white;
+    cursor: pointer;
+}
+
+.category-filter:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.add-item-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.add-item-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+.add-item-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Quick Stats */
+.quick-stats {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px solid #090808;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #007bff;
+    font-family: 'Inter', sans-serif;
+}
+
+.stat-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Shopping Items */
+.shopping-items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.shopping-item {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border: 2px solid #090808;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+.shopping-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.shopping-item.completed {
+    background-color: #f8f9fa;
+    opacity: 0.7;
+}
+
+.shopping-item.completed .item-name {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+/* Checkbox */
+.item-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox-input {
+    display: none;
+}
+
+.checkbox-label {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #090808;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.checkbox-label::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 12px;
+    height: 12px;
+    background: #007bff;
+    border-radius: 2px;
+    transition: transform 0.2s ease;
+}
+
+.checkbox-input:checked + .checkbox-label::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.checkbox-input:checked + .checkbox-label {
+    background-color: #e3f2fd;
+    border-color: #007bff;
+}
+
+/* Item Content */
+.item-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.item-name {
+    font-size: 20px;
+    font-weight: 500;
+    color: #000;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.item-category {
+    font-size: 12px;
+    font-weight: 500;
+    color: #007bff;
+    background: #e3f2fd;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    width: fit-content;
+    font-family: 'Inter', sans-serif;
+}
+
+.item-notes {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    font-style: italic;
+    font-family: 'Inter', sans-serif;
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Action Buttons */
+.item-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.action-btn svg {
+    width: 20px;
+    height: 20px;
+    color: #666;
+}
+
+.action-btn.edit:hover svg {
+    color: #007bff;
+}
+
+.action-btn.delete:hover svg {
+    color: #dc3545;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.pagination-btn {
+    background: white;
+    border: 2px solid #090808;
+    border-radius: 8px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #000;
+    min-width: 40px;
+}
+
+.pagination-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination-btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .shoppinglist-title {
+        font-size: 36px;
+    }
+    
+    .item-name {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 768px) {
+    .shoppinglist-page {
+        padding: 15px;
+    }
+    
+    .shoppinglist-content {
+        padding: 20px;
+    }
+    
+    .shoppinglist-header {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+    }
+    
+    .shoppinglist-title {
+        font-size: 28px;
+        text-align: center;
+    }
+    
+    .add-item-btn {
+        align-self: center;
+    }
+    
+    .shopping-item {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .item-content {
+        gap: 10px;
+    }
+    
+    .item-name {
+        font-size: 16px;
+    }
+    
+    .item-image {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .item-actions {
+        gap: 10px;
+    }
+    
+    .action-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .pagination-btn {
+        padding: 8px 12px;
+        font-size: 14px;
+        min-width: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .shoppinglist-page {
+        padding: 10px;
+    }
+    
+    .shoppinglist-content {
+        padding: 15px;
+    }
+    
+    .shoppinglist-title {
+        font-size: 24px;
+    }
+    
+    .add-item-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    
+    .shopping-item {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .item-name {
+        font-size: 14px;
+    }
+    
+    .item-image {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .checkbox-label {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .checkbox-label::after {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .action-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .pagination-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: 30px;
+    }
+}
