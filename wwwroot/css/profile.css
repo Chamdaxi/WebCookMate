@@ -1,0 +1,24 @@
+/* Profile Page */
+.profile-page{max-width:960px;margin:0 auto;padding:24px;background:#dcc2b9;min-height:100vh}
+.profile-header{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:24px}
+.avatar{display:flex;flex-direction:column;align-items:center;gap:8px}
+.avatar-circle{width:96px;height:96px;border-radius:50%;background:#e8d3cc;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:40px}
+.edit-link{color:#2563eb;text-decoration:none}
+.user-name{font-size:28px;font-weight:700}
+.user-email{color:#333}
+.profile-section{margin:18px 0}
+.profile-section h2{font-size:24px;margin:10px 0}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #000}
+.label{flex:1}
+.value{color:#111}
+.row-nav{border:1px solid #000;background:#e8d3cc;border-radius:8px;width:32px;height:32px}
+.switch{position:relative;display:inline-block;width:44px;height:24px}
+.switch input{display:none}
+.switch span{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#e5e7eb;border:1px solid #000;border-radius:9999px;transition:.2s}
+.switch span:before{content:"";position:absolute;height:18px;width:18px;left:2px;top:2px;background:white;border:1px solid #000;border-radius:50%;transition:.2s}
+.switch input:checked+span{background:#cfe3ff}
+.switch input:checked+span:before{transform:translateX(20px)}
+.logout-wrap{display:flex;justify-content:center;margin:24px 0}
+.logout-btn{min-width:240px;background:#3b82f6;color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:20px}
+
+

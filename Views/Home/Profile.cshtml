@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+    <div class="profile-header">
+        <div class="avatar">
+            <div class="avatar-circle">🙂</div>
+            <a class="edit-link" href="#">Edit</a>
+        </div>
+        <div class="user-info">
+            <h1 class="user-name">Nguyễn Văn A</h1>
+            <div class="user-email">abc@gmail.com</div>
+        </div>
+    </div>
+
+    <div class="profile-section">
+        <h2>Settings</h2>
+        <div class="row">
+            <div class="label">Language</div>
+            <div class="value">English</div>
+            <button class="row-nav" aria-label="change language">›</button>
+        </div>
+    </div>
+
+    <div class="profile-section">
+        <h2>Favorites</h2>
+        <div class="row">
+            <div class="label">Title</div>
+            <label class="switch"><input type="checkbox"><span></span></label>
+        </div>
+        <div class="row">
+            <div class="label">Title</div>
+            <label class="switch"><input type="checkbox"><span></span></label>
+        </div>
+    </div>
+
+    <div class="profile-section">
+        <h2>Notifications</h2>
+    </div>
+
+    <div class="logout-wrap">
+        <button class="logout-btn">Log out</button>
+    </div>
+</div>
+
+
