@@ -10,7 +10,7 @@ body {
     background-color: #E0CEC8;
     color: #000;
     line-height: 1.6;
-    padding-top: 90px; /* Fixed padding for header + navigation */
+    padding-top: 120px; /* Increased padding to prevent content overlap */
     margin: 0;
     overflow-x: hidden;
 }
@@ -85,15 +85,15 @@ body {
 }
 
 .logo-img {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .logo-text {
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 700;
     color: #2c3e50;
     letter-spacing: -0.5px;
@@ -247,7 +247,7 @@ body {
 .main-content {
     padding: 25px;
     background-color: #E0CEC8;
-    min-height: calc(100vh - 90px);
+    min-height: calc(100vh - 120px);
 }
 
 /* Hide any vertical navigation lists in main content */
@@ -308,7 +308,7 @@ body {
 
 /* Today's Suggestions */
 .today-suggestions-section {
-    margin-top: 20px;
+    margin-top: 40px;
     margin-bottom: 50px;
     padding: 30px 0;
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
@@ -527,11 +527,11 @@ body {
 
 @media (max-width: 768px) {
     body {
-        padding-top: 110px; /* Fixed padding for mobile */
+        padding-top: 140px; /* Increased padding for mobile */
     }
     
     .main-content {
-        min-height: calc(100vh - 110px);
+        min-height: calc(100vh - 140px);
     }
     
     .header {
@@ -547,7 +547,7 @@ body {
     }
     
     .today-suggestions-section {
-        margin-top: 20px;
+        margin-top: 40px;
         padding: 30px 0;
         margin-bottom: 40px;
     }
@@ -625,7 +625,7 @@ body {
     }
 
     .logo-text {
-        font-size: 36px;
+        font-size: 20px;
     }
 
     .nav-menu {
@@ -732,7 +732,7 @@ body {
     }
     
     .logo-text {
-        font-size: 24px;
+        font-size: 16px;
     }
     
     .search-bar {
@@ -782,8 +782,8 @@ body {
 }
 
     .logo-img {
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
     }
 
     .search-input {
