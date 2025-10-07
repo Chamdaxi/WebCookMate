@@ -1,0 +1,371 @@
+@{
+    ViewData["Title"] = "Recipes";
+}
+
+<div class="recipes-page">
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+        <div class="search-container">
+            <div class="search-bar">
+                <div class="search-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </div>
+                <input type="text" id="searchInput" placeholder="Tìm kiếm công thức..." class="search-input">
+            </div>
+        </div>
+
+        <div class="filter-sort-container">
+            <div class="filter-section">
+                <div>
+                    <label for="categoryFilter">Danh mục:</label>
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="breakfast">Bữa sáng</option>
+                        <option value="lunch">Bữa trưa</option>
+                        <option value="dinner">Bữa tối</option>
+                        <option value="dessert">Tráng miệng</option>
+                        <option value="snack">Đồ ăn nhẹ</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="difficultyFilter">Độ khó:</label>
+                    <select id="difficultyFilter" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="easy">Dễ</option>
+                        <option value="medium">Trung bình</option>
+                        <option value="hard">Khó</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="timeFilter">Thời gian:</label>
+                    <select id="timeFilter" class="filter-select">
+                        <option value="">Tất cả</option>
+                        <option value="15">Dưới 15 phút</option>
+                        <option value="30">Dưới 30 phút</option>
+                        <option value="60">Dưới 1 giờ</option>
+                        <option value="120">Dưới 2 giờ</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="sort-section">
+                <label for="sortSelect">Sắp xếp:</label>
+                <select id="sortSelect" class="sort-select">
+                    <option value="name">Tên A-Z</option>
+                    <option value="name-desc">Tên Z-A</option>
+                    <option value="time">Thời gian tăng dần</option>
+                    <option value="time-desc">Thời gian giảm dần</option>
+                    <option value="difficulty">Độ khó tăng dần</option>
+                    <option value="difficulty-desc">Độ khó giảm dần</option>
+                    <option value="rating">Đánh giá cao nhất</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Count -->
+    <div class="results-info">
+        <span id="resultsCount">Hiển thị 12 công thức</span>
+    </div>
+
+    <!-- Recipes Grid -->
+    <div class="recipes-grid" id="recipesGrid">
+        <!-- Recipe cards will be populated by JavaScript -->
+    </div>
+
+    <!-- Load More Button -->
+    <div class="load-more-container">
+        <button id="loadMoreBtn" class="load-more-btn">Tải thêm</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sample recipe data - using existing images
+    const recipes = [
+        {
+            id: 1,
+            name: "Phở Bò",
+            category: "lunch",
+            difficulty: "medium",
+            time: 45,
+            rating: 4.8,
+            image: "/images/recipes/phobo.jpeg",
+            description: "Món phở bò truyền thống Việt Nam",
+            ingredients: ["Bánh phở", "Thịt bò", "Hành tây", "Gừng", "Quế", "Hoa hồi"],
+            tags: ["Việt Nam", "Truyền thống", "Nước dùng"]
+        },
+        {
+            id: 2,
+            name: "Bánh Mì",
+            category: "breakfast",
+            difficulty: "easy",
+            time: 15,
+            rating: 4.6,
+            image: "/images/recipes/banhmi.jpg",
+            description: "Bánh mì thịt nướng đặc sản Sài Gòn",
+            ingredients: ["Bánh mì", "Thịt nướng", "Pate", "Rau sống", "Dưa chua"],
+            tags: ["Việt Nam", "Đường phố", "Nhanh"]
+        },
+        {
+            id: 3,
+            name: "Kho Quẹt",
+            category: "lunch",
+            difficulty: "easy",
+            time: 25,
+            rating: 4.5,
+            image: "/images/recipes/Khoquet.webp",
+            description: "Kho quẹt miền Tây với thịt và trứng",
+            ingredients: ["Thịt ba chỉ", "Trứng", "Nước mắm", "Đường", "Tỏi", "Ớt"],
+            tags: ["Việt Nam", "Miền Tây", "Đơn giản"]
+        },
+        {
+            id: 4,
+            name: "Cơm Tấm",
+            category: "lunch",
+            difficulty: "medium",
+            time: 30,
+            rating: 4.5,
+            image: "/images/recipes/phobo.jpeg",
+            description: "Cơm tấm sườn nướng đặc sản miền Nam",
+            ingredients: ["Cơm tấm", "Sườn nướng", "Trứng ốp la", "Dưa chua", "Nước mắm"],
+            tags: ["Việt Nam", "Miền Nam", "Sườn"]
+        },
+        {
+            id: 5,
+            name: "Bún Bò Huế",
+            category: "lunch",
+            difficulty: "hard",
+            time: 120,
+            rating: 4.9,
+            image: "/images/recipes/banhmi.jpg",
+            description: "Bún bò Huế cay nồng đặc sản xứ Huế",
+            ingredients: ["Bún", "Thịt bò", "Chả cua", "Rau thơm", "Ớt", "Chanh"],
+            tags: ["Việt Nam", "Huế", "Cay", "Truyền thống"]
+        },
+        {
+            id: 6,
+            name: "Pizza Margherita",
+            category: "dinner",
+            difficulty: "medium",
+            time: 40,
+            rating: 4.4,
+            image: "/images/recipes/Khoquet.webp",
+            description: "Pizza Ý cổ điển với cà chua và mozzarella",
+            ingredients: ["Bột pizza", "Cà chua", "Mozzarella", "Basil", "Dầu ô liu"],
+            tags: ["Ý", "Pizza", "Cà chua", "Phô mai"]
+        },
+        {
+            id: 7,
+            name: "Chả Cá Lã Vọng",
+            category: "dinner",
+            difficulty: "hard",
+            time: 60,
+            rating: 4.8,
+            image: "/images/recipes/phobo.jpeg",
+            description: "Chả cá Lã Vọng nổi tiếng Hà Nội",
+            ingredients: ["Cá lăng", "Nghệ", "Dill", "Bún", "Lạc rang"],
+            tags: ["Việt Nam", "Hà Nội", "Cá", "Truyền thống"]
+        },
+        {
+            id: 8,
+            name: "Bánh Xèo",
+            category: "lunch",
+            difficulty: "medium",
+            time: 35,
+            rating: 4.6,
+            image: "/images/recipes/banhmi.jpg",
+            description: "Bánh xèo miền Tây với tôm và thịt",
+            ingredients: ["Bột gạo", "Tôm", "Thịt ba chỉ", "Giá đỗ", "Rau sống"],
+            tags: ["Việt Nam", "Miền Tây", "Bánh", "Tôm"]
+        },
+        {
+            id: 9,
+            name: "Ramen",
+            category: "lunch",
+            difficulty: "hard",
+            time: 90,
+            rating: 4.7,
+            image: "/images/recipes/Khoquet.webp",
+            description: "Ramen Nhật Bản với nước dùng tonkotsu",
+            ingredients: ["Mì ramen", "Thịt heo", "Trứng luộc", "Rong biển", "Hành lá"],
+            tags: ["Nhật Bản", "Nước dùng", "Mì", "Truyền thống"]
+        },
+        {
+            id: 10,
+            name: "Gỏi Cuốn",
+            category: "snack",
+            difficulty: "easy",
+            time: 20,
+            rating: 4.5,
+            image: "/images/recipes/phobo.jpeg",
+            description: "Gỏi cuốn tôm thịt tươi mát",
+            ingredients: ["Bánh tráng", "Tôm", "Thịt", "Rau sống", "Bún"],
+            tags: ["Việt Nam", "Tươi", "Rau", "Nước chấm"]
+        },
+        {
+            id: 11,
+            name: "Tiramisu",
+            category: "dessert",
+            difficulty: "medium",
+            time: 50,
+            rating: 4.8,
+            image: "/images/recipes/banhmi.jpg",
+            description: "Tiramisu Ý với cà phê và mascarpone",
+            ingredients: ["Mascarpone", "Cà phê", "Cocoa", "Ladyfingers", "Rượu rum"],
+            tags: ["Ý", "Dessert", "Cà phê", "Creamy"]
+        },
+        {
+            id: 12,
+            name: "Bún Chả",
+            category: "lunch",
+            difficulty: "medium",
+            time: 40,
+            rating: 4.7,
+            image: "/images/recipes/Khoquet.webp",
+            description: "Bún chả Hà Nội với thịt nướng",
+            ingredients: ["Bún", "Thịt nướng", "Nước mắm", "Dưa chua", "Rau thơm"],
+            tags: ["Việt Nam", "Hà Nội", "Thịt nướng", "Nước mắm"]
+        }
+    ];
+
+    let filteredRecipes = [...recipes];
+    let displayedCount = 8;
+
+    // Initialize
+    renderRecipes();
+    updateResultsCount();
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+        filterRecipes();
+    });
+
+    // Filter functionality
+    document.getElementById('categoryFilter').addEventListener('change', filterRecipes);
+    document.getElementById('difficultyFilter').addEventListener('change', filterRecipes);
+    document.getElementById('timeFilter').addEventListener('change', filterRecipes);
+
+    // Sort functionality
+    document.getElementById('sortSelect').addEventListener('change', function() {
+        sortRecipes();
+        renderRecipes();
+    });
+
+    // Load more functionality
+    document.getElementById('loadMoreBtn').addEventListener('click', function() {
+        displayedCount += 4;
+        renderRecipes();
+        updateLoadMoreButton();
+    });
+
+    function filterRecipes() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const category = document.getElementById('categoryFilter').value;
+        const difficulty = document.getElementById('difficultyFilter').value;
+        const time = document.getElementById('timeFilter').value;
+
+        filteredRecipes = recipes.filter(recipe => {
+            const matchesSearch = recipe.name.toLowerCase().includes(searchTerm) ||
+                                 recipe.description.toLowerCase().includes(searchTerm) ||
+                                 recipe.ingredients.some(ing => ing.toLowerCase().includes(searchTerm)) ||
+                                 recipe.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+            
+            const matchesCategory = !category || recipe.category === category;
+            const matchesDifficulty = !difficulty || recipe.difficulty === difficulty;
+            const matchesTime = !time || recipe.time <= parseInt(time);
+
+            return matchesSearch && matchesCategory && matchesDifficulty && matchesTime;
+        });
+
+        displayedCount = 8;
+        renderRecipes();
+        updateResultsCount();
+        updateLoadMoreButton();
+    }
+
+    function sortRecipes() {
+        const sortBy = document.getElementById('sortSelect').value;
+        
+        filteredRecipes.sort((a, b) => {
+            switch(sortBy) {
+                case 'name':
+                    return a.name.localeCompare(b.name);
+                case 'name-desc':
+                    return b.name.localeCompare(a.name);
+                case 'time':
+                    return a.time - b.time;
+                case 'time-desc':
+                    return b.time - a.time;
+                case 'difficulty':
+                    const difficultyOrder = { 'easy': 1, 'medium': 2, 'hard': 3 };
+                    return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+                case 'difficulty-desc':
+                    const difficultyOrderDesc = { 'easy': 1, 'medium': 2, 'hard': 3 };
+                    return difficultyOrderDesc[b.difficulty] - difficultyOrderDesc[a.difficulty];
+                case 'rating':
+                    return b.rating - a.rating;
+                default:
+                    return 0;
+            }
+        });
+    }
+
+    function renderRecipes() {
+        const grid = document.getElementById('recipesGrid');
+        const recipesToShow = filteredRecipes.slice(0, displayedCount);
+        
+        grid.innerHTML = recipesToShow.map(recipe => `
+            <div class="recipe-card" data-id="${recipe.id}">
+                <div class="recipe-image">
+                    <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='/images/recipes/default.jpg'">
+                    <div class="recipe-overlay">
+                        <div class="recipe-rating">
+                            <span class="rating-stars">${'★'.repeat(Math.floor(recipe.rating))}${'☆'.repeat(5-Math.floor(recipe.rating))}</span>
+                            <span class="rating-number">${recipe.rating}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="recipe-content">
+                    <h3 class="recipe-name">${recipe.name}</h3>
+                    <p class="recipe-description">${recipe.description}</p>
+                    <div class="recipe-meta">
+                        <span class="recipe-time">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12,6 12,12 16,14"></polyline>
+                            </svg>
+                            ${recipe.time} phút
+                        </span>
+                        <span class="recipe-difficulty difficulty-${recipe.difficulty}">
+                            ${recipe.difficulty === 'easy' ? 'Dễ' : recipe.difficulty === 'medium' ? 'Trung bình' : 'Khó'}
+                        </span>
+                    </div>
+                    <div class="recipe-tags">
+                        ${recipe.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateResultsCount() {
+        document.getElementById('resultsCount').textContent = 
+            `Hiển thị ${Math.min(displayedCount, filteredRecipes.length)} trong ${filteredRecipes.length} công thức`;
+    }
+
+    function updateLoadMoreButton() {
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        if (displayedCount >= filteredRecipes.length) {
+            loadMoreBtn.style.display = 'none';
+        } else {
+            loadMoreBtn.style.display = 'block';
+        }
+    }
+});
+</script>
