@@ -1,0 +1,79 @@
+@{
+    ViewData["Title"] = "Pantry List";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/pantrylist.css" asp-append-version="true" />
+}
+
+<div class="pantry-page">
+    <div class="pantry-header">
+        <div class="brand">
+            <img src="~/images/logos/chef-hat.png" alt="CookMate" class="brand-icon" />
+            <h1 class="brand-name">CookMate</h1>
+        </div>
+        <div class="actions">
+            <button class="icon-btn" aria-label="notifications">
+                <span class="bell-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="pantry-search">
+        <input type="text" class="search-input" placeholder="Tìm kiếm" />
+    </div>
+
+    <div class="pantry-toolbar">
+        <div class="tabs">
+            <button class="tab active">All</button>
+            <button class="tab">Categories</button>
+        </div>
+        <div class="sort">
+            <span>Sort: all</span>
+            <span class="dropdown-caret"></span>
+        </div>
+    </div>
+
+    <div class="pantry-list">
+        <div class="pantry-card">
+            <div class="card-left">
+                <input type="checkbox" class="circle-check" />
+                <div class="card-info">
+                    <div class="item-name">Apple</div>
+                    <div class="item-qty">5 pcs</div>
+                    <div class="item-exp">Expires: 15/09/2025</div>
+                </div>
+            </div>
+            <button class="trash-btn" aria-label="delete"></button>
+        </div>
+
+        <div class="pantry-card">
+            <div class="card-left">
+                <input type="checkbox" class="circle-check" />
+                <div class="card-info">
+                    <div class="item-name">Bananas</div>
+                    <div class="item-qty">10 pcs</div>
+                    <div class="item-exp">Expires: 20/11/2025</div>
+                </div>
+            </div>
+            <button class="trash-btn" aria-label="delete"></button>
+        </div>
+    </div>
+
+    <div class="pagination">
+        <button class="page-nav prev" aria-label="previous">‹</button>
+        <button class="page-number active">1</button>
+        <button class="page-number">2</button>
+        <button class="page-number">3</button>
+        <button class="page-nav next" aria-label="next">›</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Placeholder for future interactivity (search, sort, pagination)
+    </script>
+}
+
+
