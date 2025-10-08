@@ -20,11 +20,22 @@
                     </svg>
                 </div>
             </div>
-            <div class="sort-button">
-                <span class="sort-text">Sort: Newest</span>
-                <svg class="sort-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
+            <div class="favorites-controls">
+                <div class="favorites-search">
+                    <div class="search-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <input type="text" placeholder="Tìm kiếm món ăn yêu thích..." class="search-input" id="favoritesSearch">
+                </div>
+                <div class="sort-button">
+                    <span class="sort-text">Sort: Newest</span>
+                    <svg class="sort-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                    </svg>
+                </div>
             </div>
         </div>
 
@@ -229,6 +240,44 @@
                     }
                 });
             });
+
+            // Search functionality
+            const searchInput = document.getElementById('favoritesSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const items = document.querySelectorAll('.favorite-item');
+                    
+                    items.forEach(item => {
+                        const title = item.querySelector('.favorite-title').textContent.toLowerCase();
+                        const subtitle = item.querySelector('.favorite-subtitle').textContent.toLowerCase();
+                        
+                        if (title.includes(searchTerm) || subtitle.includes(searchTerm)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    
+                    // Check if no results
+                    const visibleItems = Array.from(items).filter(item => item.style.display !== 'none');
+                    const grid = document.querySelector('.favorite-items-grid');
+                    
+                    if (visibleItems.length === 0 && searchTerm !== '') {
+                        if (!document.querySelector('.no-results')) {
+                            const noResults = document.createElement('div');
+                            noResults.className = 'no-results';
+                            noResults.innerHTML = '<p>Không tìm thấy món ăn nào phù hợp</p>';
+                            grid.appendChild(noResults);
+                        }
+                    } else {
+                        const noResults = document.querySelector('.no-results');
+                        if (noResults) {
+                            noResults.remove();
+                        }
+                    }
+                });
+            }
         });
     </script>
 }
