@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = "Meal Plan";
+}
+
+<div class="meal-plan-container">
+    <div class="meal-plan-header">
+        <h1>Meal Plan</h1>
+        <p>Plan your meals for the week</p>
+    </div>
+    
+    <div class="meal-plan-content">
+        <div class="week-selector">
+            <h2>This Week</h2>
+            <div class="date-range">
+                <span>Monday, Jan 15 - Sunday, Jan 21</span>
+            </div>
+        </div>
+        
+        <div class="meal-grid">
+            <div class="meal-day">
+                <h3>Monday</h3>
+                <div class="meal-slots">
+                    <div class="meal-slot breakfast">
+                        <h4>Breakfast</h4>
+                        <p>Oatmeal with berries</p>
+                    </div>
+                    <div class="meal-slot lunch">
+                        <h4>Lunch</h4>
+                        <p>Grilled chicken salad</p>
+                    </div>
+                    <div class="meal-slot dinner">
+                        <h4>Dinner</h4>
+                        <p>Salmon with vegetables</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="meal-day">
+                <h3>Tuesday</h3>
+                <div class="meal-slots">
+                    <div class="meal-slot breakfast">
+                        <h4>Breakfast</h4>
+                        <p>Greek yogurt parfait</p>
+                    </div>
+                    <div class="meal-slot lunch">
+                        <h4>Lunch</h4>
+                        <p>Quinoa bowl</p>
+                    </div>
+                    <div class="meal-slot dinner">
+                        <h4>Dinner</h4>
+                        <p>Pasta with marinara</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="meal-day">
+                <h3>Wednesday</h3>
+                <div class="meal-slots">
+                    <div class="meal-slot breakfast">
+                        <h4>Breakfast</h4>
+                        <p>Avocado toast</p>
+                    </div>
+                    <div class="meal-slot lunch">
+                        <h4>Lunch</h4>
+                        <p>Turkey sandwich</p>
+                    </div>
+                    <div class="meal-slot dinner">
+                        <h4>Dinner</h4>
+                        <p>Stir-fry vegetables</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="meal-plan-actions">
+            <button class="btn btn-primary">Add Meal</button>
+            <button class="btn btn-secondary">Generate Plan</button>
+            <button class="btn btn-outline">Export Plan</button>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/mealplan.css" asp-append-version="true" />
+}
