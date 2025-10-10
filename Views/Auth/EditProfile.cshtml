@@ -1,0 +1,91 @@
+@model demo.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tin cá nhân";
+}
+
+<div class="edit-profile-container">
+    <div class="edit-profile-header">
+        <h1>Chỉnh sửa thông tin cá nhân</h1>
+        <p>Cập nhật thông tin tài khoản của bạn</p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="edit-profile-content">
+        <div class="edit-profile-card">
+            <div class="profile-avatar-section">
+                <div class="avatar-container">
+                    <img src="~/images/logos/profile.png" alt="Profile Avatar" class="avatar-image">
+                    <div class="avatar-overlay">
+                        <span class="avatar-text">@Model.FullName?.Substring(0, 1).ToUpper()</span>
+                    </div>
+                </div>
+                <p class="avatar-note">Ảnh đại diện</p>
+            </div>
+
+            <form method="post" class="edit-form">
+                <div class="form-group">
+                    <label for="fullName" class="form-label">Họ và tên</label>
+                    <input type="text" id="fullName" name="fullName" class="form-input" value="@Model.FullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-input" value="@Model.Email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" class="form-input" value="@Model.PhoneNumber">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Cập nhật thông tin</span>
+                        <span class="btn-loading" style="display: none;">Đang cập nhật...</span>
+                    </button>
+                    <a href="@Url.Action("UserProfile", "Auth")" class="btn btn-secondary">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/editprofile.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script>
+        document.querySelector('.edit-form').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnLoading = submitBtn.querySelector('.btn-loading');
+            
+            // Show loading state
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            submitBtn.disabled = true;
+            
+            // Re-enable after 5 seconds (in case of error)
+            setTimeout(() => {
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                submitBtn.disabled = false;
+            }, 5000);
+        });
+    </script>
+}

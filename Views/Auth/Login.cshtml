@@ -35,20 +35,60 @@
         }
 
         .logo-section {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            text-align: center;
+        }
+
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
         }
 
         .logo-img {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border: 3px solid #fff;
+            object-fit: cover;
+            transition: all 0.3s ease;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .logo-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Ensure logo loads properly */
+        .logo-img {
+            background-color: #f8f9fa;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f8f9fa"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="%236c757d" font-family="Arial, sans-serif" font-size="12">Loading...</text></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
         .app-name {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
-            color: #2c3e50;
             margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .welcome-text {
@@ -135,6 +175,15 @@
             font-size: 14px;
         }
 
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
         .top-left-text {
             position: absolute;
             top: 20px;
@@ -170,7 +219,7 @@
 
     <div class="login-container">
         <div class="logo-section">
-            <img src="~/images/logos/chef-hat.png" alt="CookMate Logo" class="logo-img">
+            <img src="~/images/logos/LogoCook.jpg" alt="CookMate Logo" class="logo-img" onerror="this.src='~/images/logos/chef-hat.png'">
             <h1 class="app-name">CookMate</h1>
         </div>
 
@@ -180,6 +229,13 @@
         {
             <div class="error-message">
                 @TempData["Error"]
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="success-message">
+                @TempData["Success"]
             </div>
         }
 
@@ -229,9 +285,35 @@
         </div>
     </div>
 
+    <!-- Email/Password Login Modal -->
+    <div id="emailPasswordModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px;">
+            <h3 style="margin-top: 0; text-align: center;">Đăng Nhập</h3>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Nhập email và mật khẩu để đăng nhập</p>
+            <form method="post" action="@Url.Action("Login", "Auth")">
+                <div style="margin-bottom: 15px;">
+                    <input type="email" name="email" placeholder="Nhập email của bạn" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <input type="password" name="password" placeholder="Nhập mật khẩu" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; font-size: 14px; color: #666;">
+                        <input type="checkbox" name="rememberMe" style="margin-right: 8px;">
+                        Ghi nhớ đăng nhập
+                    </label>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" style="flex: 1; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">Đăng Nhập</button>
+                    <button type="button" onclick="closeEmailPasswordModal()" style="flex: 1; padding: 12px; background: #6c757d; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function loginWithGoogle() {
-            alert('Tính năng đăng nhập Google sẽ được triển khai sau!');
+            showEmailPasswordLogin();
         }
 
         function showEmailLogin() {
@@ -248,10 +330,30 @@
             document.querySelector('#emailModal form').reset();
         }
 
+        function showEmailPasswordLogin() {
+            document.getElementById('emailPasswordModal').style.display = 'block';
+            // Focus on email input
+            setTimeout(() => {
+                document.querySelector('#emailPasswordModal input[type="email"]').focus();
+            }, 100);
+        }
+
+        function closeEmailPasswordModal() {
+            document.getElementById('emailPasswordModal').style.display = 'none';
+            // Clear form
+            document.querySelector('#emailPasswordModal form').reset();
+        }
+
         // Đóng modal khi click outside
         document.getElementById('emailModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeEmailModal();
+            }
+        });
+
+        document.getElementById('emailPasswordModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEmailPasswordModal();
             }
         });
 
@@ -268,6 +370,29 @@
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = 'Đang gửi...';
+            submitBtn.disabled = true;
+            
+            // Re-enable button after 3 seconds (in case of error)
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }, 3000);
+        });
+
+        document.querySelector('#emailPasswordModal form').addEventListener('submit', function(e) {
+            const email = this.querySelector('input[type="email"]').value;
+            const password = this.querySelector('input[type="password"]').value;
+            
+            if (!email || !password) {
+                e.preventDefault();
+                alert('Vui lòng nhập đầy đủ email và mật khẩu');
+                return;
+            }
+            
+            // Show loading
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Đang đăng nhập...';
             submitBtn.disabled = true;
             
             // Re-enable button after 3 seconds (in case of error)

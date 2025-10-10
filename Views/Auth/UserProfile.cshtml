@@ -1,0 +1,64 @@
+@model demo.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<div class="profile-container">
+    <div class="profile-header">
+        <h1>Thông tin cá nhân</h1>
+        <p>Quản lý thông tin tài khoản của bạn</p>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-card">
+            <div class="profile-avatar">
+                <div class="avatar-container">
+                    <img src="~/images/logos/profile.png" alt="Profile Avatar" class="avatar-image">
+                    <div class="avatar-overlay">
+                        <span class="avatar-text">@Model.FullName?.Substring(0, 1).ToUpper()</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-info">
+                <div class="info-group">
+                    <label class="info-label">Họ và tên:</label>
+                    <span class="info-value">@Model.FullName</span>
+                </div>
+
+                <div class="info-group">
+                    <label class="info-label">Email:</label>
+                    <span class="info-value">@Model.Email</span>
+                </div>
+
+                <div class="info-group">
+                    <label class="info-label">Tên đăng nhập:</label>
+                    <span class="info-value">@Model.UserName</span>
+                </div>
+
+                <div class="info-group">
+                    <label class="info-label">Ngày tạo tài khoản:</label>
+                    <span class="info-value">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+
+                <div class="info-group">
+                    <label class="info-label">Email đã xác thực:</label>
+                    <span class="info-value @(Model.EmailConfirmed ? "confirmed" : "not-confirmed")">
+                        @(Model.EmailConfirmed ? "Đã xác thực" : "Chưa xác thực")
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="@Url.Action("EditProfile", "Auth")" class="btn btn-primary">Chỉnh sửa thông tin</a>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Về trang chủ</a>
+            <a href="@Url.Action("Logout", "Auth")" class="btn btn-secondary">Đăng xuất</a>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/userprofile.css" asp-append-version="true" />
+}

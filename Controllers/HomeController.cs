@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
-namespace demo.Controllers
+namespace WebCookmate.Controllers
 {
-    // [Authorize] - Tạm thời comment để test
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -31,15 +29,9 @@ namespace demo.Controllers
             return View();
         }
 
-        public IActionResult ShoppingList()
-        {
-            return View();
-        }
-
         public IActionResult MealPlan()
         {
             return View();
         }
-
     }
 }
