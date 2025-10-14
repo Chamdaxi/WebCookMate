@@ -1,0 +1,60 @@
+@{
+    ViewData["Title"] = "Recipe Detail";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        .recipe-detail-page{max-width:1000px;margin:0 auto;padding:20px}
+        .recipe-header{display:flex;justify-content:center;align-items:center;margin-bottom:16px}
+        .recipe-title{font-size:32px;font-weight:600}
+        .recipe-hero{border-radius:12px;overflow:hidden;margin-bottom:20px}
+        .recipe-hero img{width:100%;height:260px;object-fit:cover;display:block}
+        .recipe-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+        .section-title{font-size:24px;font-weight:600;margin-bottom:12px}
+        .ingredients ul{padding-left:22px}
+        .ingredients li{margin:8px 0}
+        .nutrition .row{margin:8px 0}
+        .action-row{margin-top:24px}
+        .btn-cook{background:#3b82f6;color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:18px}
+    </style>
+}
+
+<div class="recipe-detail-page">
+    <div class="recipe-header">
+        <h1 class="recipe-title">Spaghetti</h1>
+    </div>
+
+    <div class="recipe-hero">
+        <img src="~/images/recipes/today-suggestion.jpg" alt="Recipe Image" />
+    </div>
+
+    <div class="recipe-grid">
+        <div>
+            <div class="section-title">Recipe</div>
+            <div>Main Course</div>
+
+            <div class="section-title" style="margin-top:16px">Ingredients</div>
+            <div class="ingredients">
+                <ul>
+                    <li>Banh mi</li>
+                    <li>Đồ chua</li>
+                    <li>Meat</li>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">Nutrition</div>
+            <div class="nutrition">
+                <div class="row">Calo: 350-500 kcal</div>
+                <div class="row">Protein: 20-30</div>
+            </div>
+            <div class="action-row">
+                <button class="btn-cook">Cook</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

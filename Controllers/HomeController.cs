@@ -21,6 +21,11 @@ namespace demo.Controllers
             return View();
         }
 
+        public IActionResult RecipeDetail()
+        {
+            return View();
+        }
+
         public IActionResult About()
         {
             return View();

@@ -6,7 +6,7 @@
 <div class="today-suggestions-section">
     <h2 class="section-title">Today's Suggestions</h2>
     <div class="suggestions-grid">
-        <div class="suggestion-card">
+        <a class="suggestion-card" href="@Url.Action("RecipeDetail","Home")">
             <div class="suggestion-image">
                 <img src="~/images/recipes/today-suggestion.jpg" alt="Top Cooksnap">
             </div>
@@ -14,9 +14,9 @@
                 <h3>Top Món Có Nhiều Cooksnap Nhất</h3>
                 <p>Công thức đã nhận được hơn 10 cooksnap</p>
             </div>
-        </div>
+        </a>
         
-        <div class="suggestion-card">
+        <a class="suggestion-card" href="@Url.Action("RecipeDetail","Home")">
             <div class="suggestion-image">
                 <img src="~/images/recipes/banhmi.jpg" alt="Premium Menu">
             </div>
@@ -24,9 +24,9 @@
                 <h3>Thực Đơn Premium</h3>
                 <p>Thực đơn hàng tuần với những nguyên liệu theo mùa</p>
             </div>
-        </div>
+        </a>
         
-        <div class="suggestion-card">
+        <a class="suggestion-card" href="@Url.Action("RecipeDetail","Home")">
             <div class="suggestion-image">
                 <img src="~/images/recipes/phobo.jpeg" alt="Most Viewed">
             </div>
@@ -34,7 +34,7 @@
                 <h3>Top Món Được Xem Nhiều Nhất</h3>
                 <p>Những công thức có lượt xem nhiều nhất, cập nhật mỗi ngày</p>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 
@@ -115,6 +115,24 @@
                 <p>Quản lý thực phẩm</p>
             </div>
         </a>
+
+        <a href="@Url.Action("RecipeDetail", "Home")" class="quick-access-item">
+            <div class="quick-access-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M14.31 8l5.74 9.94"></path>
+                    <path d="M9.69 8h11.48"></path>
+                    <path d="M7.38 12l5.74-9.94"></path>
+                    <path d="M9.69 16L3.95 6.06"></path>
+                    <path d="M14.31 16H2.83"></path>
+                    <path d="M16.62 12l-5.74 9.94"></path>
+                </svg>
+            </div>
+            <div class="quick-access-text">
+                <h3>Recipe</h3>
+                <p>Chi tiết món ăn</p>
+            </div>
+        </a>
     </div>
 </div>
 
@@ -131,6 +149,15 @@
                 
                 card.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0)';
+                });
+
+                // Ensure click navigates to RecipeDetail even if markup/styles intercept
+                card.addEventListener('click', function(e) {
+                    // If it's already an anchor, let it proceed
+                    const anchor = this.closest('a') || (this.tagName === 'A' ? this : null);
+                    if (!anchor) {
+                        window.location.href = '@Url.Action("RecipeDetail", "Home")';
+                    }
                 });
             });
         });
