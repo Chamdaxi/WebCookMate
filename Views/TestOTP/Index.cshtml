@@ -1,0 +1,102 @@
+@{
+    ViewData["Title"] = "Test OTP";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test OTP</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { padding: 8px; width: 200px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .result { margin-top: 20px; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Test OTP Service</h1>
+    
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" value="test@example.com">
+    </div>
+    
+    <div class="form-group">
+        <label for="phone">Phone (optional):</label>
+        <input type="tel" id="phone" value="+84901234567">
+    </div>
+    
+    <button onclick="sendOTP()">Send OTP</button>
+    
+    <div class="form-group" style="margin-top: 30px;">
+        <label for="otp">OTP Code:</label>
+        <input type="text" id="otp" placeholder="Enter OTP">
+    </div>
+    
+    <button onclick="verifyOTP()">Verify OTP</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function showResult(message, type) {
+            const result = document.getElementById('result');
+            result.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+        
+        function sendOTP() {
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            
+            const formData = new FormData();
+            formData.append('email', email);
+            if (phone) {
+                formData.append('phoneNumber', phone);
+            }
+            
+            fetch('/TestOTP/SendOTP', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Send OTP result:', data);
+                showResult(JSON.stringify(data, null, 2), data.success ? 'success' : 'error');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showResult('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function verifyOTP() {
+            const email = document.getElementById('email').value;
+            const otp = document.getElementById('otp').value;
+            
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('otpCode', otp);
+            
+            fetch('/TestOTP/VerifyOTP', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Verify OTP result:', data);
+                showResult(JSON.stringify(data, null, 2), data.success ? 'success' : 'error');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showResult('Error: ' + error.message, 'error');
+            });
+        }
+    </script>
+</body>
+</html>
+
+

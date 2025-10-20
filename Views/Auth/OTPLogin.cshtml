@@ -1,0 +1,352 @@
+@{
+    ViewData["Title"] = "Đăng nhập OTP";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>@ViewData["Title"] - CookMate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Cache busting timestamp: @DateTime.Now.Ticks */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .otp-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .otp-header {
+            margin-bottom: 30px;
+        }
+
+        .otp-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .otp-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .otp-subtitle {
+            color: #718096;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .demo-notice {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .otp-form {
+            display: none;
+        }
+
+        .otp-form.active {
+            display: block;
+        }
+
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="otp-container">
+        <div class="otp-header">
+            <img src="~/images/logos/LogoCook.jpg" alt="CookMate Logo" class="otp-logo" onerror="this.src='~/images/logos/chef-hat.png'">
+            <h1 class="otp-title">Đăng nhập OTP</h1>
+            <p class="otp-subtitle">Nhập email để nhận mã OTP</p>
+            <div class="demo-notice">
+                <strong>Demo Mode:</strong> OTP sẽ được hiển thị trực tiếp trên màn hình
+            </div>
+        </div>
+
+        <!-- Email Form -->
+        <div id="emailForm" class="otp-form active">
+            <form id="sendOtpForm" asp-action="SendOTP" asp-controller="Auth" method="post">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Nhập email của bạn" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Gửi mã OTP
+                </button>
+            </form>
+        </div>
+
+        <!-- OTP Form -->
+        <div id="otpForm" class="otp-form">
+            <form id="verifyOtpForm" asp-action="VerifyOTP" asp-controller="Auth" method="post">
+                <div class="form-group">
+                    <label for="otpCode" class="form-label">Mã OTP:</label>
+                    <input type="text" id="otpCode" name="otpCode" class="form-control" placeholder="Nhập mã OTP" required maxlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Xác thực OTP
+                </button>
+            </form>
+        </div>
+
+        <a href="@Url.Action("Login", "Auth")" class="back-link">← Quay lại đăng nhập</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailForm = document.getElementById('emailForm');
+            const otpForm = document.getElementById('otpForm');
+            const sendOtpForm = document.getElementById('sendOtpForm');
+            const verifyOtpForm = document.getElementById('verifyOtpForm');
+
+            // Send OTP
+            sendOtpForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Đang gửi...';
+                submitBtn.disabled = true;
+
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(new FormData(this))
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Response text:', text);
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.success) {
+                            emailForm.classList.remove('active');
+                            otpForm.classList.add('active');
+                            showMessage(data.message, 'success');
+                        } else {
+                            showMessage(data.message || 'Có lỗi xảy ra!', 'error');
+                        }
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        showMessage('Lỗi định dạng response từ server!', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('Có lỗi xảy ra khi gửi OTP: ' + error.message, 'error');
+                })
+                .finally(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Verify OTP
+            verifyOtpForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Đang xác thực...';
+                submitBtn.disabled = true;
+
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(new FormData(this))
+                })
+                .then(response => {
+                    console.log('Verify response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Verify response text:', text);
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.success) {
+                            showMessage('Đăng nhập thành công!', 'success');
+                            setTimeout(() => {
+                                window.location.href = data.redirectUrl || '/';
+                            }, 1000);
+                        } else {
+                            showMessage(data.message || 'Mã OTP không đúng!', 'error');
+                        }
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        showMessage('Lỗi định dạng response từ server!', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('Có lỗi xảy ra khi xác thực OTP: ' + error.message, 'error');
+                })
+                .finally(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Auto-format OTP input
+            document.getElementById('otpCode').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '').substring(0, 6);
+            });
+
+            function showMessage(message, type) {
+                // Remove existing messages
+                const existingMessages = document.querySelectorAll('.success-message, .error-message');
+                existingMessages.forEach(msg => msg.remove());
+
+                // Create new message
+                const messageDiv = document.createElement('div');
+                messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+                messageDiv.textContent = message;
+                
+                // Insert after header
+                const header = document.querySelector('.otp-header');
+                header.insertAdjacentElement('afterend', messageDiv);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

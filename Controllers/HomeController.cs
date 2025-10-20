@@ -1,13 +1,37 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using demo.Services;
 
-namespace demo.Controllers
+namespace WebCookmate.Controllers
 {
-    // [Authorize] - Tạm thời comment để test
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ApiService _apiService;
+
+        public HomeController(ApiService apiService)
         {
+            _apiService = apiService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            // Get access token from session
+            var accessToken = HttpContext.Session.GetString("access_token");
+            
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                // Get meal plans and recipes from API
+                var mealPlansResponse = await _apiService.GetMealPlansAsync(accessToken);
+                var recipesResponse = await _apiService.GetRecipesAsync(accessToken);
+                
+                ViewBag.MealPlans = mealPlansResponse.Success ? mealPlansResponse.Data : new List<MealPlan>();
+                ViewBag.Recipes = recipesResponse.Success ? recipesResponse.Data : new List<Recipe>();
+            }
+            else
+            {
+                ViewBag.MealPlans = new List<MealPlan>();
+                ViewBag.Recipes = new List<Recipe>();
+            }
+            
             return View();
         }
 
@@ -31,9 +55,25 @@ namespace demo.Controllers
             return View();
         }
 
-        public IActionResult MealPlan()
+        public async Task<IActionResult> MealPlan()
         {
+            // Get access token from session
+            var accessToken = HttpContext.Session.GetString("access_token");
+            
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                // Get meal plans from API
+                var mealPlansResponse = await _apiService.GetMealPlansAsync(accessToken);
+                ViewBag.MealPlans = mealPlansResponse.Success ? mealPlansResponse.Data : new List<MealPlan>();
+            }
+            else
+            {
+                ViewBag.MealPlans = new List<MealPlan>();
+            }
+            
             return View();
         }
+
+
     }
 }

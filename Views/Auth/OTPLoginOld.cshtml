@@ -1,0 +1,270 @@
+@{
+    ViewData["Title"] = "Đăng nhập OTP";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>@ViewData["Title"] - CookMate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/otplogin.css?v=@DateTime.Now.Ticks" asp-append-version="true" />
+</head>
+<body>
+    <div class="otp-login-container">
+    <div class="otp-login-card">
+        <div class="otp-login-header">
+            <img src="~/images/logos/LogoCook.jpg" alt="CookMate Logo" class="otp-logo" onerror="this.src='~/images/logos/chef-hat.png'">
+            <h1 class="otp-title">Đăng nhập OTP</h1>
+            <p class="otp-subtitle">Nhập email để nhận mã OTP</p>
+            <div class="demo-notice">
+                <strong>Demo Mode:</strong> OTP sẽ được hiển thị trực tiếp trên màn hình
+            </div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="success-message">
+                @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="error-message">
+                @TempData["Error"]
+            </div>
+        }
+
+        <!-- Email Form -->
+        <div id="emailForm" class="otp-form">
+            <form id="sendOtpForm" asp-action="SendOTP" asp-controller="Auth" method="post">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Nhập email của bạn" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-send-otp">
+                    <span class="btn-text">Gửi mã OTP</span>
+                    <span class="btn-loading" style="display: none;">
+                        <i class="spinner"></i> Đang gửi...
+                    </span>
+                </button>
+            </form>
+        </div>
+
+        <!-- OTP Form (Hidden initially) -->
+        <div id="otpForm" class="otp-form" style="display: none;">
+            <form id="verifyOtpForm" asp-action="VerifyOTP" asp-controller="Auth" method="post">
+                <div class="form-group">
+                    <label for="otpCode" class="form-label">Mã OTP:</label>
+                    <input type="text" id="otpCode" name="otpCode" class="form-control otp-input" placeholder="Nhập mã OTP" required maxlength="6">
+                </div>
+                <div class="otp-actions">
+                    <button type="submit" class="btn btn-primary btn-verify-otp">
+                        <span class="btn-text">Xác thực OTP</span>
+                        <span class="btn-loading" style="display: none;">
+                            <i class="spinner"></i> Đang xác thực...
+                        </span>
+                    </button>
+                    <button type="button" id="resendOtpBtn" class="btn btn-secondary btn-resend">
+                        Gửi lại OTP
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="otp-footer">
+            <a href="@Url.Action("Login", "Auth")" class="back-to-login">← Quay lại đăng nhập</a>
+        </div>
+    </div>
+</div>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailForm = document.getElementById('emailForm');
+            const otpForm = document.getElementById('otpForm');
+            const sendOtpForm = document.getElementById('sendOtpForm');
+            const verifyOtpForm = document.getElementById('verifyOtpForm');
+            const resendOtpBtn = document.getElementById('resendOtpBtn');
+            const otpEmailInput = document.getElementById('otpEmail');
+            const emailInput = document.getElementById('email');
+
+            // Send OTP
+            sendOtpForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                console.log('Form submitted');
+                
+                const submitBtn = this.querySelector('.btn-send-otp');
+                const btnText = submitBtn.querySelector('.btn-text');
+                const btnLoading = submitBtn.querySelector('.btn-loading');
+                
+                // Show loading
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline-flex';
+                submitBtn.disabled = true;
+
+                const formData = new FormData(this);
+                console.log('Form data:', Object.fromEntries(formData));
+
+                // Submit form
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData)
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Response text:', text);
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('Parsed data:', data);
+                        
+                        if (data.success) {
+                            // Hide email form, show OTP form
+                            emailForm.style.display = 'none';
+                            otpForm.style.display = 'block';
+                            
+                            // Show success message from API response
+                            showMessage(data.message || 'Mã OTP đã được gửi đến email của bạn!', 'success');
+                        } else {
+                            showMessage(data.message || 'Có lỗi xảy ra!', 'error');
+                        }
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        showMessage('Lỗi định dạng response từ server!', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    showMessage('Có lỗi xảy ra khi gửi OTP: ' + error.message, 'error');
+                })
+                .finally(() => {
+                    // Hide loading
+                    btnText.style.display = 'inline';
+                    btnLoading.style.display = 'none';
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Verify OTP
+            verifyOtpForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('.btn-verify-otp');
+                const btnText = submitBtn.querySelector('.btn-text');
+                const btnLoading = submitBtn.querySelector('.btn-loading');
+                
+                // Show loading
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline-flex';
+                submitBtn.disabled = true;
+
+                // Submit form
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(new FormData(this))
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Store access token
+                        if (data.accessToken) {
+                            localStorage.setItem('accessToken', data.accessToken);
+                        }
+                        
+                        showMessage('Đăng nhập thành công!', 'success');
+                        setTimeout(() => {
+                            window.location.href = '@Url.Action("Index", "Home")';
+                        }, 1000);
+                    } else {
+                        showMessage(data.message || 'Mã OTP không đúng!', 'error');
+                    }
+                })
+                .catch(error => {
+                    showMessage('Có lỗi xảy ra khi xác thực OTP!', 'error');
+                })
+                .finally(() => {
+                    // Hide loading
+                    btnText.style.display = 'inline';
+                    btnLoading.style.display = 'none';
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Resend OTP
+            resendOtpBtn.addEventListener('click', function() {
+                const email = otpEmailInput.value;
+                if (!email) return;
+
+                this.disabled = true;
+                this.textContent = 'Đang gửi...';
+
+                fetch('@Url.Action("SendOTP", "Auth")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `email=${encodeURIComponent(email)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('Mã OTP mới đã được gửi!', 'success');
+                    } else {
+                        showMessage(data.message || 'Có lỗi xảy ra!', 'error');
+                    }
+                })
+                .catch(error => {
+                    showMessage('Có lỗi xảy ra khi gửi lại OTP!', 'error');
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.textContent = 'Gửi lại OTP';
+                });
+            });
+
+            // Auto-format OTP input
+            document.getElementById('otpCode').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '').substring(0, 6);
+            });
+
+            function showMessage(message, type) {
+                // Remove existing messages
+                const existingMessages = document.querySelectorAll('.success-message, .error-message');
+                existingMessages.forEach(msg => msg.remove());
+
+                // Create new message
+                const messageDiv = document.createElement('div');
+                messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+                messageDiv.textContent = message;
+                
+                // Insert after header
+                const header = document.querySelector('.otp-login-header');
+                header.insertAdjacentElement('afterend', messageDiv);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    messageDiv.remove();
+                }, 5000);
+            }
+        });
+    </script>
+    </body>
+</html>

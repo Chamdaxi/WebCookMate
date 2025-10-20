@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test OTP</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { padding: 8px; width: 200px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        .message { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Test OTP API</h1>
+    
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" value="test@example.com">
+    </div>
+    
+    <button onclick="sendOTP()">Gửi OTP</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function showMessage(message, type) {
+            const result = document.getElementById('result');
+            result.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+        
+        function sendOTP() {
+            const email = document.getElementById('email').value;
+            const button = document.querySelector('button');
+            const originalText = button.textContent;
+            
+            button.textContent = 'Đang gửi...';
+            button.disabled = true;
+            
+            console.log('Sending OTP to:', email);
+            
+            fetch('/Auth/SendOTP', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'email=' + encodeURIComponent(email)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                console.log('Response text:', text);
+                try {
+                    const data = JSON.parse(text);
+                    console.log('Parsed data:', data);
+                    if (data.success) {
+                        showMessage(data.message, 'success');
+                    } else {
+                        showMessage(data.message || 'Có lỗi xảy ra!', 'error');
+                    }
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    showMessage('Lỗi định dạng response: ' + text, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Có lỗi xảy ra: ' + error.message, 'error');
+            })
+            .finally(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
+
+

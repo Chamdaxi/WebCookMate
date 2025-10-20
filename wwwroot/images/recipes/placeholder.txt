@@ -1,0 +1,20 @@
+# Recipe Images Placeholder
+
+This directory contains recipe images for the CookMate application.
+
+Required images:
+- phobo.jpeg (already exists)
+- banhmi.jpg (already exists)
+- spaghetti.jpg
+- comtam.jpg
+- bunbo.jpg
+- pizza.jpg
+- chaca.jpg
+- banhxeo.jpg
+- ramen.jpg
+- goicuon.jpg
+- tiramisu.jpg
+- buncha.jpg
+- default.jpg
+
+Note: Some images may already exist from previous implementations.
