@@ -2,6 +2,20 @@
     ViewData["Title"] = "Recipes";
 }
 
+@section Styles {
+    <style>
+        .recipes-page {
+            padding-top: 200px;
+        }
+        
+        @@media (max-width: 768px) {
+            .recipes-page {
+                padding-top: 150px;
+            }
+        }
+    </style>
+}
+
 <div class="recipes-page">
     <!-- Search and Filter Section -->
     <div class="search-filter-section">

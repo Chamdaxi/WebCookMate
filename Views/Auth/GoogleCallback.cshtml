@@ -1,0 +1,134 @@
+@{
+    ViewData["Title"] = "Google OAuth Callback";
+    Layout = "_Layout";
+}
+
+<div class="google-callback-container">
+    <div class="google-callback-card">
+        <div class="google-callback-header">
+            <img src="~/images/logos/LogoCook.jpg" alt="CookMate Logo" class="callback-logo" onerror="this.src='~/images/logos/chef-hat.png'">
+            <h1 class="callback-title">Đang xử lý đăng nhập Google...</h1>
+            <p class="callback-subtitle">Vui lòng đợi trong giây lát</p>
+        </div>
+
+        <div class="callback-content">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+            
+            <div id="status-message" class="status-message">
+                Đang kết nối với Google...
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/googlecallback.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusMessage = document.getElementById('status-message');
+            
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+            
+            if (error) {
+                statusMessage.textContent = 'Có lỗi xảy ra khi đăng nhập Google: ' + error;
+                statusMessage.className = 'status-message error';
+                setTimeout(() => {
+                    window.location.href = '@Url.Action("Login", "Auth")';
+                }, 3000);
+                return;
+            }
+            
+            if (!code) {
+                statusMessage.textContent = 'Không nhận được mã xác thực từ Google';
+                statusMessage.className = 'status-message error';
+                setTimeout(() => {
+                    window.location.href = '@Url.Action("Login", "Auth")';
+                }, 3000);
+                return;
+            }
+            
+            // Exchange code for access token
+            statusMessage.textContent = 'Đang lấy thông tin từ Google...';
+            
+            fetch('@Url.Action("ExchangeGoogleCode", "Auth")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusMessage.textContent = 'Đang lấy thông tin người dùng...';
+                    
+                    // Get user info from Google
+                    return fetch('https://www.googleapis.com/oauth2/v2/userinfo?access_token=' + data.accessToken);
+                } else {
+                    throw new Error(data.message || 'Không thể lấy access token');
+                }
+            })
+            .then(response => response.json())
+            .then(userData => {
+                statusMessage.textContent = 'Đang đăng nhập vào hệ thống...';
+                
+                // Call our API to authenticate
+                return fetch('https://cookm8.vercel.app/api/auth/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: userData.email,
+                        name: userData.name,
+                        picture: userData.picture,
+                        googleId: userData.id
+                    })
+                });
+            })
+            .then(response => response.json())
+            .then(apiResponse => {
+                if (apiResponse.success || apiResponse.accessToken) {
+                    // Store access token
+                    localStorage.setItem('accessToken', apiResponse.accessToken || apiResponse.token);
+                    localStorage.setItem('userInfo', JSON.stringify(apiResponse.user || {
+                        email: userData.email,
+                        name: userData.name,
+                        picture: userData.picture
+                    }));
+                    
+                    statusMessage.textContent = 'Đăng nhập thành công!';
+                    statusMessage.className = 'status-message success';
+                    
+                    // Redirect to home page
+                    setTimeout(() => {
+                        window.location.href = '@Url.Action("Index", "Home")';
+                    }, 1000);
+                } else {
+                    throw new Error(apiResponse.message || 'Không thể đăng nhập vào hệ thống');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusMessage.textContent = 'Có lỗi xảy ra: ' + error.message;
+                statusMessage.className = 'status-message error';
+                
+                setTimeout(() => {
+                    window.location.href = '@Url.Action("Login", "Auth")';
+                }, 3000);
+            });
+        });
+    </script>
+}
+
+
+
+

@@ -88,6 +88,9 @@
                         <polyline points="6,9 12,15 18,9"></polyline>
                     </svg>
                 </li>
+                <li class="nav-item">
+                    <a href="@Url.Action("FavoriteList", "Home")" class="nav-link">FavoriteList</a>
+                </li>
             </ul>
         </nav>
     </div>
@@ -98,6 +101,7 @@
     </main>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/auth.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

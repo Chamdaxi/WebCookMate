@@ -2,6 +2,23 @@
     ViewData["Title"] = "Trang chủ";
 }
 
+@if (TempData["AccessToken"] != null)
+{
+    <script>
+        // Store access token in localStorage
+        localStorage.setItem('accessToken', '@TempData["AccessToken"]');
+        console.log('Access token stored in localStorage');
+    </script>
+}
+
+<!-- Home Page Banner -->
+<div class="home-banner">
+    <div class="banner-content">
+        <h1 class="banner-title">Chào mừng đến với CookMate</h1>
+        <p class="banner-subtitle">Khám phá những công thức nấu ăn tuyệt vời và lên kế hoạch bữa ăn hoàn hảo</p>
+    </div>
+</div>
+
 <!-- Today's Suggestions -->
 <div class="today-suggestions-section">
     <h2 class="section-title">Today's Suggestions</h2>

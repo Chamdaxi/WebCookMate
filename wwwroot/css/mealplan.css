@@ -1,40 +1,48 @@
 /* MealPlan Page */
 .mealplan-page {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px;
+    padding-top: 500px !important;
     min-height: calc(100vh - 120px);
 }
+
 
 /* Page Header */
 .mealplan-header {
     text-align: center;
-    margin-bottom: 30px;
-    padding: 20px 0;
+    margin-bottom: 40px;
+    padding: 30px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .page-title {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 700;
     color: #2c3e50;
-    margin: 0 0 10px 0;
+    margin: 0 0 15px 0;
     font-family: 'Inter', sans-serif;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .page-subtitle {
-    font-size: 16px;
+    font-size: 18px;
     color: #7f8c8d;
     margin: 0;
     font-family: 'Inter', sans-serif;
+    font-weight: 400;
 }
 
 /* Main Content Grid */
 .mealplan-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    gap: 40px;
     align-items: stretch;
     min-height: 600px;
+    margin-top: 20px;
 }
 
 /* Calendar Section */
@@ -461,9 +469,30 @@
 
 @media (max-width: 768px) {
     .mealplan-page {
-        padding: 15px;
+        padding: 20px;
+        padding-top: 450px !important;
         gap: 20px;
     }
+    
+    .mealplan-header {
+        margin-bottom: 30px;
+        padding: 25px 0;
+    }
+    
+    .page-title {
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+    
+    .page-subtitle {
+        font-size: 16px;
+    }
+    
+    .mealplan-content {
+        gap: 25px;
+        margin-top: 15px;
+    }
+    
     
     .calendar-section {
         padding: 20px;
