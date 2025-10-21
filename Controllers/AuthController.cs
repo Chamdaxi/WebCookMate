@@ -298,5 +298,11 @@ namespace demo.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult TestRecovery()
+        {
+            return View();
+        }
     }
 }
