@@ -1,0 +1,65 @@
+﻿[
+    {
+        "Branch":  "Cn_Google",
+        "Restore":  true,
+        "Build":  true,
+        "Run":  true,
+        "Note":  ""
+    },
+    {
+        "Branch":  "feature/otp-authentication",
+        "Restore":  true,
+        "Build":  false,
+        "Run":  false,
+        "Note":  "build_fail"
+    },
+    {
+        "Branch":  "feature/shopping-list",
+        "Restore":  true,
+        "Build":  true,
+        "Run":  true,
+        "Note":  ""
+    },
+    {
+        "Branch":  "fix_manh",
+        "Restore":  true,
+        "Build":  true,
+        "Run":  true,
+        "Note":  ""
+    },
+    {
+        "Branch":  "main",
+        "Restore":  true,
+        "Build":  true,
+        "Run":  true,
+        "Note":  ""
+    },
+    {
+        "Branch":  "otp-authentication",
+        "Restore":  true,
+        "Build":  true,
+        "Run":  true,
+        "Note":  ""
+    },
+    {
+        "Branch":  "pantrylist",
+        "Restore":  true,
+        "Build":  true,
+        "Run":  true,
+        "Note":  ""
+    },
+    {
+        "Branch":  "profile",
+        "Restore":  true,
+        "Build":  true,
+        "Run":  true,
+        "Note":  ""
+    },
+    {
+        "Branch":  "timkiem",
+        "Restore":  true,
+        "Build":  true,
+        "Run":  true,
+        "Note":  ""
+    }
+]
