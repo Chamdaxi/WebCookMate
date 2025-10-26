@@ -17,13 +17,20 @@ namespace demo.Controllers
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ApiService _apiService;
     private readonly OTPService _otpService;
+    private readonly FavoriteSeedService _favoriteSeedService;
 
-        public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApiService apiService, OTPService otpService)
+        public AuthController(
+            UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager, 
+            ApiService apiService, 
+            OTPService otpService,
+            FavoriteSeedService favoriteSeedService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _apiService = apiService;
             _otpService = otpService;
+            _favoriteSeedService = favoriteSeedService;
         }
 
         [HttpGet]
@@ -67,19 +74,33 @@ namespace demo.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Tạo user claims
-            var userClaims = new List<Claim>
+            // Tìm hoặc tạo user trong database
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
             {
-                new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Name, name ?? email),
-                new Claim(ClaimTypes.NameIdentifier, email)
-            };
+                // Tạo user mới
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = name ?? email.Split('@')[0],
+                    EmailConfirmed = true,
+                    CreatedAt = DateTime.Now
+                };
 
-            var userIdentity = new ClaimsIdentity(userClaims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var userPrincipal = new ClaimsPrincipal(userIdentity);
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    TempData["Error"] = "Không thể tạo tài khoản";
+                    return RedirectToAction("Login");
+                }
+            }
 
-            // Đăng nhập user với Identity scheme
-            await HttpContext.SignInAsync("Identity.Application", userPrincipal);
+            // Đăng nhập user bằng SignInManager
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // Tự động thêm món ăn yêu thích mẫu nếu user chưa có món nào
+            await _favoriteSeedService.EnsureUserHasFavorites(user.Id);
 
             // Redirect đến trang chủ
             return RedirectToAction("Index", "Home");
@@ -104,6 +125,9 @@ namespace demo.Controllers
             var result = await _signInManager.PasswordSignInAsync(user, password, rememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
+                // Tự động thêm món ăn yêu thích mẫu nếu user chưa có món nào
+                await _favoriteSeedService.EnsureUserHasFavorites(user.Id);
+                
                 return RedirectToAction("Index", "Home");
             }
 
@@ -300,6 +324,9 @@ namespace demo.Controllers
 
                     // Đăng nhập user
                     await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    // Tự động thêm món ăn yêu thích mẫu nếu user chưa có món nào
+                    await _favoriteSeedService.EnsureUserHasFavorites(user.Id);
 
                     // Xóa session OTP
                     HttpContext.Session.Remove("otp_email");

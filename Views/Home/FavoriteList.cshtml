@@ -18,7 +18,7 @@
         </div>
         <div class="header-stats">
             <div class="stat-item">
-                <span class="stat-number">12</span>
+                <span class="stat-number">0</span>
                 <span class="stat-label">Món yêu thích</span>
             </div>
         </div>
@@ -33,298 +33,28 @@
             </svg>
             <input type="text" placeholder="Tìm kiếm món yêu thích..." class="search-input">
         </div>
-        <div class="filter-buttons">
-            <button class="filter-btn active" data-filter="all">Tất cả</button>
-            <button class="filter-btn" data-filter="breakfast">Bữa sáng</button>
-            <button class="filter-btn" data-filter="lunch">Bữa trưa</button>
-            <button class="filter-btn" data-filter="dinner">Bữa tối</button>
-            <button class="filter-btn" data-filter="snack">Đồ ăn nhẹ</button>
+        <div class="filter-controls">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Tất cả</button>
+                <button class="filter-btn" data-filter="breakfast">Bữa sáng</button>
+                <button class="filter-btn" data-filter="lunch">Bữa trưa</button>
+                <button class="filter-btn" data-filter="dinner">Bữa tối</button>
+                <button class="filter-btn" data-filter="snack">Đồ ăn nhẹ</button>
+            </div>
+            <div class="sort-controls">
+                <select class="sort-select" id="sortSelect">
+                    <option value="name">Sắp xếp theo tên</option>
+                    <option value="time">Sắp xếp theo thời gian</option>
+                    <option value="rating">Sắp xếp theo đánh giá</option>
+                    <option value="date">Sắp xếp theo ngày thêm</option>
+                </select>
+            </div>
         </div>
     </div>
 
     <!-- Favorites Grid -->
     <div class="favorites-grid">
-        <!-- Favorite Item 1 -->
-        <div class="favorite-card" data-category="breakfast">
-            <div class="card-image">
-                <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400&h=300&fit=crop" alt="Bánh mì nướng">
-                <div class="card-overlay">
-                    <button class="quick-action-btn" title="Xem chi tiết">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                    <button class="quick-action-btn" title="Nấu ngay">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="favorite-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>Bánh mì nướng bơ</h3>
-                    <div class="rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="rating-text">4.8</span>
-                    </div>
-                </div>
-                <p class="card-description">Bánh mì nướng giòn với bơ thơm ngon, hoàn hảo cho bữa sáng</p>
-                <div class="card-meta">
-                    <span class="cooking-time">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12,6 12,12 16,14"></polyline>
-                        </svg>
-                        15 phút
-                    </span>
-                    <span class="difficulty easy">Dễ</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Favorite Item 2 -->
-        <div class="favorite-card" data-category="lunch">
-            <div class="card-image">
-                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop" alt="Pizza">
-                <div class="card-overlay">
-                    <button class="quick-action-btn" title="Xem chi tiết">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                    <button class="quick-action-btn" title="Nấu ngay">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="favorite-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>Pizza Margherita</h3>
-                    <div class="rating">
-                        <span class="stars">★★★★☆</span>
-                        <span class="rating-text">4.5</span>
-                    </div>
-                </div>
-                <p class="card-description">Pizza cổ điển với cà chua, mozzarella và húng quế tươi</p>
-                <div class="card-meta">
-                    <span class="cooking-time">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12,6 12,12 16,14"></polyline>
-                        </svg>
-                        30 phút
-                    </span>
-                    <span class="difficulty medium">Trung bình</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Favorite Item 3 -->
-        <div class="favorite-card" data-category="dinner">
-            <div class="card-image">
-                <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop" alt="Pasta">
-                <div class="card-overlay">
-                    <button class="quick-action-btn" title="Xem chi tiết">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                    <button class="quick-action-btn" title="Nấu ngay">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="favorite-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>Spaghetti Carbonara</h3>
-                    <div class="rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="rating-text">4.9</span>
-                    </div>
-                </div>
-                <p class="card-description">Mì Ý với sốt kem, trứng và thịt xông khói</p>
-                <div class="card-meta">
-                    <span class="cooking-time">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12,6 12,12 16,14"></polyline>
-                        </svg>
-                        25 phút
-                    </span>
-                    <span class="difficulty medium">Trung bình</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Favorite Item 4 -->
-        <div class="favorite-card" data-category="snack">
-            <div class="card-image">
-                <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop" alt="Cookies">
-                <div class="card-overlay">
-                    <button class="quick-action-btn" title="Xem chi tiết">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                    <button class="quick-action-btn" title="Nấu ngay">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="favorite-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>Chocolate Chip Cookies</h3>
-                    <div class="rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="rating-text">4.7</span>
-                    </div>
-                </div>
-                <p class="card-description">Bánh quy chocolate chip giòn tan, ngọt ngào</p>
-                <div class="card-meta">
-                    <span class="cooking-time">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12,6 12,12 16,14"></polyline>
-                        </svg>
-                        20 phút
-                    </span>
-                    <span class="difficulty easy">Dễ</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Favorite Item 5 -->
-        <div class="favorite-card" data-category="breakfast">
-            <div class="card-image">
-                <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=300&fit=crop" alt="Pancakes">
-                <div class="card-overlay">
-                    <button class="quick-action-btn" title="Xem chi tiết">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                    <button class="quick-action-btn" title="Nấu ngay">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="favorite-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>Pancakes với siro</h3>
-                    <div class="rating">
-                        <span class="stars">★★★★☆</span>
-                        <span class="rating-text">4.6</span>
-                    </div>
-                </div>
-                <p class="card-description">Bánh pancake mềm mịn với siro maple ngọt ngào</p>
-                <div class="card-meta">
-                    <span class="cooking-time">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12,6 12,12 16,14"></polyline>
-                        </svg>
-                        18 phút
-                    </span>
-                    <span class="difficulty easy">Dễ</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Favorite Item 6 -->
-        <div class="favorite-card" data-category="lunch">
-            <div class="card-image">
-                <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop" alt="Salad">
-                <div class="card-overlay">
-                    <button class="quick-action-btn" title="Xem chi tiết">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                    <button class="quick-action-btn" title="Nấu ngay">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="favorite-badge">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>Salad Caesar</h3>
-                    <div class="rating">
-                        <span class="stars">★★★★☆</span>
-                        <span class="rating-text">4.4</span>
-                    </div>
-                </div>
-                <p class="card-description">Salad tươi ngon với sốt Caesar và bánh mì nướng</p>
-                <div class="card-meta">
-                    <span class="cooking-time">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12,6 12,12 16,14"></polyline>
-                        </svg>
-                        10 phút
-                    </span>
-                    <span class="difficulty easy">Dễ</span>
-                </div>
-            </div>
-        </div>
+        <!-- Favorites will be loaded from API -->
     </div>
 
     <!-- Empty State (hidden by default) -->
@@ -444,10 +174,38 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
         .filter-buttons {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+        }
+
+        .sort-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .sort-select {
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .filter-btn {
@@ -486,12 +244,34 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
             position: relative;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
         }
 
         .favorite-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stagger animation for cards */
+        .favorite-card:nth-child(1) { animation-delay: 0.05s; }
+        .favorite-card:nth-child(2) { animation-delay: 0.1s; }
+        .favorite-card:nth-child(3) { animation-delay: 0.15s; }
+        .favorite-card:nth-child(4) { animation-delay: 0.2s; }
+        .favorite-card:nth-child(5) { animation-delay: 0.25s; }
+        .favorite-card:nth-child(6) { animation-delay: 0.3s; }
+        .favorite-card:nth-child(n+7) { animation-delay: 0.35s; }
 
         .card-image {
             position: relative;
@@ -547,6 +327,11 @@
             background: #667eea;
             color: white;
             transform: scale(1.1);
+        }
+
+        .quick-action-btn.remove-btn:hover {
+            background: #ff4757;
+            color: white;
         }
 
         .favorite-badge {
@@ -712,7 +497,16 @@
                 max-width: none;
             }
 
+            .filter-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+
             .filter-buttons {
+                justify-content: center;
+            }
+
+            .sort-controls {
                 justify-content: center;
             }
 
@@ -726,11 +520,146 @@
 
 @section Scripts {
     <script>
-        // Filter functionality
+        // Enhanced Favorite List functionality with API integration
         document.addEventListener('DOMContentLoaded', function() {
             const filterButtons = document.querySelectorAll('.filter-btn');
-            const favoriteCards = document.querySelectorAll('.favorite-card');
             const searchInput = document.querySelector('.search-input');
+            const sortSelect = document.getElementById('sortSelect');
+            const favoritesGrid = document.querySelector('.favorites-grid');
+            const emptyState = document.querySelector('.empty-state');
+            const statNumber = document.querySelector('.stat-number');
+
+            let allFavorites = [];
+            let filteredFavorites = [];
+
+            // Show loading state
+            showLoading();
+
+            // Load favorites from API
+            loadFavorites();
+
+            // Load favorites from API
+            async function loadFavorites() {
+                try {
+                    const response = await fetch('/api/Favorite', {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to load favorites');
+                    }
+
+                    const result = await response.json();
+                    allFavorites = result.data || [];
+                    filteredFavorites = [...allFavorites];
+                    
+                    renderFavorites();
+                    updateStats();
+                } catch (error) {
+                    console.error('Error loading favorites:', error);
+                    showEmptyState();
+                }
+            }
+
+            // Render favorites
+            function renderFavorites() {
+                if (filteredFavorites.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+
+                favoritesGrid.style.display = 'grid';
+                emptyState.style.display = 'none';
+
+                favoritesGrid.innerHTML = filteredFavorites.map(fav => `
+                    <div class="favorite-card" data-category="${fav.recipeCategory}" data-rating="${fav.rating}" data-time="${fav.cookingTime}" data-date="${fav.addedAt}" data-id="${fav.id}">
+                        <div class="card-image">
+                            <img src="${getRecipeImage(fav)}" alt="${fav.recipeName}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop'">
+                            <div class="card-overlay">
+                                <button class="quick-action-btn" title="Xem chi tiết">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                                <button class="quick-action-btn" title="Nấu ngay">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                    </svg>
+                                </button>
+                                <button class="quick-action-btn" title="Thêm vào danh sách mua sắm">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="9" cy="21" r="1"></circle>
+                                        <circle cx="20" cy="21" r="1"></circle>
+                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                    </svg>
+                                </button>
+                                <button class="quick-action-btn remove-btn" title="Xóa khỏi yêu thích" data-favorite-id="${fav.id}">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3,6 5,6 21,6"></polyline>
+                                        <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="favorite-badge">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-header">
+                                <h3>${fav.recipeName}</h3>
+                                <div class="rating">
+                                    <span class="stars">${'★'.repeat(Math.floor(fav.rating))}${'☆'.repeat(5-Math.floor(fav.rating))}</span>
+                                    <span class="rating-text">${fav.rating.toFixed(1)}</span>
+                                </div>
+                            </div>
+                            <p class="card-description">${fav.recipeDescription || 'Món ăn ngon'}</p>
+                            <div class="card-meta">
+                                <span class="cooking-time">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12,6 12,12 16,14"></polyline>
+                                    </svg>
+                                    ${fav.cookingTime} phút
+                                </span>
+                                <span class="difficulty ${fav.difficulty}">${getDifficultyText(fav.difficulty)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Attach event listeners to newly created buttons
+                attachEventListeners();
+            }
+
+            // Attach event listeners
+            function attachEventListeners() {
+                document.querySelectorAll('.quick-action-btn').forEach(btn => {
+                    btn.addEventListener('click', async function(e) {
+                        e.stopPropagation();
+                        const title = this.getAttribute('title');
+                        const card = this.closest('.favorite-card');
+                        
+                        if (title === 'Xem chi tiết') {
+                            showRecipeDetail(card);
+                        } else if (title === 'Nấu ngay') {
+                            startCooking(card);
+                        } else if (title === 'Thêm vào danh sách mua sắm') {
+                            addToShoppingList(card);
+                        } else if (title === 'Xóa khỏi yêu thích') {
+                            const favoriteId = this.getAttribute('data-favorite-id');
+                            await removeFromFavorites(favoriteId, card);
+                        }
+                    });
+                });
+            }
 
             // Filter by category
             filterButtons.forEach(button => {
@@ -742,45 +671,224 @@
                     this.classList.add('active');
                     
                     // Filter cards
-                    favoriteCards.forEach(card => {
-                        if (filter === 'all' || card.getAttribute('data-category') === filter) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
+                    filterCards(filter);
                 });
             });
 
             // Search functionality
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
-                
-                favoriteCards.forEach(card => {
-                    const title = card.querySelector('h3').textContent.toLowerCase();
-                    const description = card.querySelector('.card-description').textContent.toLowerCase();
-                    
-                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
+                filterCards('all', searchTerm);
             });
 
-            // Quick action buttons
-            document.querySelectorAll('.quick-action-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const title = this.getAttribute('title');
+            // Sort functionality
+            sortSelect.addEventListener('change', function() {
+                const sortBy = this.value;
+                sortCards(sortBy);
+            });
+
+            // Filter cards function
+            function filterCards(category, searchTerm = '') {
+                filteredFavorites = allFavorites.filter(fav => {
+                    const categoryMatch = category === 'all' || fav.recipeCategory === category;
+                    const searchMatch = searchTerm === '' || 
+                        fav.recipeName.toLowerCase().includes(searchTerm) || 
+                        fav.recipeDescription.toLowerCase().includes(searchTerm);
                     
-                    if (title === 'Xem chi tiết') {
-                        alert('Tính năng xem chi tiết sẽ được phát triển!');
-                    } else if (title === 'Nấu ngay') {
-                        alert('Tính năng nấu ngay sẽ được phát triển!');
+                    return categoryMatch && searchMatch;
+                });
+                
+                renderFavorites();
+                updateStats();
+            }
+
+            // Sort cards function
+            function sortCards(sortBy) {
+                filteredFavorites.sort((a, b) => {
+                    switch(sortBy) {
+                        case 'name':
+                            return a.recipeName.localeCompare(b.recipeName);
+                        case 'time':
+                            return a.cookingTime - b.cookingTime;
+                        case 'rating':
+                            return b.rating - a.rating;
+                        case 'date':
+                            return new Date(b.addedAt) - new Date(a.addedAt);
+                        default:
+                            return 0;
                     }
                 });
-            });
+                
+                renderFavorites();
+            }
+
+            // Action functions
+            function showRecipeDetail(card) {
+                const title = card.querySelector('h3').textContent;
+                alert(`Xem chi tiết công thức: ${title}\n\nTính năng này sẽ hiển thị:\n- Nguyên liệu chi tiết\n- Các bước nấu ăn\n- Video hướng dẫn\n- Mẹo nấu ăn`);
+            }
+
+            function startCooking(card) {
+                const title = card.querySelector('h3').textContent;
+                const time = card.querySelector('.cooking-time').textContent;
+                if (confirm(`Bắt đầu nấu: ${title}?\nThời gian: ${time}`)) {
+                    alert(`Chúc bạn nấu ăn ngon miệng! 🍳\n\nTính năng này sẽ:\n- Hiển thị timer nấu ăn\n- Hướng dẫn từng bước\n- Nhắc nhở thời gian`);
+                }
+            }
+
+            function addToShoppingList(card) {
+                const title = card.querySelector('h3').textContent;
+                if (confirm(`Thêm "${title}" vào danh sách mua sắm?`)) {
+                    showNotification(`Đã thêm "${title}" vào danh sách mua sắm!`, 'success');
+                }
+            }
+
+            async function removeFromFavorites(favoriteId, card) {
+                const title = card.querySelector('h3').textContent;
+                if (!confirm(`Bạn có chắc muốn xóa "${title}" khỏi danh sách yêu thích?`)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/Favorite/${favoriteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to remove favorite');
+                    }
+
+                    // Add removal animation
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.transform = 'scale(0.8)';
+                    card.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        // Remove from arrays
+                        allFavorites = allFavorites.filter(f => f.id !== favoriteId);
+                        filteredFavorites = filteredFavorites.filter(f => f.id !== favoriteId);
+                        
+                        renderFavorites();
+                        updateStats();
+                    }, 300);
+                    
+                    showNotification(`Đã xóa "${title}" khỏi yêu thích!`, 'info');
+                } catch (error) {
+                    console.error('Error removing favorite:', error);
+                    showNotification('Có lỗi xảy ra. Vui lòng thử lại!', 'error');
+                }
+            }
+
+            function updateStats() {
+                statNumber.textContent = filteredFavorites.length;
+            }
+
+            function showEmptyState() {
+                emptyState.style.display = 'block';
+                favoritesGrid.style.display = 'none';
+                statNumber.textContent = '0';
+            }
+
+            function getDifficultyText(difficulty) {
+                switch(difficulty) {
+                    case 'easy': return 'Dễ';
+                    case 'medium': return 'Trung bình';
+                    case 'hard': return 'Khó';
+                    default: return 'Dễ';
+                }
+            }
+
+            function getRecipeImage(fav) {
+                // If recipe has an image, use it
+                if (fav.recipeImage && fav.recipeImage.trim() !== '') {
+                    return fav.recipeImage;
+                }
+                
+                // Otherwise, use beautiful Unsplash food images based on category
+                const foodImages = {
+                    'breakfast': 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&h=300&fit=crop',
+                    'lunch': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop',
+                    'dinner': 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop',
+                    'snack': 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop',
+                    'default': 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop'
+                };
+                
+                return foodImages[fav.recipeCategory] || foodImages.default;
+            }
+
+            function showLoading() {
+                favoritesGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <div class="loading-spinner" style="display: inline-block; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 20px; color: #666; font-size: 16px;">Đang tải danh sách yêu thích...</p>
+                    </div>
+                `;
+                // Add keyframes for spinner
+                if (!document.getElementById('spinner-keyframes')) {
+                    const style = document.createElement('style');
+                    style.id = 'spinner-keyframes';
+                    style.innerHTML = `
+                        @@keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+
+            function showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.textContent = message;
+                
+                // Style notification
+                Object.assign(notification.style, {
+                    position: 'fixed',
+                    top: '100px',
+                    right: '20px',
+                    padding: '15px 20px',
+                    borderRadius: '12px',
+                    color: 'white',
+                    fontWeight: '500',
+                    zIndex: '10000',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                    transform: 'translateX(400px)',
+                    transition: 'transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+                });
+                
+                // Set background color based on type
+                const colors = {
+                    success: '#4CAF50',
+                    info: '#2196F3',
+                    warning: '#FF9800',
+                    error: '#F44336'
+                };
+                notification.style.backgroundColor = colors[type] || colors.info;
+                
+                // Add to page
+                document.body.appendChild(notification);
+                
+                // Animate in
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(400px)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            document.body.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
         });
     </script>
 }

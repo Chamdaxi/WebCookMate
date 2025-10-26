@@ -10,5 +10,7 @@ namespace demo.Data
             : base(options)
         {
         }
+
+        public DbSet<Favorite> Favorites { get; set; }
     }
 }

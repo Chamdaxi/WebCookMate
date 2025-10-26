@@ -13,6 +13,67 @@
                 padding-top: 150px;
             }
         }
+        
+        /* Favorite button styling */
+        .favorite-toggle-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        .favorite-toggle-btn svg {
+            color: #ff6b6b;
+            transition: all 0.3s ease;
+        }
+        
+        .favorite-toggle-btn:hover {
+            transform: scale(1.1);
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .favorite-toggle-btn.favorited svg {
+            fill: #ff6b6b;
+        }
+        
+        .recipe-overlay {
+            position: relative;
+        }
+        
+        /* Notification animations */
+        @@keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @@keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
     </style>
 }
 
@@ -98,8 +159,39 @@
     </div>
 </div>
 
+<script src="~/js/favorites.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize FavoriteManager with notification callback
+    let favoriteManager = null;
+    
+    function showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
+    favoriteManager = new FavoriteManager(showNotification);
+    
     // Sample recipe data - using existing images
     const recipes = [
         {
@@ -343,6 +435,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="rating-stars">${'★'.repeat(Math.floor(recipe.rating))}${'☆'.repeat(5-Math.floor(recipe.rating))}</span>
                             <span class="rating-number">${recipe.rating}</span>
                         </div>
+                        <button class="favorite-toggle-btn" data-recipe-id="${recipe.id}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 <div class="recipe-content">
@@ -366,6 +463,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `).join('');
+        
+        // Attach favorite button event listeners after rendering
+        attachFavoriteListeners();
     }
 
     function updateResultsCount() {
@@ -380,6 +480,31 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             loadMoreBtn.style.display = 'block';
         }
+    }
+    
+    function attachFavoriteListeners() {
+        document.querySelectorAll('.favorite-toggle-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const recipeId = this.getAttribute('data-recipe-id');
+                const recipe = recipes.find(r => r.id == recipeId);
+                
+                if (recipe && favoriteManager) {
+                    const recipeData = {
+                        id: recipe.id.toString(),
+                        name: recipe.name,
+                        description: recipe.description,
+                        category: recipe.category,
+                        image: recipe.image,
+                        time: recipe.time,
+                        difficulty: recipe.difficulty,
+                        rating: recipe.rating
+                    };
+                    
+                    await favoriteManager.toggleFavorite(recipeData, this);
+                }
+            });
+        });
     }
 });
 </script>

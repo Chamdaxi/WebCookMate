@@ -54,7 +54,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
 });
 
-// Thêm Google Authentication - Cấu hình mới hoàn toàn
+// Thêm Google Authentication - FIX cho .NET 8 + macOS Sequoia
 builder.Services.AddAuthentication()
     .AddGoogle(options =>
     {
@@ -73,6 +73,18 @@ builder.Services.AddAuthentication()
         // Cấu hình cookie cho Google OAuth
         options.CorrelationCookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
         options.CorrelationCookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
+        
+        // FIX SSL cho .NET 8 + macOS Sequoia: Sử dụng SocketsHttpHandler thay vì HttpClientHandler
+        var socketsHandler = new System.Net.Http.SocketsHttpHandler
+        {
+            UseCookies = false,
+            SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+            {
+                // Bypass SSL certificate validation cho development
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            }
+        };
+        options.BackchannelHttpHandler = socketsHandler;
     });
 
     // Thêm HttpClient và Services
@@ -87,6 +99,9 @@ builder.Services.AddAuthentication()
     builder.Services.AddScoped<EmailService>();
     builder.Services.AddScoped<SmsService>();
     builder.Services.AddScoped<OTPService>();
+    
+    // Favorite Seed Service - Tự động thêm món ăn yêu thích mẫu cho user mới
+    builder.Services.AddScoped<FavoriteSeedService>();
 
 // Cấu hình HTTP cho development (tạm thời)
 // builder.WebHost.ConfigureKestrel(options =>
