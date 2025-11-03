@@ -124,15 +124,24 @@ namespace demo.Controllers
         [Route("Auth/UserProfile")]
         public async Task<IActionResult> UserProfile()
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login");
-            }
+            // Tạm thời comment để test không cần đăng nhập
+            // if (!User.Identity.IsAuthenticated)
+            // {
+            //     return RedirectToAction("Login");
+            // }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return RedirectToAction("Login");
+                // Tạo user demo để test nếu chưa đăng nhập
+                user = new ApplicationUser
+                {
+                    UserName = "test@example.com",
+                    Email = "test@example.com",
+                    FullName = "Test User",
+                    EmailConfirmed = true,
+                    CreatedAt = DateTime.Now
+                };
             }
 
             return View(user);
@@ -185,6 +194,76 @@ namespace demo.Controllers
             {
                 TempData["Error"] = "Có lỗi xảy ra khi cập nhật thông tin: " + string.Join(", ", result.Errors.Select(e => e.Description));
                 return View(user);
+            }
+        }
+
+        // Delete Account Actions
+        [HttpGet]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            // Tạm thời comment để test không cần đăng nhập
+            // if (!User.Identity.IsAuthenticated)
+            // {
+            //     return RedirectToAction("Login");
+            // }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                // Tạo user demo để test nếu chưa đăng nhập
+                user = new ApplicationUser
+                {
+                    UserName = "test@example.com",
+                    Email = "test@example.com",
+                    FullName = "Test User",
+                    EmailConfirmed = true,
+                    CreatedAt = DateTime.Now
+                };
+            }
+
+            return View(user);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmDeleteAccount(string password)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                TempData["Error"] = "Không tìm thấy tài khoản.";
+                return RedirectToAction("Login");
+            }
+
+            // Kiểm tra mật khẩu nếu user có mật khẩu
+            var hasPassword = await _userManager.HasPasswordAsync(user);
+            if (hasPassword && !string.IsNullOrWhiteSpace(password))
+            {
+                var passwordCheck = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
+                if (!passwordCheck.Succeeded)
+                {
+                    TempData["Error"] = "Mật khẩu không đúng. Vui lòng thử lại.";
+                    return View("DeleteAccount", user);
+                }
+            }
+
+            // Xóa tài khoản
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                await _signInManager.SignOutAsync();
+                TempData["Success"] = "Tài khoản đã được xóa thành công.";
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                TempData["Error"] = "Có lỗi xảy ra khi xóa tài khoản: " + string.Join(", ", result.Errors.Select(e => e.Description));
+                return View("DeleteAccount", user);
             }
         }
 

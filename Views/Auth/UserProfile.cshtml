@@ -2,19 +2,45 @@
 
 @{
     ViewData["Title"] = "User Profile";
+    Layout = null;
 }
 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CookMate</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/userprofile.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
 <div class="profile-container">
     <div class="profile-header">
         <h1>Thông tin cá nhân</h1>
         <p>Quản lý thông tin tài khoản của bạn</p>
     </div>
 
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
     <div class="profile-content">
         <div class="profile-card">
             <div class="profile-avatar">
                 <div class="avatar-container">
-                    <img src="~/images/logos/profile.png" alt="Profile Avatar" class="avatar-image">
+                    <img src="~/images/logos/profile.png" alt="Profile Avatar" class="avatar-image" onerror="this.style.display='none'">
                     <div class="avatar-overlay">
                         <span class="avatar-text">@Model.FullName?.Substring(0, 1).ToUpper()</span>
                     </div>
@@ -55,10 +81,9 @@
             <a href="@Url.Action("EditProfile", "Auth")" class="btn btn-primary">Chỉnh sửa thông tin</a>
             <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Về trang chủ</a>
             <a href="@Url.Action("Logout", "Auth")" class="btn btn-secondary">Đăng xuất</a>
+            <a href="@Url.Action("DeleteAccount", "Auth")" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác!');">Xóa tài khoản</a>
         </div>
     </div>
 </div>
-
-@section Styles {
-    <link rel="stylesheet" href="~/css/userprofile.css" asp-append-version="true" />
-}
+</body>
+</html>

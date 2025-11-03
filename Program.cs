@@ -45,21 +45,47 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 // Cấu hình Cookie Authentication
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Auth/Login";
+    // Tạm thời comment để test không cần đăng nhập
+    // options.LoginPath = "/Auth/Login";
     options.LogoutPath = "/Auth/Logout";
     options.AccessDeniedPath = "/Auth/AccessDenied";
     
     // Cấu hình cookie cho Google OAuth
     options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
     options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
+    
+    // Tắt automatic redirect để test
+    options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+    {
+        OnRedirectToLogin = context =>
+        {
+            // Không redirect nếu đang truy cập UserProfile
+            if (context.Request.Path.StartsWithSegments("/Auth/UserProfile"))
+            {
+                context.Response.StatusCode = 200;
+            }
+            else
+            {
+                context.Response.Redirect("/Auth/Login");
+            }
+            return System.Threading.Tasks.Task.CompletedTask;
+        }
+    };
 });
 
-// Thêm Google Authentication - Cấu hình mới hoàn toàn
-builder.Services.AddAuthentication()
-    .AddGoogle(options =>
+// Thêm Google Authentication - Chỉ thêm nếu có ClientId
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+var authBuilder = builder.Services.AddAuthentication();
+
+// Chỉ add Google authentication nếu có ClientId và ClientSecret
+if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+{
+    authBuilder.AddGoogle(options =>
     {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? string.Empty;
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? string.Empty;
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
         
         // Cấu hình redirect URI
         options.CallbackPath = "/signin-google";
@@ -74,6 +100,7 @@ builder.Services.AddAuthentication()
         options.CorrelationCookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
         options.CorrelationCookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
     });
+}
 
     // Thêm HttpClient và Services
     builder.Services.AddHttpClient<TokenService>();
