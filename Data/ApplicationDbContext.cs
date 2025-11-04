@@ -10,5 +10,8 @@ namespace demo.Data
             : base(options)
         {
         }
+        
+        public DbSet<ShoppingItem> ShoppingItems { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
     }
 }
