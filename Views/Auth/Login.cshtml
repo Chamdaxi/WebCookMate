@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Đăng Nhập";
+    ViewData["Title"] = "Đăng Nhập - CookMate";
     Layout = null;
 }
 
@@ -8,199 +8,194 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CookMate</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/modern-login.css" asp-append-version="true" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .login-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .login-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .otp-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .otp-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+        }
+
+        .google-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .info-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .api-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="login-wrapper">
-        <div class="login-container">
-            <div class="login-card">
-                <div class="login-header">
-                    <div class="logo-section">
-                        <img src="~/images/logos/LogoCook.jpg" alt="CookMate Logo" class="logo-img" onerror="this.src='~/images/logos/chef-hat.png'">
-                        <h1 class="app-name">CookMate</h1>
-                        <p class="app-tagline">Nấu ăn thông minh, cuộc sống dễ dàng</p>
-                    </div>
-                </div>
+    <div class="login-container">
+        <div class="logo">👨‍🍳</div>
+        
+        <h1>CookMate</h1>
+        <p class="subtitle">Nấu ăn thông minh, cuộc sống dễ dàng</p>
 
-                <div class="login-content">
-                    <h2 class="login-title">Đăng nhập</h2>
-                    <p class="login-subtitle">Chào mừng bạn quay trở lại!</p>
+        @if (TempData["Success"] != null)
+        {
+            <div class="success-message">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="error-message">@TempData["Error"]</div>
+        }
 
-                    @if (TempData["Success"] != null)
-                    {
-                        <div class="success-message">@TempData["Success"]</div>
-                    }
-                    @if (TempData["Error"] != null)
-                    {
-                        <div class="error-message">@TempData["Error"]</div>
-                    }
+        <!-- Đăng nhập Google -->
+        <a href="@Url.Action("GoogleLogin", "Auth")" class="login-btn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Đăng nhập với Google
+        </a>
 
-                    <form asp-action="Login" method="post" class="login-form">
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email</label>
-                            <div class="input-wrapper">
-                                <svg class="input-icon" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                                </svg>
-                                <input type="email" id="email" name="email" class="form-input" placeholder="Nhập email của bạn" required>
-                            </div>
-                        </div>
+        <!-- Đăng nhập OTP -->
+        <a href="@Url.Action("OTPLogin", "Auth")" class="login-btn otp-btn">
+            🔐 Đăng nhập bằng OTP (Email)
+        </a>
 
-                        <div class="form-group">
-                            <label for="password" class="form-label">Mật khẩu</label>
-                            <div class="input-wrapper">
-                                <svg class="input-icon" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
-                                </svg>
-                                <input type="password" id="password" name="password" class="form-input" placeholder="Nhập mật khẩu" required>
-                                <button type="button" class="password-toggle" onclick="togglePassword()">
-                                    <svg class="eye-icon" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="form-options">
-                            <label class="checkbox-wrapper">
-                                <input type="checkbox" name="rememberMe" class="checkbox-input">
-                                <span class="checkbox-label">Ghi nhớ đăng nhập</span>
-                            </label>
-                            <a href="#" class="forgot-password">Quên mật khẩu?</a>
-                        </div>
-
-                        <button type="submit" class="login-btn">
-                            <span class="btn-text">Đăng nhập</span>
-                            <svg class="btn-icon" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"/>
-                            </svg>
-                        </button>
-                    </form>
-
-                    <div class="divider">
-                        <span class="divider-text">Hoặc</span>
-                    </div>
-
-                    <div class="social-login">
-                        <a href="@Url.Action("GoogleLogin", "Auth")" class="social-btn google-btn">
-                            <svg class="social-icon" viewBox="0 0 24 24">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            <span class="social-text">Đăng nhập với Google</span>
-                        </a>
-
-                        <a href="@Url.Action("RealOTP", "Auth")" class="social-btn otp-btn">
-                            <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                            <span class="social-text">Đăng nhập với OTP</span>
-                        </a>
-                    </div>
-
-                    <div class="signup-link">
-                        <p>Chưa có tài khoản? <a href="#" class="link">Đăng ký ngay</a></p>
-                    </div>
-                </div>
-            </div>
+        <div class="info-box">
+            <h3>🌐 Powered by CookMate API</h3>
+            <p>
+                Tất cả dữ liệu được lưu trữ và quản lý bởi CookMate API Server.
+                <br>
+                Đăng nhập một lần, sử dụng mọi nơi!
+            </p>
+            <span class="api-badge">cookm8.vercel.app</span>
         </div>
     </div>
-
-    <!-- Email/Password Modal -->
-    <div id="emailModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Đăng nhập với Email</h3>
-                <button class="close-btn" onclick="closeEmailPasswordModal()">&times;</button>
-            </div>
-            <form id="emailPasswordForm" class="modal-form">
-                <div class="form-group">
-                    <label for="modalEmail">Email:</label>
-                    <input type="email" id="modalEmail" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="modalPassword">Mật khẩu:</label>
-                    <input type="password" id="modalPassword" name="password" required>
-                </div>
-                <button type="submit" class="modal-btn">Đăng nhập</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-            // Google OAuth được xử lý bởi GoogleAuthController
-
-        function showEmailLogin() {
-            document.getElementById('emailModal').style.display = 'block';
-            // Focus on email input
-            setTimeout(() => {
-                document.getElementById('modalEmail').focus();
-            }, 100);
-        }
-
-        function closeEmailPasswordModal() {
-            document.getElementById('emailModal').style.display = 'none';
-        }
-
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.querySelector('.eye-icon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.innerHTML = '<path d="M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"/>';
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.innerHTML = '<path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>';
-            }
-        }
-
-        // Handle email/password form submission
-        document.getElementById('emailPasswordForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('modalEmail').value;
-            const password = document.getElementById('modalPassword').value;
-            const submitBtn = this.querySelector('button[type="submit"]');
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Đang đăng nhập...';
-            
-            try {
-                const response = await fetch('/Auth/Login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
-                });
-                
-                if (response.ok) {
-                    // Redirect to home page
-                    window.location.href = '/Home/Index';
-                } else {
-                    alert('Email hoặc mật khẩu không đúng');
-                }
-            } catch (error) {
-                alert('Có lỗi xảy ra khi đăng nhập');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Đăng nhập';
-            }
-        });
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('emailModal');
-            if (event.target === modal) {
-                closeEmailPasswordModal();
-            }
-        }
-    </script>
 </body>
 </html>

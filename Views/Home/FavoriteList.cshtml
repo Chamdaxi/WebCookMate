@@ -541,25 +541,70 @@
             // Load favorites from API
             async function loadFavorites() {
                 try {
-                    const response = await fetch('/api/Favorite', {
+                    console.log('🔄 Loading favorites...');
+                    const response = await fetch('/api/FavoriteApi', {
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         credentials: 'include'
                     });
 
+                    console.log('📡 Response status:', response.status, response.statusText);
+
                     if (!response.ok) {
-                        throw new Error('Failed to load favorites');
+                        const errorText = await response.text();
+                        console.error('❌ Failed to load favorites:', response.status, errorText);
+                        
+                        // Handle Spoonacular limit error specifically
+                        if (response.status === 503) {
+                            let errorData;
+                            try {
+                                errorData = JSON.parse(errorText);
+                            } catch {
+                                errorData = { message: errorText };
+                            }
+                            
+                            if (errorData.code === 'SPOONACULAR_LIMIT') {
+                                showSpoonacularLimitMessage(errorData.details || errorData.message);
+                                return;
+                            }
+                        }
+                        
+                        throw new Error('Failed to load favorites: ' + response.status);
                     }
 
                     const result = await response.json();
-                    allFavorites = result.data || [];
+                    console.log('📦 Raw favorites response:', result);
+                    
+                    // Handle both array and wrapped object formats
+                    let favoritesArray = [];
+                    if (Array.isArray(result)) {
+                        favoritesArray = result;
+                    } else if (result && typeof result === 'object') {
+                        favoritesArray = result.data || result.favorites || result.items || [];
+                    }
+                    
+                    console.log('✅ Loaded favorites:', favoritesArray.length);
+                    
+                    // Map API response to UI format
+                    allFavorites = favoritesArray.map(fav => ({
+                        id: fav.id || fav._id || fav.favoriteId,
+                        recipeId: fav.recipeId || fav.recipe_id || fav.recipe?.id,
+                        recipeName: fav.recipeName || fav.recipe?.title || fav.recipe?.name || 'Recipe',
+                        recipeCategory: fav.recipeCategory || fav.recipe?.category || 'lunch',
+                        rating: fav.rating || fav.recipe?.rating || 4.5,
+                        cookingTime: fav.cookingTime || fav.recipe?.readyInMinutes || fav.recipe?.cookingTime || 30,
+                        image: fav.image || fav.recipe?.image || fav.recipeImage || '',
+                        addedAt: fav.addedAt || fav.createdAt || fav.dateAdded || new Date().toISOString()
+                    }));
+                    
                     filteredFavorites = [...allFavorites];
                     
+                    console.log('✅ Mapped favorites:', allFavorites.length);
                     renderFavorites();
                     updateStats();
                 } catch (error) {
-                    console.error('Error loading favorites:', error);
+                    console.error('❌ Error loading favorites:', error);
                     showEmptyState();
                 }
             }
@@ -750,7 +795,7 @@
                 }
 
                 try {
-                    const response = await fetch(`/api/Favorite/${favoriteId}`, {
+                    const response = await fetch(`/api/FavoriteApi/${favoriteId}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -791,6 +836,28 @@
                 emptyState.style.display = 'block';
                 favoritesGrid.style.display = 'none';
                 statNumber.textContent = '0';
+            }
+
+            function showSpoonacularLimitMessage(message) {
+                // Hide grid and show custom message
+                favoritesGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                
+                // Update empty state content
+                const emptyStateHTML = `
+                    <div class="empty-icon" style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+                    <h3 style="color: #f59e0b; margin-bottom: 15px;">Giới hạn API đã đạt</h3>
+                    <p style="font-size: 16px; line-height: 1.6; max-width: 600px; margin: 0 auto 30px;">
+                        ${message || 'Món yêu thích của bạn đã được lưu nhưng không thể hiển thị chi tiết do giới hạn API Spoonacular. Vui lòng thử lại sau (giới hạn sẽ reset vào ngày mai).'}
+                    </p>
+                    <div style="padding: 20px; background: #fef3c7; border-radius: 10px; max-width: 500px; margin: 0 auto;">
+                        <p style="margin: 0; font-size: 14px; color: #92400e;">
+                            <strong>💡 Gợi ý:</strong> Bạn vẫn có thể thêm món yêu thích mới từ trang Recipes. Các món đã thêm sẽ được lưu và sẽ hiển thị đầy đủ khi API limit reset.
+                        </p>
+                    </div>
+                `;
+                emptyState.innerHTML = emptyStateHTML;
+                statNumber.textContent = '?';
             }
 
             function getDifficultyText(difficulty) {

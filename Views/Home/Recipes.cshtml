@@ -192,8 +192,47 @@ document.addEventListener('DOMContentLoaded', function() {
     
     favoriteManager = new FavoriteManager(showNotification);
     
-    // Sample recipe data - using existing images
-    const recipes = [
+    // Load recipes from API (ViewBag) or use sample data as fallback
+    let recipes = [];
+    
+    // Try to load from ViewBag (API data)
+    @if (ViewBag.Recipes != null)
+    {
+        <text>
+        const apiRecipes = @Html.Raw(Json.Serialize(ViewBag.Recipes));
+        if (apiRecipes && apiRecipes.length > 0) {
+            // Map API format to UI format
+            recipes = apiRecipes.map(recipe => ({
+                id: recipe.id || recipe.Id,
+                name: recipe.title || recipe.Title || 'Recipe',
+                category: 'lunch', // Default category
+                difficulty: 'medium', // Default difficulty
+                time: recipe.readyInMinutes || recipe.ReadyInMinutes || 30,
+                rating: 4.5, // Default rating
+                image: recipe.image || recipe.Image || '/images/recipes/default.jpg',
+                description: recipe.summary || recipe.Summary || 'Delicious recipe',
+                ingredients: [], // API might not have ingredients
+                tags: recipe.tags || recipe.Tags || ['Recipe']
+            }));
+            console.log('✅ Loaded ' + recipes.length + ' recipes from CookMate API');
+        } else {
+            // Fallback to sample data
+            recipes = getSampleRecipes();
+            console.log('⚠️ No API data, using sample recipes');
+        }
+        </text>
+    }
+    else
+    {
+        <text>
+        // Fallback to sample data
+        recipes = getSampleRecipes();
+        console.log('⚠️ No API data, using sample recipes');
+        </text>
+    }
+    
+    function getSampleRecipes() {
+        return [
         {
             id: 1,
             name: "Phở Bò",
@@ -338,7 +377,8 @@ document.addEventListener('DOMContentLoaded', function() {
             ingredients: ["Bún", "Thịt nướng", "Nước mắm", "Dưa chua", "Rau thơm"],
             tags: ["Việt Nam", "Hà Nội", "Thịt nướng", "Nước mắm"]
         }
-    ];
+        ];
+    }
 
     let filteredRecipes = [...recipes];
     let displayedCount = 8;

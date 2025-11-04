@@ -12,5 +12,7 @@ namespace demo.Data
         }
 
         public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<IngredientCategory> IngredientCategories { get; set; }
+        public DbSet<Ingredient> Ingredients { get; set; }
     }
 }

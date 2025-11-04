@@ -1,3 +1,14 @@
 @{
-    Layout = "_Layout";
+    // Auth pages (Login, OTP) không dùng layout
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    
+    if (controller == "Auth" && (action == "Login" || action == "OTPLogin"))
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
 }

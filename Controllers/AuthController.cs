@@ -1,36 +1,29 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using demo.Models;
-using demo.Data;
-using demo.Services;
-using System.Text.Json;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text;
 
 namespace demo.Controllers
 {
+    /// <summary>
+    /// Auth Controller - ONLY Google OAuth
+    /// Calls CookMate API Server: https://cookm8.vercel.app
+    /// </summary>
     public class AuthController : Controller
     {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly ApiService _apiService;
-    private readonly OTPService _otpService;
-    private readonly FavoriteSeedService _favoriteSeedService;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<AuthController> _logger;
+        private const string API_BASE_URL = "https://cookm8.vercel.app";
 
         public AuthController(
-            UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, 
-            ApiService apiService, 
-            OTPService otpService,
-            FavoriteSeedService favoriteSeedService)
+            IHttpClientFactory httpClientFactory,
+            ILogger<AuthController> logger)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _apiService = apiService;
-            _otpService = otpService;
-            _favoriteSeedService = favoriteSeedService;
+            _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -39,11 +32,11 @@ namespace demo.Controllers
             return View();
         }
 
-        // Google OAuth Actions
+        #region Google OAuth → CookMate API
+
         [HttpGet]
         public IActionResult GoogleLogin()
         {
-            // Redirect trực tiếp đến Google với prompt=select_account để hiển thị danh sách tài khoản
             var properties = new AuthenticationProperties
             {
                 RedirectUri = Url.Action("GoogleResponse"),
@@ -56,296 +49,287 @@ namespace demo.Controllers
         [HttpGet]
         public async Task<IActionResult> GoogleResponse()
         {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-            
-            if (!result.Succeeded)
+            try
             {
-                TempData["Error"] = "Google authentication failed";
-                return RedirectToAction("Login");
-            }
-
-            var claims = result.Principal.Claims.ToList();
-            var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-
-            if (string.IsNullOrEmpty(email))
-            {
-                TempData["Error"] = "Email not found in Google response";
-                return RedirectToAction("Login");
-            }
-
-            // Tìm hoặc tạo user trong database
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                // Tạo user mới
-                user = new ApplicationUser
+                var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+                
+                if (!result.Succeeded)
                 {
-                    UserName = email,
-                    Email = email,
-                    FullName = name ?? email.Split('@')[0],
-                    EmailConfirmed = true,
-                    CreatedAt = DateTime.Now
+                    _logger.LogError("Google authentication failed");
+                    TempData["Error"] = "Google authentication failed";
+                    return RedirectToAction("Login");
+                }
+
+                var claims = result.Principal.Claims.ToList();
+                var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                var googleUserId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                var picture = claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    _logger.LogError("Email not found in Google response");
+                    TempData["Error"] = "Email not found in Google response";
+                    return RedirectToAction("Login");
+                }
+
+                _logger.LogInformation($"📧 Google auth successful: {email}");
+
+                // CALL CookMate API Server
+                var httpClient = _httpClientFactory.CreateClient();
+                var requestData = new
+                {
+                    googleUserId = googleUserId ?? email,
+                    email = email,
+                    name = name ?? email.Split('@')[0],
+                    avatar = picture ?? ""
                 };
 
-                var createResult = await _userManager.CreateAsync(user);
-                if (!createResult.Succeeded)
+                var json = JsonSerializer.Serialize(requestData, new JsonSerializerOptions
                 {
-                    TempData["Error"] = "Không thể tạo tài khoản";
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                _logger.LogInformation($"🌐 Calling CookMate API: POST {API_BASE_URL}/api/auth/google");
+                _logger.LogInformation($"📤 Request: {json}");
+                
+                var response = await httpClient.PostAsync($"{API_BASE_URL}/api/auth/google", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation($"📥 Response status: {response.StatusCode}");
+                _logger.LogInformation($"📥 Response: {responseContent}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiResponse = JsonSerializer.Deserialize<CookMateAuthResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    if (apiResponse != null && !string.IsNullOrEmpty(apiResponse.Token))
+                    {
+                        // Lưu JWT token vào session
+                        HttpContext.Session.SetString("access_token", apiResponse.Token);
+                        HttpContext.Session.SetString("user_email", apiResponse.User?.Email ?? email);
+                        HttpContext.Session.SetString("user_name", apiResponse.User?.Name ?? name ?? "");
+                        HttpContext.Session.SetString("user_id", apiResponse.User?.Id ?? "");
+
+                        _logger.LogInformation($"✅ Authentication successful!");
+                        _logger.LogInformation($"🔑 Token: {apiResponse.Token.Substring(0, Math.Min(50, apiResponse.Token.Length))}...");
+                        _logger.LogInformation($"👤 User: {apiResponse.User?.Email} (ID: {apiResponse.User?.Id})");
+                        
+                        // Create local cookie
+                        var userClaims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Email, email),
+                            new Claim(ClaimTypes.Name, name ?? email),
+                            new Claim("access_token", apiResponse.Token),
+                            new Claim("user_id", apiResponse.User?.Id ?? "")
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(userClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                        await HttpContext.SignInAsync(
+                            CookieAuthenticationDefaults.AuthenticationScheme, 
+                            claimsPrincipal);
+
+                        TempData["Success"] = $"Chào mừng {name}! Đăng nhập thành công.";
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        _logger.LogError($"❌ API response missing token: {responseContent}");
+                        TempData["Error"] = "Failed to get authentication token from server";
+                        return RedirectToAction("Login");
+                    }
+                }
+                else
+                {
+                    _logger.LogError($"❌ API call failed: {response.StatusCode} - {responseContent}");
+                    TempData["Error"] = $"Authentication failed: {response.StatusCode}";
                     return RedirectToAction("Login");
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error during Google authentication");
+                TempData["Error"] = "Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.";
+                return RedirectToAction("Login");
+            }
+        }
 
-            // Đăng nhập user bằng SignInManager
-            await _signInManager.SignInAsync(user, isPersistent: false);
+        #endregion
 
-            // Tự động thêm món ăn yêu thích mẫu nếu user chưa có món nào
-            await _favoriteSeedService.EnsureUserHasFavorites(user.Id);
+        #region OTP Authentication → CookMate API
 
-            // Redirect đến trang chủ
-            return RedirectToAction("Index", "Home");
+        [HttpGet]
+        public IActionResult OTPLogin()
+        {
+            return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string email, string password, bool rememberMe = false)
+        public async Task<IActionResult> SendOTP([FromBody] SendOTPRequest request)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            try
             {
-                TempData["Error"] = "Vui lòng nhập đầy đủ thông tin";
-                return View();
-            }
+                if (string.IsNullOrEmpty(request.Email))
+                {
+                    return Json(new { success = false, message = "Email là bắt buộc" });
+                }
 
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+                var httpClient = _httpClientFactory.CreateClient();
+                var requestData = new { email = request.Email };
+                var json = JsonSerializer.Serialize(requestData);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                _logger.LogInformation($"🌐 Sending OTP to: {request.Email}");
+
+                var response = await httpClient.PostAsync($"{API_BASE_URL}/api/auth/otp", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Lưu email vào session
+                    HttpContext.Session.SetString("otp_email", request.Email);
+
+                    _logger.LogInformation($"✅ OTP sent successfully to {request.Email}");
+                    return Json(new { success = true, message = "Mã OTP đã được gửi đến email của bạn" });
+                }
+                else
+                {
+                    _logger.LogError($"❌ Failed to send OTP: {responseContent}");
+                    return Json(new { success = false, message = "Không thể gửi OTP. Vui lòng thử lại." });
+                }
+            }
+            catch (Exception ex)
             {
-                TempData["Error"] = "Email hoặc mật khẩu không đúng";
-                return View();
+                _logger.LogError(ex, "Error sending OTP");
+                return Json(new { success = false, message = "Có lỗi xảy ra" });
             }
-
-            var result = await _signInManager.PasswordSignInAsync(user, password, rememberMe, lockoutOnFailure: false);
-            if (result.Succeeded)
-            {
-                // Tự động thêm món ăn yêu thích mẫu nếu user chưa có món nào
-                await _favoriteSeedService.EnsureUserHasFavorites(user.Id);
-                
-                return RedirectToAction("Index", "Home");
-            }
-
-            TempData["Error"] = "Email hoặc mật khẩu không đúng";
-            return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyOTP([FromBody] VerifyOTPRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Otp))
+                {
+                    return Json(new { success = false, message = "Email và OTP là bắt buộc" });
+                }
+
+                var httpClient = _httpClientFactory.CreateClient();
+                var requestData = new { email = request.Email, otp = request.Otp };
+                var json = JsonSerializer.Serialize(requestData);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                _logger.LogInformation($"🌐 Verifying OTP for: {request.Email}");
+
+                var response = await httpClient.PostAsync($"{API_BASE_URL}/api/auth/otp/verify", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation($"📥 Response: {responseContent}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiResponse = JsonSerializer.Deserialize<CookMateAuthResponse>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    if (apiResponse != null && !string.IsNullOrEmpty(apiResponse.Token))
+                    {
+                        // Lưu JWT token vào session
+                        HttpContext.Session.SetString("access_token", apiResponse.Token);
+                        HttpContext.Session.SetString("user_email", apiResponse.User?.Email ?? request.Email);
+                        HttpContext.Session.SetString("user_name", apiResponse.User?.Name ?? request.Email.Split('@')[0]);
+                        HttpContext.Session.SetString("user_id", apiResponse.User?.Id ?? "");
+
+                        _logger.LogInformation($"✅ OTP verified successfully for {request.Email}");
+
+                        // Create local cookie
+                        var userClaims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Email, request.Email),
+                            new Claim(ClaimTypes.Name, apiResponse.User?.Name ?? request.Email),
+                            new Claim("access_token", apiResponse.Token),
+                            new Claim("user_id", apiResponse.User?.Id ?? "")
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(userClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+                        // Clear OTP session
+                        HttpContext.Session.Remove("otp_email");
+
+                        return Json(new { 
+                            success = true, 
+                            message = "Đăng nhập thành công!",
+                            redirectUrl = Url.Action("Index", "Home")
+                        });
+                    }
+                }
+
+                return Json(new { success = false, message = "Mã OTP không đúng hoặc đã hết hạn" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error verifying OTP");
+                return Json(new { success = false, message = "Có lỗi xảy ra khi xác thực OTP" });
+            }
+        }
+
+        #endregion
 
         [HttpGet]
         [Route("Auth/Logout")]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            // Clear session
+            HttpContext.Session.Clear();
+
+            // Sign out
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            _logger.LogInformation("👋 User logged out");
             TempData["Success"] = "Đăng xuất thành công!";
             return RedirectToAction("Login");
         }
 
-        [HttpGet]
-        [Route("Auth/UserProfile")]
-        public async Task<IActionResult> UserProfile()
+        #region Request/Response Models
+
+        public class SendOTPRequest
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login");
-            }
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            return View(user);
+            public string Email { get; set; } = "";
         }
 
-        [HttpGet]
-        public IActionResult EditProfile()
+        public class VerifyOTPRequest
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login");
-            }
-
-            var user = _userManager.GetUserAsync(User).Result;
-            if (user == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            return View(user);
+            public string Email { get; set; } = "";
+            public string Otp { get; set; } = "";
         }
 
-        [HttpPost]
-        public async Task<IActionResult> EditProfile(string fullName, string email, string phoneNumber)
+        private class CookMateAuthResponse
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login");
-            }
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            // Cập nhật thông tin
-            user.FullName = fullName;
-            user.Email = email;
-            user.NormalizedEmail = email.ToUpper();
-            user.PhoneNumber = phoneNumber;
-
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
-            {
-                TempData["Success"] = "Cập nhật thông tin thành công!";
-                return RedirectToAction("UserProfile");
-            }
-            else
-            {
-                TempData["Error"] = "Có lỗi xảy ra khi cập nhật thông tin: " + string.Join(", ", result.Errors.Select(e => e.Description));
-                return View(user);
-            }
+            public string Token { get; set; } = "";
+            public string Message { get; set; } = "";
+            public UserInfo? User { get; set; }
         }
 
-        // OTP Login Actions
-        [HttpGet]
-        public IActionResult OTPLogin()
+        private class UserInfo
         {
-            // Redirect to RealOTP instead
-            return RedirectToAction("RealOTP");
+            public string Id { get; set; } = "";
+            public string Email { get; set; } = "";
+            public string Name { get; set; } = "";
+            public string Avatar { get; set; } = "";
+            public List<string>? DietaryPreferences { get; set; }
         }
 
-        // GET: Auth/SimpleOTP - Trang OTP đơn giản mới
-        public IActionResult SimpleOTP()
-        {
-            return View();
-        }
-
-        // GET: Auth/RealOTP - Trang OTP thực sự với Email/SMS
-        public IActionResult RealOTP()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SendOTP(string email, string? phoneNumber = null)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(email))
-                {
-                    return Json(new { success = false, message = "Vui lòng nhập email" });
-                }
-
-                // Sử dụng OTP Service thực sự
-                var otpResult = await _otpService.SendOTPAsync(email, phoneNumber);
-                
-                if (otpResult.Success)
-                {
-                    // Lưu email vào session để verify sau
-                    HttpContext.Session.SetString("otp_email", email);
-                    
-                    // Chỉ trả về otpCode nếu thực sự là demo mode
-                    if (!string.IsNullOrEmpty(otpResult.OTPCode) && otpResult.Message.Contains("Demo"))
-                    {
-                        return Json(new { 
-                            success = true, 
-                            message = $"Mã OTP: {otpResult.OTPCode} (Demo mode)",
-                            otpCode = otpResult.OTPCode
-                        });
-                    }
-                    else
-                    {
-                        return Json(new { 
-                            success = true, 
-                            message = otpResult.Message
-                        });
-                    }
-                }
-                else
-                {
-                    return Json(new { success = false, message = otpResult.Message });
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"SendOTP Error: {ex.Message}");
-                return Json(new { success = false, message = "Có lỗi xảy ra khi gửi OTP!" });
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> VerifyOTP(string otpCode)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(otpCode))
-                {
-                    return Json(new { success = false, message = "Vui lòng nhập mã OTP" });
-                }
-
-                // Lấy email từ session
-                var email = HttpContext.Session.GetString("otp_email");
-                if (string.IsNullOrEmpty(email))
-                {
-                    return Json(new { success = false, message = "Vui lòng gửi OTP trước" });
-                }
-
-                // Sử dụng OTP Service để verify
-                var verifyResult = await _otpService.VerifyOTPAsync(email, otpCode);
-                
-                if (verifyResult.Success)
-                {
-                    // Tìm hoặc tạo user
-                    var user = await _userManager.FindByEmailAsync(email);
-                    if (user == null)
-                    {
-                        // Tạo user mới
-                        user = new ApplicationUser
-                        {
-                            UserName = email,
-                            Email = email,
-                            FullName = email.Split('@')[0],
-                            EmailConfirmed = true,
-                            CreatedAt = DateTime.Now
-                        };
-
-                        var result = await _userManager.CreateAsync(user);
-                        if (!result.Succeeded)
-                        {
-                            return Json(new { success = false, message = "Không thể tạo tài khoản" });
-                        }
-                    }
-
-                    // Đăng nhập user
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    // Tự động thêm món ăn yêu thích mẫu nếu user chưa có món nào
-                    await _favoriteSeedService.EnsureUserHasFavorites(user.Id);
-
-                    // Xóa session OTP
-                    HttpContext.Session.Remove("otp_email");
-
-                    return Json(new { 
-                        success = true, 
-                        message = "Đăng nhập thành công!",
-                        redirectUrl = Url.Action("Index", "Home")
-                    });
-                }
-                else
-                {
-                    return Json(new { success = false, message = verifyResult.Message });
-                }
-            }
-            catch (Exception)
-            {
-                return Json(new { success = false, message = "Có lỗi xảy ra khi xác thực OTP" });
-            }
-        }
+        #endregion
     }
 }

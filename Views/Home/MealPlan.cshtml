@@ -5,6 +5,40 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/mealplan.css" asp-append-version="true" />
+    <style>
+        /* Highlight days with meal plans */
+        .calendar-day.has-meal-plan {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .calendar-day.has-meal-plan::after {
+            content: '📅';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+        }
+        
+        .calendar-day.has-meal-plan.active {
+            box-shadow: 0 0 0 3px #667eea;
+        }
+        
+        /* Button danger style */
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+    </style>
 }
 
 <!-- Main Content -->
@@ -109,92 +143,79 @@
                 </svg>
             </div>
             <div class="date-info">
-                <h3 class="date-text">Ngày 11 10 2025</h3>
-                <p class="meal-type">Thực đơn tập gym</p>
+                <h3 class="date-text" id="selectedDateText">Chọn ngày</h3>
+                <p class="meal-type" id="selectedMealPlanName">Chưa chọn kế hoạch</p>
             </div>
             <div class="meal-stats">
                 <div class="stat-item">
-                    <span class="stat-number">3</span>
+                    <span class="stat-number" id="mealCount">0</span>
                     <span class="stat-label">Món ăn</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number">1,200</span>
+                    <span class="stat-number" id="caloriesCount">0</span>
                     <span class="stat-label">Calories</span>
                 </div>
             </div>
         </div>
 
-        <!-- Meal Categories -->
-        <div class="meal-categories">
+        <!-- Meal Plan Details -->
+        <div id="mealPlanDetails">
+            <div class="empty-state" style="text-align: center; padding: 40px; color: #999;">
+                <p>Chọn ngày trong lịch để xem kế hoạch bữa ăn</p>
+            </div>
+        </div>
+
+        <!-- Meal Categories (will be rendered dynamically) -->
+        <div class="meal-categories" id="mealCategories" style="display: none;">
             <!-- Breakfast -->
             <div class="meal-category">
                 <h4 class="category-title">Bữa sáng</h4>
-                <div class="meal-items">
-                    <div class="meal-item">
-                        <div class="meal-checkbox">
-                            <input type="checkbox" id="beef" class="checkbox-input">
-                            <label for="beef" class="checkbox-label"></label>
-                        </div>
-                        <div class="meal-content">
-                            <h5 class="meal-name">Thịt bò</h5>
-                            <p class="meal-info">250g • 300 cal</p>
-                        </div>
-                        <div class="meal-image">
-                            <img src="~/images/recipes/today-suggestion.jpg" alt="Thịt bò">
-                        </div>
-                    </div>
+                <div class="meal-items" id="breakfastItems">
+                    <!-- Loaded from API -->
                 </div>
             </div>
 
             <!-- Lunch -->
             <div class="meal-category">
                 <h4 class="category-title">Bữa trưa</h4>
-                <div class="meal-items">
-                    <div class="meal-item">
-                        <div class="meal-checkbox">
-                            <input type="checkbox" id="rice" class="checkbox-input">
-                            <label for="rice" class="checkbox-label"></label>
-                        </div>
-                        <div class="meal-content">
-                            <h5 class="meal-name">Cơm</h5>
-                            <p class="meal-info">200g • 400 cal</p>
-                        </div>
-                        <div class="meal-image">
-                            <img src="~/images/recipes/phobo.jpeg" alt="Cơm">
-                        </div>
-                    </div>
+                <div class="meal-items" id="lunchItems">
+                    <!-- Loaded from API -->
                 </div>
             </div>
 
             <!-- Dinner -->
             <div class="meal-category">
                 <h4 class="category-title">Bữa tối</h4>
-                <div class="meal-items">
-                    <div class="meal-item">
-                        <div class="meal-checkbox">
-                            <input type="checkbox" id="eggs" class="checkbox-input">
-                            <label for="eggs" class="checkbox-label"></label>
-                        </div>
-                        <div class="meal-content">
-                            <h5 class="meal-name">Trứng luộc</h5>
-                            <p class="meal-info">2 quả • 140 cal</p>
-                        </div>
-                        <div class="meal-image">
-                            <img src="~/images/recipes/banhmi.jpg" alt="Trứng luộc">
-                        </div>
-                    </div>
+                <div class="meal-items" id="dinnerItems">
+                    <!-- Loaded from API -->
                 </div>
             </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="btn btn-primary" onclick="addMeal()">
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button class="btn btn-primary" onclick="addMeal()" id="addMealBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
                 Thêm món ăn
+            </button>
+            <button class="btn btn-secondary" onclick="editMealPlan()" id="editMealPlanBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Sửa kế hoạch
+            </button>
+            <button class="btn btn-danger" onclick="deleteMealPlan()" id="deleteMealPlanBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                Xóa kế hoạch
             </button>
             <button class="btn btn-secondary" onclick="saveMealPlan()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -211,8 +232,24 @@
 
 @section Scripts {
     <script>
+        // Load meal plans from API (ViewBag)
+        let mealPlans = [];
+        let selectedMealPlan = null;
+        let selectedDate = null;
+
+        @if (ViewBag.MealPlans != null)
+        {
+            <text>
+            mealPlans = @Html.Raw(Json.Serialize(ViewBag.MealPlans));
+            console.log('✅ Loaded ' + mealPlans.length + ' meal plans from CookMate API');
+            </text>
+        }
+
         // Calendar day selection
         document.addEventListener('DOMContentLoaded', function() {
+            // Mark days with meal plans
+            markDaysWithMealPlans();
+
             const calendarDays = document.querySelectorAll('.calendar-day');
             
             calendarDays.forEach(day => {
@@ -223,78 +260,328 @@
                         // Add active class to clicked day
                         this.classList.add('active');
                         
+                        const dayNumber = parseInt(this.textContent.trim());
+                        selectedDate = dayNumber;
+                        
                         // Update date header
-                        const dateText = document.querySelector('.date-text');
+                        const dateText = document.getElementById('selectedDateText');
                         if (dateText) {
-                            dateText.textContent = `Ngày ${this.textContent} 10 2025`;
+                            const today = new Date();
+                            dateText.textContent = `Ngày ${dayNumber} ${today.getMonth() + 1} ${today.getFullYear()}`;
                         }
                         
                         // Update meal plan for selected day
-                        updateMealPlanForDay(this.textContent);
+                        updateMealPlanForDay(dayNumber);
                     });
                 }
             });
+        });
 
-            // Meal item checkbox functionality
-            const mealCheckboxes = document.querySelectorAll('.checkbox-input');
-            
-            mealCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const mealItem = this.closest('.meal-item');
-                    if (this.checked) {
-                        mealItem.classList.add('completed');
-                    } else {
-                        mealItem.classList.remove('completed');
+        // Mark calendar days that have meal plans
+        function markDaysWithMealPlans() {
+            if (!mealPlans || mealPlans.length === 0) return;
+
+            mealPlans.forEach(plan => {
+                const planDate = new Date(plan.date || plan.Date);
+                const dayNumber = planDate.getDate();
+                
+                const calendarDays = document.querySelectorAll('.calendar-day');
+                calendarDays.forEach(day => {
+                    if (parseInt(day.textContent.trim()) === dayNumber) {
+                        day.classList.add('has-meal-plan');
+                        day.setAttribute('data-meal-plan-id', plan.id || plan.Id || '');
                     }
-                    
-                    // Update meal stats
-                    updateMealStats();
                 });
             });
-
-            // Set default active day (day 11)
-            const day11 = document.querySelector('.calendar-day');
-            if (day11 && day11.textContent.trim() === '11') {
-                day11.classList.add('active');
-            }
-            
-            // Initialize meal stats
-            updateMealStats();
-        });
+        }
 
         // Update meal plan for selected day
         function updateMealPlanForDay(day) {
-            console.log(`Loading meal plan for day ${day}`);
-            // Here you would typically load meal plan data from server
-            // For now, we'll just update the display
+            // Find meal plan for this day
+            const plan = mealPlans.find(p => {
+                const planDate = new Date(p.date || p.Date);
+                return planDate.getDate() === day;
+            });
+
+            if (!plan) {
+                // No meal plan for this day
+                document.getElementById('mealPlanDetails').innerHTML = `
+                    <div class="empty-state" style="text-align: center; padding: 40px; color: #999;">
+                        <p>Chưa có kế hoạch bữa ăn cho ngày này</p>
+                        <button class="btn btn-primary" onclick="addMeal()" style="margin-top: 20px;">
+                            Tạo kế hoạch mới
+                        </button>
+                    </div>
+                `;
+                document.getElementById('mealCategories').style.display = 'none';
+                document.getElementById('actionButtons').style.display = 'none';
+                document.getElementById('selectedMealPlanName').textContent = 'Chưa có kế hoạch';
+                document.getElementById('mealCount').textContent = '0';
+                document.getElementById('caloriesCount').textContent = '0';
+                selectedMealPlan = null;
+                return;
+            }
+
+            selectedMealPlan = plan;
+            
+            // Update header
+            document.getElementById('selectedMealPlanName').textContent = plan.name || plan.Name || 'Kế hoạch bữa ăn';
+            
+            // Show meal categories
+            document.getElementById('mealPlanDetails').innerHTML = '';
+            document.getElementById('mealCategories').style.display = 'block';
+            
+            // Get recipe IDs
+            const recipeIds = plan.recipeIds || plan.RecipeIds || [];
+            
+            // Load recipe details (if available)
+            // For now, just show recipe IDs
+            renderMealPlan(recipeIds, plan);
+        }
+
+        // Render meal plan
+        function renderMealPlan(recipeIds, plan) {
+            // Show action buttons when meal plan is selected
+            document.getElementById('actionButtons').style.display = 'flex';
+            
+            // Clear existing items
+            document.getElementById('breakfastItems').innerHTML = '';
+            document.getElementById('lunchItems').innerHTML = '';
+            document.getElementById('dinnerItems').innerHTML = '';
+
+            if (!recipeIds || recipeIds.length === 0) {
+                document.getElementById('mealCategories').innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #999;">
+                        <p>Chưa có món ăn nào trong kế hoạch này</p>
+                    </div>
+                `;
+                updateMealStats(0, 0);
+                return;
+            }
+
+            // For now, display recipe IDs
+            // In real implementation, would call API to get recipe details
+            recipeIds.forEach((recipeId, index) => {
+                const mealItem = `
+                    <div class="meal-item">
+                        <div class="meal-checkbox">
+                            <input type="checkbox" id="recipe_${recipeId}" class="checkbox-input" onchange="updateMealStats()">
+                            <label for="recipe_${recipeId}" class="checkbox-label"></label>
+                        </div>
+                        <div class="meal-content">
+                            <h5 class="meal-name">Recipe ${recipeId}</h5>
+                            <p class="meal-info">Recipe ID: ${recipeId}</p>
+                        </div>
+                        <div class="meal-image">
+                            <img src="/images/recipes/default.jpg" alt="Recipe" onerror="this.src='/images/recipes/today-suggestion.jpg'">
+                        </div>
+                    </div>
+                `;
+                
+                // Distribute to categories (simple round-robin)
+                if (index % 3 === 0) {
+                    document.getElementById('breakfastItems').innerHTML += mealItem;
+                } else if (index % 3 === 1) {
+                    document.getElementById('lunchItems').innerHTML += mealItem;
+                } else {
+                    document.getElementById('dinnerItems').innerHTML += mealItem;
+                }
+            });
+
+            updateMealStats(recipeIds.length, 0);
         }
 
         // Update meal statistics
-        function updateMealStats() {
-            const completedMeals = document.querySelectorAll('.meal-item.completed').length;
-            const totalMeals = document.querySelectorAll('.meal-item').length;
-            
-            const statNumber = document.querySelector('.stat-number');
-            if (statNumber) {
-                statNumber.textContent = `${completedMeals}/${totalMeals}`;
+        function updateMealStats(totalMeals = null, totalCalories = 0) {
+            if (totalMeals !== null) {
+                document.getElementById('mealCount').textContent = totalMeals;
+            } else {
+                const completedMeals = document.querySelectorAll('.meal-item.completed').length;
+                const total = document.querySelectorAll('.meal-item').length;
+                document.getElementById('mealCount').textContent = `${completedMeals}/${total}`;
             }
+            
+            document.getElementById('caloriesCount').textContent = totalCalories.toLocaleString();
         }
 
         // Add new meal
-        function addMeal() {
-            alert('Tính năng thêm món ăn sẽ được phát triển trong phiên bản tiếp theo!');
+        async function addMeal() {
+            if (!selectedDate) {
+                alert('Vui lòng chọn ngày trước!');
+                return;
+            }
+
+            const mealPlanName = prompt('Tên kế hoạch bữa ăn:');
+            if (!mealPlanName) return;
+
+            const recipeIdsInput = prompt('Nhập Recipe IDs (phân cách bằng dấu phẩy):');
+            if (!recipeIdsInput) return;
+
+            const recipeIds = recipeIdsInput.split(',').map(id => id.trim()).filter(id => id);
+
+            const today = new Date();
+            const planDate = new Date(today.getFullYear(), today.getMonth(), selectedDate);
+
+            try {
+                const response = await fetch('/api/MealPlansApi', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        name: mealPlanName,
+                        recipeIds: recipeIds,
+                        date: planDate.toISOString(),
+                        notes: ''
+                    })
+                });
+
+                if (response.ok) {
+                    const newPlan = await response.json();
+                    mealPlans.push(newPlan);
+                    markDaysWithMealPlans();
+                    updateMealPlanForDay(selectedDate);
+                    console.log('✅ Created meal plan via CookMate API');
+                    alert('Đã tạo kế hoạch bữa ăn thành công!');
+                } else {
+                    const error = await response.json();
+                    alert('Lỗi: ' + (error.message || 'Không thể tạo kế hoạch'));
+                }
+            } catch (error) {
+                console.error('Error creating meal plan:', error);
+                alert('Có lỗi xảy ra khi tạo kế hoạch');
+            }
+        }
+
+        // Edit meal plan
+        async function editMealPlan() {
+            if (!selectedMealPlan) {
+                alert('Chưa có kế hoạch để sửa!');
+                return;
+            }
+
+            const planId = selectedMealPlan.id || selectedMealPlan.Id;
+            const currentName = selectedMealPlan.name || selectedMealPlan.Name || '';
+            const currentRecipeIds = (selectedMealPlan.recipeIds || selectedMealPlan.RecipeIds || []).join(', ');
+
+            const newName = prompt('Sửa tên kế hoạch:', currentName);
+            if (!newName || !newName.trim()) return;
+
+            const newRecipeIdsInput = prompt('Sửa Recipe IDs (phân cách bằng dấu phẩy):', currentRecipeIds);
+            if (newRecipeIdsInput === null) return;
+
+            const newRecipeIds = newRecipeIdsInput.split(',').map(id => id.trim()).filter(id => id);
+            const planDate = new Date(selectedMealPlan.date || selectedMealPlan.Date);
+
+            try {
+                const response = await fetch('/api/MealPlansApi', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        mealPlanId: planId,
+                        name: newName.trim(),
+                        recipeIds: newRecipeIds,
+                        date: planDate.toISOString(),
+                        notes: selectedMealPlan.notes || selectedMealPlan.Notes || ''
+                    })
+                });
+
+                if (response.ok) {
+                    const updatedPlan = await response.json();
+                    // Update local meal plans array
+                    const index = mealPlans.findIndex(p => (p.id || p.Id) === planId);
+                    if (index !== -1) {
+                        mealPlans[index] = updatedPlan;
+                    }
+                    
+                    // Reload display
+                    updateMealPlanForDay(selectedDate);
+                    console.log('✅ Updated meal plan via CookMate API');
+                    alert('Đã sửa kế hoạch bữa ăn thành công!');
+                } else {
+                    const error = await response.json();
+                    alert('Lỗi: ' + (error.message || 'Không thể sửa kế hoạch'));
+                }
+            } catch (error) {
+                console.error('Error updating meal plan:', error);
+                alert('Có lỗi xảy ra khi sửa kế hoạch');
+            }
+        }
+
+        // Delete meal plan
+        async function deleteMealPlan() {
+            if (!selectedMealPlan) {
+                alert('Chưa có kế hoạch để xóa!');
+                return;
+            }
+
+            const planId = selectedMealPlan.id || selectedMealPlan.Id;
+            const planName = selectedMealPlan.name || selectedMealPlan.Name || 'kế hoạch này';
+
+            if (!confirm(`Bạn có chắc muốn xóa "${planName}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/MealPlansApi/${planId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    // Remove from local array
+                    mealPlans = mealPlans.filter(p => (p.id || p.Id) !== planId);
+                    
+                    // Update calendar
+                    markDaysWithMealPlans();
+                    
+                    // Clear display
+                    document.getElementById('mealPlanDetails').innerHTML = `
+                        <div class="empty-state" style="text-align: center; padding: 40px; color: #999;">
+                            <p>Chưa có kế hoạch bữa ăn cho ngày này</p>
+                            <button class="btn btn-primary" onclick="addMeal()" style="margin-top: 20px;">
+                                Tạo kế hoạch mới
+                            </button>
+                        </div>
+                    `;
+                    document.getElementById('mealCategories').style.display = 'none';
+                    document.getElementById('actionButtons').style.display = 'none';
+                    document.getElementById('selectedMealPlanName').textContent = 'Chưa có kế hoạch';
+                    document.getElementById('mealCount').textContent = '0';
+                    document.getElementById('caloriesCount').textContent = '0';
+                    selectedMealPlan = null;
+                    
+                    // Remove active class from calendar day
+                    const calendarDays = document.querySelectorAll('.calendar-day');
+                    calendarDays.forEach(d => d.classList.remove('active'));
+                    
+                    console.log('✅ Deleted meal plan via CookMate API');
+                    alert('Đã xóa kế hoạch bữa ăn thành công!');
+                } else {
+                    const error = await response.json();
+                    alert('Lỗi: ' + (error.message || 'Không thể xóa kế hoạch'));
+                }
+            } catch (error) {
+                console.error('Error deleting meal plan:', error);
+                alert('Có lỗi xảy ra khi xóa kế hoạch');
+            }
         }
 
         // Save meal plan
-        function saveMealPlan() {
+        async function saveMealPlan() {
+            if (!selectedMealPlan) {
+                alert('Chưa có kế hoạch để lưu!');
+                return;
+            }
+
             const completedMeals = document.querySelectorAll('.meal-item.completed').length;
             const totalMeals = document.querySelectorAll('.meal-item').length;
             
-            if (completedMeals === totalMeals) {
-                alert('Chúc mừng! Bạn đã hoàn thành tất cả các bữa ăn trong ngày! 🎉');
-            } else {
-                alert(`Đã lưu kế hoạch ăn uống! Bạn đã hoàn thành ${completedMeals}/${totalMeals} bữa ăn.`);
-            }
+            alert(`Đã lưu kế hoạch ăn uống! Bạn đã hoàn thành ${completedMeals}/${totalMeals} bữa ăn.`);
         }
     </script>
 }

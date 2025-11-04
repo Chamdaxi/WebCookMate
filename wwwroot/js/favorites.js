@@ -7,11 +7,13 @@ class FavoriteManager {
 
     async loadFavoritesCache() {
         try {
-            const response = await fetch('/api/Favorite', { credentials: 'include' });
+            const response = await fetch('/api/FavoriteApi', { credentials: 'include' });
             if (response.ok) {
                 const result = await response.json();
-                this.favoritesCache = new Set(result.data.map(fav => fav.recipeId));
+                // CookMate API returns array directly
+                this.favoritesCache = new Set(result.map(fav => fav.recipeId));
                 this.updateAllFavoriteButtons();
+                console.log('✅ Loaded favorites from CookMate API:', this.favoritesCache.size);
             }
         } catch (error) {
             console.error('Error loading favorites cache:', error);
@@ -27,7 +29,7 @@ class FavoriteManager {
         if (await this.isFavorite(recipeId)) {
             // Remove from favorites
             try {
-                const response = await fetch(`/api/Favorite/recipe/${recipeId}`, {
+                const response = await fetch(`/api/FavoriteApi/recipe/${recipeId}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include'
@@ -40,6 +42,7 @@ class FavoriteManager {
                 this.favoritesCache.delete(recipeId);
                 this.updateFavoriteButton(buttonElement, false);
                 this.notification(`Đã xóa "${recipeData.name}" khỏi yêu thích!`, 'info');
+                console.log('✅ Removed from favorites via CookMate API');
                 return false; // Not a favorite anymore
             } catch (error) {
                 console.error('Error removing favorite:', error);
@@ -60,21 +63,33 @@ class FavoriteManager {
                     rating: recipeData.rating
                 };
 
-                const response = await fetch('/api/Favorite', {
+                // CookMate API only needs recipeId
+                console.log('🔄 Adding favorite:', recipeData.id);
+                const response = await fetch('/api/FavoriteApi', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(favorite),
+                    body: JSON.stringify({ recipeId: recipeData.id }),
                     credentials: 'include'
                 });
 
+                console.log('📡 Add favorite response status:', response.status, response.statusText);
+
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to add to favorites');
+                    const errorText = await response.text();
+                    console.error('❌ Failed to add favorite:', response.status, errorText);
+                    let errorData;
+                    try {
+                        errorData = JSON.parse(errorText);
+                    } catch {
+                        errorData = { message: errorText };
+                    }
+                    throw new Error(errorData.message || errorData.error || 'Failed to add to favorites');
                 }
 
                 this.favoritesCache.add(recipeId);
                 this.updateFavoriteButton(buttonElement, true);
                 this.notification(`Đã thêm "${recipeData.name}" vào yêu thích!`, 'success');
+                console.log('✅ Added to favorites via CookMate API');
                 return true; // Now a favorite
             } catch (error) {
                 console.error('Error adding favorite:', error);
