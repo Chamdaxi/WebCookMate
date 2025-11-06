@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text;
+using demo.Models;
+using demo.Services;
 
 namespace demo.Controllers
 {
@@ -16,14 +18,17 @@ namespace demo.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<AuthController> _logger;
+        private readonly CookMateApiService _cookMateApi;
         private const string API_BASE_URL = "https://cookm8.vercel.app";
 
         public AuthController(
             IHttpClientFactory httpClientFactory,
-            ILogger<AuthController> logger)
+            ILogger<AuthController> logger,
+            Services.CookMateApiService cookMateApi)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+            _cookMateApi = cookMateApi;
         }
 
         [HttpGet]
@@ -300,6 +305,141 @@ namespace demo.Controllers
             TempData["Success"] = "Đăng xuất thành công!";
             return RedirectToAction("Login");
         }
+
+        #region User Profile
+
+        [HttpGet]
+        public IActionResult UserProfile()
+        {
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return RedirectToAction("Login");
+            }
+
+            try
+            {
+                // Lấy thông tin từ session (không cần call API)
+                var userId = HttpContext.Session.GetString("user_id");
+                var email = HttpContext.Session.GetString("user_email");
+                var name = HttpContext.Session.GetString("user_name");
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    // Fallback: lấy từ User.Identity nếu session không có
+                    email = User.Identity.Name ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+                    name = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? email.Split('@')[0];
+                }
+
+                // Map to ApplicationUser model for view
+                var user = new ApplicationUser
+                {
+                    Id = userId ?? Guid.NewGuid().ToString(),
+                    Email = email ?? "",
+                    FullName = name ?? email?.Split('@')[0] ?? "",
+                    UserName = email ?? "",
+                    EmailConfirmed = true,
+                    CreatedAt = DateTime.Now
+                };
+
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading user profile");
+                TempData["Error"] = "Có lỗi xảy ra khi tải thông tin tài khoản.";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult DeleteAccount()
+        {
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return RedirectToAction("Login");
+            }
+
+            try
+            {
+                // Lấy thông tin từ session (không cần call API)
+                var userId = HttpContext.Session.GetString("user_id");
+                var email = HttpContext.Session.GetString("user_email");
+                var name = HttpContext.Session.GetString("user_name");
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    // Fallback: lấy từ User.Identity nếu session không có
+                    email = User.Identity.Name ?? User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+                    name = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? email.Split('@')[0];
+                }
+
+                // Map to ApplicationUser model for view
+                var user = new ApplicationUser
+                {
+                    Id = userId ?? Guid.NewGuid().ToString(),
+                    Email = email ?? "",
+                    FullName = name ?? email?.Split('@')[0] ?? "",
+                    UserName = email ?? "",
+                    EmailConfirmed = true,
+                    CreatedAt = DateTime.Now
+                };
+
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading user profile for delete");
+                TempData["Error"] = "Có lỗi xảy ra khi tải thông tin tài khoản.";
+                return RedirectToAction("UserProfile");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmDeleteAccount(string? password = null)
+        {
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return RedirectToAction("Login");
+            }
+
+            try
+            {
+                // Get user profile first
+                var profile = await _cookMateApi.GetProfileAsync();
+                if (profile == null)
+                {
+                    TempData["Error"] = "Không tìm thấy tài khoản.";
+                    return RedirectToAction("Login");
+                }
+
+                // Call API to delete account
+                var success = await _cookMateApi.DeleteAccountAsync();
+                if (success)
+                {
+                    // Clear session and sign out
+                    HttpContext.Session.Clear();
+                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    _logger.LogInformation($"🗑️ Account deleted: {profile.Email}");
+                    TempData["Success"] = "Tài khoản đã được xóa thành công.";
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    TempData["Error"] = "Có lỗi xảy ra khi xóa tài khoản. Vui lòng thử lại.";
+                    return RedirectToAction("DeleteAccount");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting account");
+                TempData["Error"] = "Có lỗi xảy ra khi xóa tài khoản: " + ex.Message;
+                return RedirectToAction("DeleteAccount");
+            }
+        }
+
+        #endregion
 
         #region Request/Response Models
 

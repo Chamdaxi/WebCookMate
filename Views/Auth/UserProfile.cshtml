@@ -16,7 +16,7 @@
                 <div class="avatar-container">
                     <img src="~/images/logos/profile.png" alt="Profile Avatar" class="avatar-image">
                     <div class="avatar-overlay">
-                        <span class="avatar-text">@Model.FullName?.Substring(0, 1).ToUpper()</span>
+                        <span class="avatar-text">@(Model.FullName?.Length > 0 ? Model.FullName.Substring(0, 1).ToUpper() : Model.Email?.Length > 0 ? Model.Email.Substring(0, 1).ToUpper() : "U")</span>
                     </div>
                 </div>
             </div>
@@ -55,6 +55,7 @@
             <a href="@Url.Action("EditProfile", "Auth")" class="btn btn-primary">Chỉnh sửa thông tin</a>
             <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Về trang chủ</a>
             <a href="@Url.Action("Logout", "Auth")" class="btn btn-secondary">Đăng xuất</a>
+            <a href="@Url.Action("DeleteAccount", "Auth")" class="btn btn-danger">Xóa tài khoản</a>
         </div>
     </div>
 </div>

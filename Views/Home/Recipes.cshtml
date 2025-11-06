@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const recipesToShow = filteredRecipes.slice(0, displayedCount);
         
         grid.innerHTML = recipesToShow.map(recipe => `
-            <div class="recipe-card" data-id="${recipe.id}">
+            <div class="recipe-card" data-id="${recipe.id}" style="cursor: pointer;">
                 <div class="recipe-image">
                     <img src="${recipe.image}" alt="${recipe.name}" onerror="this.src='/images/recipes/default.jpg'">
                     <div class="recipe-overlay">
@@ -506,6 +506,192 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Attach favorite button event listeners after rendering
         attachFavoriteListeners();
+        
+        // Attach click event listeners to recipe cards
+        attachRecipeCardListeners();
+    }
+    
+    function attachRecipeCardListeners() {
+        document.querySelectorAll('.recipe-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Don't trigger if clicking on favorite button
+                if (e.target.closest('.favorite-toggle-btn')) {
+                    return;
+                }
+                
+                const recipeId = this.getAttribute('data-id');
+                const recipe = recipes.find(r => r.id == recipeId);
+                
+                if (recipe) {
+                    showRecipeDetail(recipe);
+                }
+            });
+        });
+    }
+    
+    function showRecipeDetail(recipe) {
+        // Create modal
+        const modal = document.createElement('div');
+        modal.className = 'recipe-detail-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        modal.innerHTML = `
+            <div class="recipe-detail-content" style="
+                background: white;
+                border-radius: 20px;
+                max-width: 800px;
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                animation: slideUp 0.3s ease;
+            ">
+                <button class="close-modal-btn" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background: rgba(0,0,0,0.1);
+                    border: none;
+                    border-radius: 50%;
+                    width: 40px;
+                    height: 40px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10;
+                    transition: all 0.3s ease;
+                ">✕</button>
+                
+                <div class="recipe-detail-image" style="
+                    width: 100%;
+                    height: 300px;
+                    overflow: hidden;
+                    border-radius: 20px 20px 0 0;
+                ">
+                    <img src="${recipe.image}" alt="${recipe.name}" style="
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    " onerror="this.src='/images/recipes/default.jpg'">
+                </div>
+                
+                <div style="padding: 30px;">
+                    <h2 style="font-size: 28px; margin-bottom: 15px; color: #2c3e50;">${recipe.name}</h2>
+                    <p style="color: #7f8c8d; margin-bottom: 20px; line-height: 1.6;">${recipe.description}</p>
+                    
+                    <div style="display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12,6 12,12 16,14"></polyline>
+                            </svg>
+                            <span style="color: #2c3e50; font-weight: 500;">${recipe.time} phút</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="color: #2c3e50; font-weight: 500;">Độ khó:</span>
+                            <span class="recipe-difficulty difficulty-${recipe.difficulty}" style="
+                                padding: 4px 12px;
+                                border-radius: 12px;
+                                font-size: 14px;
+                                font-weight: 500;
+                            ">
+                                ${recipe.difficulty === 'easy' ? 'Dễ' : recipe.difficulty === 'medium' ? 'Trung bình' : 'Khó'}
+                            </span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="color: #2c3e50; font-weight: 500;">Đánh giá:</span>
+                            <span style="color: #f39c12;">${'★'.repeat(Math.floor(recipe.rating))}${'☆'.repeat(5-Math.floor(recipe.rating))} ${recipe.rating}</span>
+                        </div>
+                    </div>
+                    
+                    ${recipe.ingredients && recipe.ingredients.length > 0 ? `
+                        <div style="margin-bottom: 25px;">
+                            <h3 style="font-size: 20px; margin-bottom: 15px; color: #2c3e50;">Nguyên liệu</h3>
+                            <ul style="list-style: none; padding: 0;">
+                                ${recipe.ingredients.map(ing => `
+                                    <li style="padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #555;">
+                                        <span style="margin-right: 10px;">•</span>${ing}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="font-size: 20px; margin-bottom: 15px; color: #2c3e50;">Tags</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            ${recipe.tags.map(tag => `<span class="tag" style="
+                                background: #f0f0f0;
+                                padding: 6px 12px;
+                                border-radius: 12px;
+                                font-size: 14px;
+                                color: #555;
+                            ">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateY(50px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            .close-modal-btn:hover {
+                background: rgba(0,0,0,0.2) !important;
+                transform: scale(1.1);
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.body.appendChild(modal);
+        
+        // Close modal handlers
+        const closeBtn = modal.querySelector('.close-modal-btn');
+        closeBtn.addEventListener('click', () => {
+            modal.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => modal.remove(), 300);
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => modal.remove(), 300);
+            }
+        });
+        
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+        
+        // Restore body scroll when modal closes
+        const restoreScroll = () => {
+            document.body.style.overflow = '';
+        };
+        closeBtn.addEventListener('click', restoreScroll);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) restoreScroll();
+        });
     }
 
     function updateResultsCount() {

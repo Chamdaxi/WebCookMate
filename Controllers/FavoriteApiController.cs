@@ -41,7 +41,7 @@ namespace demo.Controllers
                 if (favorites == null)
                 {
                     _logger.LogWarning("⚠️ GetFavoritesAsync returned null, returning empty list");
-                    return Ok(new List<Favorite>());
+                    return Ok(new List<object>());
                 }
 
                 _logger.LogInformation($"✅ Fetched {favorites.Count} favorites from CookMate API");

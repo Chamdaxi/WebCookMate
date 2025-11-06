@@ -403,7 +403,58 @@ namespace demo.Services
 
         public async Task<List<Recipe>?> GetTodayRecipesAsync()
         {
-            return await GetAsync<List<Recipe>>("/recipes/today");
+            try
+            {
+                var client = CreateAuthenticatedClient();
+                var response = await client.GetAsync($"{API_BASE_URL}/recipes/today");
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonDoc = JsonSerializer.Deserialize<JsonElement>(content);
+                    
+                    // Handle both array and wrapped object formats
+                    if (jsonDoc.ValueKind == JsonValueKind.Array)
+                    {
+                        return JsonSerializer.Deserialize<List<Recipe>>(content, new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+                    }
+                    else if (jsonDoc.ValueKind == JsonValueKind.Object)
+                    {
+                        // Try to get recipes property (common format)
+                        foreach (var key in new[] { "recipes", "data", "items", "results", "content" })
+                        {
+                            if (jsonDoc.TryGetProperty(key, out var recipesElement) && recipesElement.ValueKind == JsonValueKind.Array)
+                            {
+                                return JsonSerializer.Deserialize<List<Recipe>>(recipesElement.GetRawText(), new JsonSerializerOptions
+                                {
+                                    PropertyNameCaseInsensitive = true
+                                });
+                            }
+                        }
+                    }
+                    
+                    _logger.LogWarning($"Unexpected response format for recipes/today: {content.Substring(0, Math.Min(200, content.Length))}");
+                    return new List<Recipe>();
+                }
+                
+                // If 400 BadRequest or other client errors, return empty list instead of null
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    _logger.LogWarning($"GET /recipes/today returned 400 BadRequest - returning empty list");
+                    return new List<Recipe>();
+                }
+                
+                _logger.LogError($"GET /recipes/today failed: {response.StatusCode}");
+                return new List<Recipe>(); // Return empty list instead of null
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error calling GET /recipes/today");
+                return new List<Recipe>(); // Return empty list instead of null
+            }
         }
 
         public async Task<List<Recipe>?> GetRecipeDetailsAsync(List<int> recipeIds)

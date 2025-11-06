@@ -459,6 +459,12 @@ def create_meal_plans(token, recipe_ids=None):
     today = datetime.now()
     meal_plans = [
         {
+            "name": "Kế hoạch bữa ăn hôm nay",
+            "recipeIds": recipe_ids[:3] if len(recipe_ids) >= 3 else recipe_ids,
+            "notes": "Bữa sáng, trưa và tối cho ngày hôm nay",
+            "date": today.replace(hour=0, minute=0, second=0, microsecond=0).isoformat() + "Z"  # Today
+        },
+        {
             "name": "Thực đơn tuần này",
             "recipeIds": recipe_ids[:3] if len(recipe_ids) >= 3 else recipe_ids,
             "notes": "Kế hoạch ăn uống lành mạnh với các món ngon",

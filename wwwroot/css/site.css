@@ -545,6 +545,149 @@ body {
     padding: 0 20px;
 }
 
+/* Recipe Today Section */
+.recipe-today-section {
+    margin-top: 0;
+    margin-bottom: 60px;
+    padding: 40px 0;
+    padding-top: 200px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Recipe Card Link */
+.recipe-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.recipe-card-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.recipe-card-link * {
+    pointer-events: none; /* Make all child elements non-clickable, only the link itself is clickable */
+}
+
+.recipe-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.recipe-card-action {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #667eea;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.recipe-card:hover .recipe-card-action {
+    opacity: 1;
+}
+
+.recipe-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: #f0f0f0;
+    pointer-events: none; /* Prevent image from blocking clicks */
+}
+
+.recipe-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none; /* Ensure image doesn't block clicks */
+    user-select: none; /* Prevent image selection */
+}
+
+.recipe-content {
+    padding: 20px;
+}
+
+.recipe-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.recipe-time,
+.recipe-servings {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin: 5px 0;
+}
+
+/* Empty States */
+.meal-plan-empty,
+.recipe-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #7f8c8d;
+}
+
+.meal-plan-empty a,
+.recipe-empty a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.meal-plan-empty a:hover,
+.recipe-empty a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Meal Plan Card Link */
+.meal-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.meal-card-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.meal-card-link * {
+    pointer-events: none; /* Make all child elements non-clickable, only the link itself is clickable */
+}
+
 .meal-card {
     background: white;
     border-radius: 20px;
@@ -554,12 +697,26 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.4s ease;
     backdrop-filter: blur(10px);
+    position: relative;
 }
 
 .meal-card:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     border-color: #3498db;
+}
+
+.meal-card-action {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #667eea;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.meal-card:hover .meal-card-action {
+    opacity: 1;
 }
 
 .meal-time {

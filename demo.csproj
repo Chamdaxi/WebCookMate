@@ -16,4 +16,16 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
   </ItemGroup>
 
+  <!-- Exclude old controllers that are not used anymore -->
+  <ItemGroup>
+    <Compile Remove="Controllers/SeedController.cs" />
+    <Compile Remove="Controllers/CookMateApiController.cs" />
+    <Compile Remove="Controllers/IngredientController.cs" />
+    <Compile Remove="Controllers/IngredientCategoryController.cs" />
+    <Compile Remove="Controllers/FavoriteController.cs" />
+    <Compile Remove="Services/IngredientSeedService.cs" />
+    <Compile Remove="Services/IngredientCategorySeedService.cs" />
+    <Compile Remove="Services/FavoriteSeedService.cs" />
+  </ItemGroup>
+
 </Project>

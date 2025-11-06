@@ -1,5 +1,18 @@
+@using System.Linq
+@using demo.Services
 @{
     ViewData["Title"] = "Trang chủ";
+    var mealPlans = ViewBag.MealPlans as List<CookMateApiService.MealPlan> ?? new List<CookMateApiService.MealPlan>();
+    var recipes = ViewBag.Recipes as List<CookMateApiService.Recipe> ?? new List<CookMateApiService.Recipe>();
+    var today = DateTime.Today;
+    var todayMealPlans = mealPlans.Where(mp => {
+        try {
+            var date = mp.Date;
+            return date.Date == today;
+        } catch {
+            return false;
+        }
+    }).ToList();
 }
 
 @if (TempData["AccessToken"] != null)
@@ -57,24 +70,75 @@
 
 <!-- Meal Plan Today -->
 <div class="meal-plan-section">
-    <h2 class="section-title">Meal Plan Today</h2>
-    <div class="meal-plan-cards">
-        <div class="meal-card">
-            <div class="meal-time">Breakfast</div>
-            <div class="meal-dish">Spaghetti Carbonara</div>
-            <div class="meal-time-info">8:00 AM</div>
+    <h2 class="section-title">Meal Plan Hôm Nay</h2>
+    @if (todayMealPlans.Any())
+    {
+        <div class="meal-plan-cards">
+            @foreach (var mealPlan in todayMealPlans)
+            {
+                <a href="@Url.Action("MealPlan", "Home")" class="meal-card-link" title="Xem chi tiết kế hoạch bữa ăn">
+                    <div class="meal-card">
+                        <div class="meal-time">@(mealPlan.Name ?? "Kế hoạch bữa ăn")</div>
+                        <div class="meal-dish">@(mealPlan.RecipeIds?.Count > 0 ? $"{mealPlan.RecipeIds.Count} món ăn" : "Chưa có món ăn")</div>
+                        @if (!string.IsNullOrEmpty(mealPlan.Notes))
+                        {
+                            <div class="meal-time-info">@mealPlan.Notes</div>
+                        }
+                        else
+                        {
+                            <div class="meal-time-info">Hôm nay</div>
+                        }
+                        <div class="meal-card-action">Xem chi tiết →</div>
+                    </div>
+                </a>
+            }
         </div>
-        <div class="meal-card">
-            <div class="meal-time">Lunch</div>
-            <div class="meal-dish">Vietnamese Noodles</div>
-            <div class="meal-time-info">12:30 PM</div>
+    }
+    else
+    {
+        <div class="meal-plan-empty">
+            <p>Chưa có kế hoạch bữa ăn cho hôm nay. <a href="@Url.Action("MealPlan", "Home")">Tạo kế hoạch mới</a></p>
         </div>
-        <div class="meal-card">
-            <div class="meal-time">Dinner</div>
-            <div class="meal-dish">Grilled Salmon Rice</div>
-            <div class="meal-time-info">7:00 PM</div>
+    }
+</div>
+
+<!-- Recipe Today -->
+<div class="recipe-today-section">
+    <h2 class="section-title">Công Thức Hôm Nay</h2>
+    @if (recipes.Any())
+    {
+        <div class="recipes-grid">
+            @foreach (var recipe in recipes.Take(6))
+            {
+                <div class="recipe-card" onclick="window.location.href='@Url.Action("Recipes", "Home")'" style="cursor: pointer;">
+                    @if (!string.IsNullOrEmpty(recipe.Image))
+                    {
+                        <div class="recipe-image">
+                            <img src="@recipe.Image" alt="@(recipe.Title ?? "Recipe")" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                        </div>
+                    }
+                    <div class="recipe-content">
+                        <h3 class="recipe-title">@(recipe.Title ?? "Công thức")</h3>
+                        @if (recipe.ReadyInMinutes > 0)
+                        {
+                            <p class="recipe-time">⏱️ @recipe.ReadyInMinutes phút</p>
+                        }
+                        @if (recipe.Servings > 0)
+                        {
+                            <p class="recipe-servings">🍽️ @recipe.Servings phần</p>
+                        }
+                        <div class="recipe-card-action">Xem chi tiết →</div>
+                    </div>
+                </div>
+            }
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="recipe-empty">
+            <p>Chưa có công thức đề xuất cho hôm nay. <a href="@Url.Action("Recipes", "Home")">Khám phá công thức</a></p>
+        </div>
+    }
 </div>
 
 <!-- Quick Access -->
