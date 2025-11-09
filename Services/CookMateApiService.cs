@@ -1177,16 +1177,89 @@ namespace demo.Services
             try
             {
                 _logger.LogInformation($"🔄 POST /favorites - RecipeId: {recipeId}");
-                var result = await PostAsync<Favorite>("/favorites", new { recipeId });
-                if (result == null)
+                
+                var client = CreateAuthenticatedClient();
+                var jsonOptions = new JsonSerializerOptions
                 {
-                    _logger.LogWarning($"⚠️ PostAsync returned null for RecipeId: {recipeId}");
-                }
-                else
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = false
+                };
+                var json = JsonSerializer.Serialize(new { recipeId }, jsonOptions);
+                _logger.LogInformation($"📤 POST {API_BASE_URL}/favorites");
+                _logger.LogInformation($"📤 Request body: {json}");
+                
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync($"{API_BASE_URL}/favorites", content);
+                
+                var responseContent = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation($"📥 Response status: {response.StatusCode}");
+                _logger.LogInformation($"📥 Response body (first 500 chars): {responseContent.Substring(0, Math.Min(500, responseContent.Length))}");
+                
+                if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"✅ Successfully added favorite: RecipeId {recipeId}");
+                    _logger.LogInformation($"✅ POST /favorites succeeded: {response.StatusCode}");
+                    
+                    // Try to parse as Favorite object first
+                    try
+                    {
+                        var favorite = JsonSerializer.Deserialize<Favorite>(responseContent, new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+                        
+                        if (favorite != null && !string.IsNullOrEmpty(favorite.GetId()))
+                        {
+                            _logger.LogInformation($"✅ Successfully parsed favorite object: RecipeId {recipeId}");
+                            return favorite;
+                        }
+                    }
+                    catch (JsonException)
+                    {
+                        // If deserialization fails, check if it's a message response
+                        _logger.LogInformation("ℹ️ Response is not a Favorite object, checking for message...");
+                    }
+                    
+                    // Check if response is a message object (e.g., {"message": "Favorite added successfully"})
+                    try
+                    {
+                        var jsonDoc = JsonSerializer.Deserialize<JsonElement>(responseContent);
+                        if (jsonDoc.ValueKind == JsonValueKind.Object)
+                        {
+                            // If API returns success message, create a minimal Favorite object
+                            // The favorite was added successfully, we just don't have the full object
+                            // We'll fetch it later when loading favorites list
+                            _logger.LogInformation($"✅ API returned success message for RecipeId {recipeId}, creating minimal Favorite object");
+                            
+                            return new Favorite
+                            {
+                                RecipeId = recipeId,
+                                Recipe_Id = recipeId,
+                                UserId = "", // Will be set by API
+                                CreatedAt = DateTime.UtcNow,
+                                Created_At = DateTime.UtcNow
+                            };
+                        }
+                    }
+                    catch (Exception parseEx)
+                    {
+                        _logger.LogWarning($"⚠️ Could not parse response: {parseEx.Message}");
+                    }
+                    
+                    // If we can't parse, still return a minimal Favorite to indicate success
+                    _logger.LogInformation($"✅ Creating minimal Favorite object for RecipeId {recipeId}");
+                    return new Favorite
+                    {
+                        RecipeId = recipeId,
+                        Recipe_Id = recipeId,
+                        UserId = "",
+                        CreatedAt = DateTime.UtcNow,
+                        Created_At = DateTime.UtcNow
+                    };
                 }
-                return result;
+                
+                _logger.LogError($"❌ POST /favorites failed: {response.StatusCode}");
+                _logger.LogError($"❌ Response body: {responseContent}");
+                return null;
             }
             catch (Exception ex)
             {

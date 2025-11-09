@@ -1580,18 +1580,17 @@
                     const favorite = await response.json();
                     console.log('✅ Added favorite:', favorite);
 
-                    showNotification(`Đã thêm Recipe ID "${recipeId}" vào yêu thích!`, 'success');
+                    showNotification(`✅ Đã thêm Recipe ID "${recipeId}" vào yêu thích!`, 'success');
                     
                     // Clear input
                     input.value = '';
                     
-                    // Reload favorites
-                    await loadFavorites();
+                    // Close modal first
+                    closeAddFavoriteModal();
                     
-                    // Close modal after a short delay
-                    setTimeout(() => {
-                        closeAddFavoriteModal();
-                    }, 1500);
+                    // Clear cache and reload favorites to get latest data (including the new favorite)
+                    localStorage.removeItem('cachedFavorites');
+                    await loadFavorites();
 
                 } catch (error) {
                     console.error('❌ Error adding favorite:', error);

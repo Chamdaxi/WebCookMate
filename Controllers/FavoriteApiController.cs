@@ -177,7 +177,22 @@ namespace demo.Controllers
                 }
 
                 _logger.LogInformation($"✅ Added favorite: Recipe {request.RecipeId}");
-                return Ok(favorite);
+                
+                // Normalize response to ensure consistent format
+                var normalizedFavorite = new
+                {
+                    id = favorite.GetId(),
+                    _id = favorite.GetId(),
+                    favoriteId = favorite.GetId(),
+                    recipeId = favorite.GetRecipeId(),
+                    recipe_id = favorite.GetRecipeId(),
+                    userId = favorite.UserId ?? "",
+                    createdAt = favorite.GetCreatedAt().ToString("o"),
+                    created_at = favorite.GetCreatedAt().ToString("o"),
+                    addedAt = favorite.GetCreatedAt().ToString("o")
+                };
+                
+                return Ok(normalizedFavorite);
             }
             catch (Exception ex)
             {
