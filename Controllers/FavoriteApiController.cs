@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using demo.Services;
 using demo.Models;
+using System.Linq;
 
 namespace demo.Controllers
 {
@@ -35,28 +36,80 @@ namespace demo.Controllers
             {
                 _logger.LogInformation("🔄 GET /api/FavoriteApi called");
                 
-                var favorites = await _cookMateApi.GetFavoritesAsync();
+                var (favorites, isSpoonacularLimit) = await _cookMateApi.GetFavoritesAsync();
                 
-                // Return empty list instead of error if null (allows UI to work)
+                // Handle null response
                 if (favorites == null)
                 {
                     _logger.LogWarning("⚠️ GetFavoritesAsync returned null, returning empty list");
-                    return Ok(new List<object>());
+                    return Ok(new { 
+                        favorites = new List<object>(),
+                        message = "Không thể lấy danh sách favorites. Vui lòng thử lại sau.",
+                        spoonacularLimit = false,
+                        canAdd = true
+                    });
                 }
 
-                _logger.LogInformation($"✅ Fetched {favorites.Count} favorites from CookMate API");
-                return Ok(favorites);
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("Spoonacular API limit"))
-            {
-                // Spoonacular limit reached - favorites exist but cannot fetch details
-                _logger.LogWarning($"⚠️ Spoonacular API limit: {ex.Message}");
-                return StatusCode(503, new { 
-                    message = "Không thể tải danh sách món yêu thích", 
-                    error = "Spoonacular API limit reached",
-                    details = "Món yêu thích của bạn đã được lưu nhưng không thể hiển thị chi tiết do giới hạn API. Vui lòng thử lại sau.",
-                    code = "SPOONACULAR_LIMIT"
-                });
+                // If favorites list is empty
+                if (favorites.Count == 0)
+                {
+                    if (isSpoonacularLimit)
+                    {
+                        _logger.LogInformation("✅ Fetched 0 favorites from CookMate API due to Spoonacular limit");
+                        return Ok(new { 
+                            favorites = new List<object>(),
+                            message = "Giới hạn API Spoonacular đã đạt. Favorites có thể đã được lưu nhưng không thể hiển thị chi tiết. Bạn vẫn có thể thêm favorites mới bằng button 'Thêm món yêu thích'. Favorites sẽ được hiển thị khi API limit reset.",
+                            spoonacularLimit = true,
+                            canAdd = true
+                        });
+                    }
+                    else
+                    {
+                        _logger.LogInformation("✅ Fetched 0 favorites from CookMate API (no favorites found)");
+                        return Ok(new { 
+                            favorites = new List<object>(),
+                            message = "Chưa có món yêu thích nào. Hãy thêm favorites bằng button 'Thêm món yêu thích' hoặc từ trang Recipes.",
+                            spoonacularLimit = false,
+                            canAdd = true
+                        });
+                    }
+                }
+
+                _logger.LogInformation($"✅ Fetched {favorites.Count} favorites from CookMate API (Spoonacular limit: {isSpoonacularLimit})");
+                
+                // Normalize favorites to ensure IDs are consistent
+                var normalizedFavorites = favorites.Select(f => new
+                {
+                    id = f.GetId(),
+                    _id = f.GetId(),
+                    favoriteId = f.GetId(),
+                    recipeId = f.GetRecipeId(),
+                    recipe_id = f.GetRecipeId(),
+                    userId = f.UserId ?? "",
+                    createdAt = f.GetCreatedAt().ToString("o"),
+                    created_at = f.GetCreatedAt().ToString("o"),
+                    addedAt = f.GetCreatedAt().ToString("o")
+                }).ToList();
+                
+                // Log normalized favorites for debugging
+                if (normalizedFavorites.Count > 0)
+                {
+                    var first = normalizedFavorites[0];
+                    _logger.LogInformation($"🔍 First normalized favorite - id: '{first.id}', recipeId: '{first.recipeId}', userId: '{first.userId}'");
+                }
+                
+                // Return favorites with Spoonacular limit flag if applicable
+                if (isSpoonacularLimit)
+                {
+                    return Ok(new { 
+                        favorites = normalizedFavorites,
+                        message = "Một số favorites có thể không hiển thị đầy đủ chi tiết do giới hạn API Spoonacular.",
+                        spoonacularLimit = true,
+                        canAdd = true
+                    });
+                }
+                
+                return Ok(normalizedFavorites);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -80,14 +133,14 @@ namespace demo.Controllers
         {
             try
             {
-                var favorites = await _cookMateApi.GetFavoritesAsync();
+                var (favorites, _) = await _cookMateApi.GetFavoritesAsync();
                 
                 if (favorites == null)
                 {
                     return Ok(new { isFavorite = false });
                 }
 
-                var isFavorite = favorites.Any(f => f.RecipeId == recipeId);
+                var isFavorite = favorites.Any(f => f.GetRecipeId() == recipeId);
                 
                 _logger.LogInformation($"✅ Checked favorite status for recipe {recipeId}: {isFavorite}");
                 return Ok(new { isFavorite });

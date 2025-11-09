@@ -38,6 +38,144 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
         }
+
+        /* Calendar navigation */
+        .calendar-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        .calendar-nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .calendar-nav-btn:hover {
+            background: #5568d3;
+        }
+
+        .calendar-month-year {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Hide header and navigation when modal is open */
+        body.modal-open .header-container,
+        body.modal-open .home-text {
+            display: none !important;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .recipe-selection {
+            margin-top: 10px;
+        }
+
+        .recipe-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .recipe-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .recipe-item:last-child {
+            border-bottom: none;
+        }
+
+        .recipe-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
     </style>
 }
 
@@ -66,6 +204,13 @@
         </div>
         
         <div class="calendar-container">
+            <!-- Calendar Navigation -->
+            <div class="calendar-navigation">
+                <button class="calendar-nav-btn" onclick="changeMonth(-1)">← Tháng trước</button>
+                <div class="calendar-month-year" id="calendarMonthYear"></div>
+                <button class="calendar-nav-btn" onclick="changeMonth(1)">Tháng sau →</button>
+            </div>
+            
             <div class="calendar-grid">
                 <div class="calendar-header-row">
                     <div class="day-header">CN</div>
@@ -76,56 +221,7 @@
                     <div class="day-header">Thứ6</div>
                     <div class="day-header">Thứ7</div>
                 </div>
-                
-                <div class="calendar-week">
-                    <div class="calendar-day">1</div>
-                    <div class="calendar-day">2</div>
-                    <div class="calendar-day">3</div>
-                    <div class="calendar-day">4</div>
-                    <div class="calendar-day">5</div>
-                    <div class="calendar-day">6</div>
-                    <div class="calendar-day">7</div>
-                </div>
-                
-                <div class="calendar-week">
-                    <div class="calendar-day">8</div>
-                    <div class="calendar-day">9</div>
-                    <div class="calendar-day">10</div>
-                    <div class="calendar-day">11</div>
-                    <div class="calendar-day">12</div>
-                    <div class="calendar-day">13</div>
-                    <div class="calendar-day">14</div>
-                </div>
-                
-                <div class="calendar-week">
-                    <div class="calendar-day">15</div>
-                    <div class="calendar-day">16</div>
-                    <div class="calendar-day">17</div>
-                    <div class="calendar-day">18</div>
-                    <div class="calendar-day">19</div>
-                    <div class="calendar-day">20</div>
-                    <div class="calendar-day">21</div>
-                </div>
-                
-                <div class="calendar-week">
-                    <div class="calendar-day">22</div>
-                    <div class="calendar-day">23</div>
-                    <div class="calendar-day">24</div>
-                    <div class="calendar-day">25</div>
-                    <div class="calendar-day">26</div>
-                    <div class="calendar-day">27</div>
-                    <div class="calendar-day">28</div>
-                </div>
-                
-                <div class="calendar-week">
-                    <div class="calendar-day">29</div>
-                    <div class="calendar-day">30</div>
-                    <div class="calendar-day"></div>
-                    <div class="calendar-day"></div>
-                    <div class="calendar-day"></div>
-                    <div class="calendar-day"></div>
-                    <div class="calendar-day"></div>
-                </div>
+                <div id="calendarDays"></div>
             </div>
         </div>
     </div>
@@ -145,6 +241,7 @@
             <div class="date-info">
                 <h3 class="date-text" id="selectedDateText">Chọn ngày</h3>
                 <p class="meal-type" id="selectedMealPlanName">Chưa chọn kế hoạch</p>
+                <div id="mealPlanHeaderImage" style="display: none;"></div>
             </div>
             <div class="meal-stats">
                 <div class="stat-item">
@@ -168,7 +265,7 @@
         <!-- Meal Categories (will be rendered dynamically) -->
         <div class="meal-categories" id="mealCategories" style="display: none;">
             <!-- Breakfast -->
-            <div class="meal-category">
+            <div class="meal-category" id="breakfastCategory">
                 <h4 class="category-title">Bữa sáng</h4>
                 <div class="meal-items" id="breakfastItems">
                     <!-- Loaded from API -->
@@ -176,7 +273,7 @@
             </div>
 
             <!-- Lunch -->
-            <div class="meal-category">
+            <div class="meal-category" id="lunchCategory">
                 <h4 class="category-title">Bữa trưa</h4>
                 <div class="meal-items" id="lunchItems">
                     <!-- Loaded from API -->
@@ -184,7 +281,7 @@
             </div>
 
             <!-- Dinner -->
-            <div class="meal-category">
+            <div class="meal-category" id="dinnerCategory">
                 <h4 class="category-title">Bữa tối</h4>
                 <div class="meal-items" id="dinnerItems">
                     <!-- Loaded from API -->
@@ -194,14 +291,14 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons" id="actionButtons" style="display: none;">
-            <button class="btn btn-primary" onclick="addMeal()" id="addMealBtn">
+            <button class="btn btn-primary" onclick="openAddMealModal()" id="addMealBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
                 Thêm món ăn
             </button>
-            <button class="btn btn-secondary" onclick="editMealPlan()" id="editMealPlanBtn">
+            <button class="btn btn-secondary" onclick="openEditMealPlanModal()" id="editMealPlanBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -217,25 +314,75 @@
                 </svg>
                 Xóa kế hoạch
             </button>
-            <button class="btn btn-secondary" onclick="saveMealPlan()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                    <polyline points="17,21 17,13 7,13 7,21"></polyline>
-                    <polyline points="7,3 7,8 15,8"></polyline>
-                </svg>
-                Lưu kế hoạch
-            </button>
         </div>
     </div>
     </div>
 </div>
 
+<!-- Add/Edit Meal Plan Modal -->
+<div id="mealPlanModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Thêm kế hoạch bữa ăn</h2>
+            <span class="close" onclick="closeMealPlanModal()">&times;</span>
+        </div>
+        <form id="mealPlanForm" onsubmit="handleMealPlanSubmit(event)">
+            <div class="form-group">
+                <label for="mealPlanName">Tên kế hoạch *</label>
+                <input type="text" id="mealPlanName" required placeholder="VD: Kế hoạch thứ 2">
+            </div>
+            <div class="form-group">
+                <label for="mealPlanType">Loại bữa ăn *</label>
+                <select id="mealPlanType" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                    <option value="breakfast">Bữa sáng</option>
+                    <option value="lunch">Bữa trưa</option>
+                    <option value="dinner">Bữa tối</option>
+                </select>
+                <small style="color: #666; font-size: 12px;">Chọn loại bữa ăn cho kế hoạch này</small>
+            </div>
+            <div class="form-group">
+                <label>Recipe IDs (phân cách bằng dấu phẩy) *</label>
+                <input type="text" id="mealPlanRecipeIds" required placeholder="VD: 715538, 716429, 716426">
+                <small style="color: #666; font-size: 12px;">Nhập các Recipe ID phân cách bằng dấu phẩy</small>
+            </div>
+            <div class="form-group">
+                <label for="mealPlanImageUrl">Link ảnh (tùy chọn)</label>
+                <input type="url" id="mealPlanImageUrl" placeholder="https://example.com/image.jpg">
+                <small style="color: #666; font-size: 12px; line-height: 1.6;">
+                    <strong>📌 Cách lấy link ảnh từ Google Images (KHÔNG cần lưu ảnh về máy):</strong><br>
+                    1. Tìm ảnh trên Google Images<br>
+                    2. <strong>Click vào ảnh</strong> để xem ảnh lớn hơn (không click vào trang web)<br>
+                    3. <strong>Click chuột phải vào ảnh</strong> → Chọn <strong>"Copy image address"</strong> (Chrome) hoặc <strong>"Sao chép địa chỉ ảnh"</strong> (Firefox)<br>
+                    4. Dán link vào ô trên (link sẽ giống: <code>https://example.com/image.jpg</code>)<br>
+                    <br>
+                    <strong>✅ Link đúng:</strong> Kết thúc bằng .jpg, .png, .gif, .webp (ví dụ: <code>https://cdn.example.com/photo.jpg</code>)<br>
+                    <strong>❌ Link sai:</strong> Bắt đầu bằng <code>google.com/url</code> (đó là link redirect, không phải link ảnh trực tiếp)
+                </small>
+                <div id="mealPlanImagePreview" style="margin-top: 10px; display: none;">
+                    <img id="mealPlanImagePreviewImg" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 5px; border: 1px solid #ddd;">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="mealPlanNotes">Ghi chú</label>
+                <textarea id="mealPlanNotes" placeholder="Thêm ghi chú cho kế hoạch này..."></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeMealPlanModal()">Hủy</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        // Load meal plans from API (ViewBag)
+        // Global variables
         let mealPlans = [];
         let selectedMealPlan = null;
         let selectedDate = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let isEditMode = false;
 
         @if (ViewBag.MealPlans != null)
         {
@@ -245,62 +392,275 @@
             </text>
         }
 
-        // Calendar day selection
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mark days with meal plans
-            markDaysWithMealPlans();
+        // Function to reload meal plans from API
+        async function reloadMealPlans() {
+            try {
+                console.log('🔄 Reloading meal plans from API...');
+                const response = await fetch('/api/MealPlansApi', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
 
-            const calendarDays = document.querySelectorAll('.calendar-day');
-            
-            calendarDays.forEach(day => {
-                if (day.textContent.trim()) {
-                    day.addEventListener('click', function() {
-                        // Remove active class from all days
-                        calendarDays.forEach(d => d.classList.remove('active'));
-                        // Add active class to clicked day
-                        this.classList.add('active');
-                        
-                        const dayNumber = parseInt(this.textContent.trim());
-                        selectedDate = dayNumber;
-                        
-                        // Update date header
-                        const dateText = document.getElementById('selectedDateText');
-                        if (dateText) {
-                            const today = new Date();
-                            dateText.textContent = `Ngày ${dayNumber} ${today.getMonth() + 1} ${today.getFullYear()}`;
+                if (response.ok) {
+                    const data = await response.json();
+                    mealPlans = data || [];
+                    
+                    // Normalize all meal plan IDs to ensure consistency
+                    mealPlans.forEach(plan => {
+                        if (!plan.id && (plan._id || plan._Id)) {
+                            plan.id = plan._id || plan._Id;
                         }
-                        
-                        // Update meal plan for selected day
-                        updateMealPlanForDay(dayNumber);
                     });
+                    
+                    console.log('✅ Reloaded ' + mealPlans.length + ' meal plans from API');
+                    if (mealPlans.length > 0) {
+                        console.log('📋 First meal plan:', { 
+                            id: mealPlans[0].id, 
+                            name: mealPlans[0].name, 
+                            date: mealPlans[0].date 
+                        });
+                    }
+                    
+                    // Refresh calendar to show updated data
+                    renderCalendar();
+                    
+                    // If a date was selected, update the display
+                    if (selectedDate) {
+                        updateMealPlanForDay(selectedDate);
+                    }
+                    
+                    return true;
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Failed to reload meal plans:', response.status, errorText);
+                    return false;
                 }
-            });
+            } catch (error) {
+                console.error('❌ Error reloading meal plans:', error);
+                return false;
+            }
+        }
+
+        // Update image preview when URL changes
+        function updateImagePreview(imageUrl) {
+            const previewDiv = document.getElementById('mealPlanImagePreview');
+            
+            if (!previewDiv) {
+                return; // Element not found
+            }
+            
+            if (imageUrl && imageUrl.trim()) {
+                let displayUrl = imageUrl.trim();
+                
+                // Handle Google redirect URLs - try to extract actual image URL
+                if (displayUrl.includes('google.com/url') && displayUrl.includes('url=')) {
+                    try {
+                        const urlMatch = displayUrl.match(/url=([^&]+)/);
+                        if (urlMatch) {
+                            displayUrl = decodeURIComponent(urlMatch[1]);
+                            console.log('🔄 Extracted URL from Google redirect for preview:', displayUrl);
+                            // Update the input field with the extracted URL (optional, user can keep original)
+                            // document.getElementById('mealPlanImageUrl').value = displayUrl;
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Failed to extract URL from Google redirect:', e);
+                    }
+                }
+                
+                // Create new img element to avoid caching issues
+                const img = document.createElement('img');
+                img.id = 'mealPlanImagePreviewImg';
+                img.src = displayUrl;
+                img.alt = 'Preview';
+                img.style.cssText = 'max-width: 100%; max-height: 200px; border-radius: 5px; border: 1px solid #ddd;';
+                
+                // Handle image load error
+                img.onerror = function() {
+                    console.error('❌ Failed to load image preview:', displayUrl);
+                    previewDiv.innerHTML = `<div style="color: #d32f2f; padding: 10px; border: 1px solid #d32f2f; border-radius: 5px; background: #ffebee; font-size: 12px;">
+                        <p style="margin: 0 0 5px 0;"><strong>⚠️ Không thể tải ảnh từ link này</strong></p>
+                        <p style="margin: 0 0 5px 0; font-size: 11px;">Link: <code style="background: #fff; padding: 2px 4px; border-radius: 2px; font-size: 10px; word-break: break-all;">${escapeHtml(displayUrl.substring(0, 60))}...</code></p>
+                        <p style="margin: 0; font-size: 11px; color: #666;">📌 <strong>Hướng dẫn:</strong> Sử dụng link ảnh trực tiếp (kết thúc bằng .jpg, .png, .gif)</p>
+                        <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">👉 Click chuột phải vào ảnh → "Copy image address" để lấy link trực tiếp</p>
+                    </div>`;
+                };
+                
+                // Handle image load success
+                img.onload = function() {
+                    console.log('✅ Image preview loaded successfully:', displayUrl);
+                    previewDiv.innerHTML = '';
+                    previewDiv.appendChild(img);
+                };
+                
+                previewDiv.innerHTML = '<p style="color: #666; padding: 10px; text-align: center; font-size: 12px;">Đang tải ảnh...</p>';
+                previewDiv.style.display = 'block';
+            } else {
+                previewDiv.innerHTML = '';
+                previewDiv.style.display = 'none';
+            }
+        }
+
+        // Initialize calendar on page load and setup image URL preview
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCalendar();
+            markDaysWithMealPlans();
+            
+            // Setup image URL preview
+            const imageUrlInput = document.getElementById('mealPlanImageUrl');
+            if (imageUrlInput) {
+                imageUrlInput.addEventListener('input', function() {
+                    updateImagePreview(this.value);
+                });
+                
+                imageUrlInput.addEventListener('paste', function() {
+                    // Wait a bit for paste to complete
+                    setTimeout(() => {
+                        updateImagePreview(this.value);
+                    }, 100);
+                });
+            }
         });
+
+        // Render calendar for current month
+        function renderCalendar() {
+            const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                              'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+            
+            document.getElementById('calendarMonthYear').textContent = 
+                monthNames[currentMonth] + ' ' + currentYear;
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            let calendarHTML = '';
+            let day = 1;
+
+            // Create weeks
+            for (let week = 0; week < 6; week++) {
+                calendarHTML += '<div class="calendar-week">';
+                
+                for (let weekday = 0; weekday < 7; weekday++) {
+                    if ((week === 0 && weekday < firstDay) || day > daysInMonth) {
+                        calendarHTML += '<div class="calendar-day"></div>';
+                    } else {
+                        const dayDate = new Date(currentYear, currentMonth, day);
+                        const dateStr = formatDateString(dayDate);
+                        calendarHTML += 
+                            `<div class="calendar-day" data-date="${dateStr}" onclick="selectDate('${dateStr}', ${day})">${day}</div>`;
+                        day++;
+                    }
+                }
+                
+                calendarHTML += '</div>';
+                if (day > daysInMonth) break;
+            }
+
+            document.getElementById('calendarDays').innerHTML = calendarHTML;
+            markDaysWithMealPlans();
+        }
+
+        // Change month
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+
+        // Format date string (YYYY-MM-DD)
+        function formatDateString(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Select date
+        function selectDate(dateStr, dayNumber) {
+            selectedDate = dateStr;
+            
+            // Remove active class from all days
+            document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+            
+            // Add active class to selected day
+            const dayElement = document.querySelector(`[data-date="${dateStr}"]`);
+            if (dayElement) {
+                dayElement.classList.add('active');
+            }
+
+            // Update date header
+            const date = new Date(dateStr);
+            const dateText = document.getElementById('selectedDateText');
+            if (dateText) {
+                const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+                dateText.textContent = `${dayNames[date.getDay()]}, ${dayNumber}/${date.getMonth() + 1}/${date.getFullYear()}`;
+            }
+
+            // Update meal plan for selected day
+            updateMealPlanForDay(dateStr);
+        }
 
         // Mark calendar days that have meal plans
         function markDaysWithMealPlans() {
-            if (!mealPlans || mealPlans.length === 0) return;
-
-            mealPlans.forEach(plan => {
-                const planDate = new Date(plan.date || plan.Date);
-                const dayNumber = planDate.getDate();
-                
-                const calendarDays = document.querySelectorAll('.calendar-day');
-                calendarDays.forEach(day => {
-                    if (parseInt(day.textContent.trim()) === dayNumber) {
-                        day.classList.add('has-meal-plan');
-                        day.setAttribute('data-meal-plan-id', plan.id || plan.Id || '');
-                    }
+            if (!mealPlans || mealPlans.length === 0) {
+                // Remove all marks if no meal plans
+                document.querySelectorAll('.calendar-day').forEach(d => {
+                    d.classList.remove('has-meal-plan');
+                    d.removeAttribute('data-meal-plan-id');
                 });
+                return;
+            }
+
+            // Remove all existing marks
+            document.querySelectorAll('.calendar-day').forEach(d => {
+                d.classList.remove('has-meal-plan');
+                d.removeAttribute('data-meal-plan-id');
             });
+
+            let markedCount = 0;
+            mealPlans.forEach(plan => {
+                if (!plan.date) return;
+                
+                // Normalize ID if needed
+                if (!plan.id && (plan._id || plan._Id)) {
+                    plan.id = plan._id || plan._Id;
+                }
+                
+                try {
+                    const planDate = new Date(plan.date);
+                    // Check if meal plan is in current month
+                    if (planDate.getMonth() === currentMonth && planDate.getFullYear() === currentYear) {
+                        const dateStr = formatDateString(planDate);
+                        const dayElement = document.querySelector(`[data-date="${dateStr}"]`);
+                        if (dayElement) {
+                            dayElement.classList.add('has-meal-plan');
+                            dayElement.setAttribute('data-meal-plan-id', plan.id || '');
+                            markedCount++;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error parsing date for meal plan:', plan.date, e);
+                }
+            });
+            
+            if (markedCount > 0) {
+                console.log(`✅ Marked ${markedCount} days with meal plans in calendar`);
+            }
         }
 
         // Update meal plan for selected day
-        function updateMealPlanForDay(day) {
-            // Find meal plan for this day
+        function updateMealPlanForDay(dateStr) {
+            // Find meal plan for this date (compare date strings)
             const plan = mealPlans.find(p => {
-                const planDate = new Date(p.date || p.Date);
-                return planDate.getDate() === day;
+                if (!p.date) return false;
+                const planDate = new Date(p.date);
+                const planDateStr = formatDateString(planDate);
+                return planDateStr === dateStr;
             });
 
             if (!plan) {
@@ -308,7 +668,7 @@
                 document.getElementById('mealPlanDetails').innerHTML = `
                     <div class="empty-state" style="text-align: center; padding: 40px; color: #999;">
                         <p>Chưa có kế hoạch bữa ăn cho ngày này</p>
-                        <button class="btn btn-primary" onclick="addMeal()" style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="openAddMealModal()" style="margin-top: 20px;">
                             Tạo kế hoạch mới
                         </button>
                     </div>
@@ -318,77 +678,407 @@
                 document.getElementById('selectedMealPlanName').textContent = 'Chưa có kế hoạch';
                 document.getElementById('mealCount').textContent = '0';
                 document.getElementById('caloriesCount').textContent = '0';
+                const headerImageDiv = document.getElementById('mealPlanHeaderImage');
+                if (headerImageDiv) {
+                    headerImageDiv.innerHTML = '';
+                    headerImageDiv.style.display = 'none';
+                }
                 selectedMealPlan = null;
                 return;
             }
 
             selectedMealPlan = plan;
             
+            // Validate and normalize plan ID
+            if (!plan.id && (plan._id || plan._Id)) {
+                plan.id = plan._id || plan._Id;
+            }
+            
+            console.log('📋 Selected meal plan:', { 
+                id: plan.id, 
+                name: plan.name, 
+                date: plan.date,
+                recipeIds: plan.recipeIds 
+            });
+            
+            // Extract mealType from notes
+            let mealType = 'breakfast'; // default
+            if (plan.notes) {
+                const match = plan.notes.match(/mealType:(\w+)/);
+                if (match) {
+                    mealType = match[1];
+                }
+            }
+            // Store mealType in plan object for easy access
+            plan.mealType = mealType;
+            
             // Update header
-            document.getElementById('selectedMealPlanName').textContent = plan.name || plan.Name || 'Kế hoạch bữa ăn';
+            const mealTypeNames = {
+                'breakfast': 'Bữa sáng',
+                'lunch': 'Bữa trưa',
+                'dinner': 'Bữa tối'
+            };
+            const mealTypeName = mealTypeNames[mealType] || 'Bữa ăn';
+            document.getElementById('selectedMealPlanName').textContent = (plan.name || 'Kế hoạch bữa ăn') + ' - ' + mealTypeName;
+            
+            // Extract imageUrl from notes
+            let imageUrl = '';
+            if (plan.notes) {
+                const imageUrlMatch = plan.notes.match(/imageUrl:(https?:\/\/[^\s\n]+)/);
+                if (imageUrlMatch) {
+                    imageUrl = imageUrlMatch[1];
+                    console.log('🖼️ Extracted imageUrl from notes:', imageUrl);
+                }
+            }
+            plan.imageUrl = imageUrl; // Store in plan object for easy access
+            
+            // Show meal plan image in header if available
+            const headerImageDiv = document.getElementById('mealPlanHeaderImage');
+            if (headerImageDiv) {
+                if (imageUrl && imageUrl.trim()) {
+                    console.log('🖼️ Displaying meal plan image in header:', imageUrl);
+                    // Handle Google redirect URLs - try to extract actual image URL
+                    let displayUrl = imageUrl.trim();
+                    
+                    // If it's a Google redirect URL, try to extract the actual URL
+                    if (displayUrl.includes('google.com/url') && displayUrl.includes('url=')) {
+                        try {
+                            const urlMatch = displayUrl.match(/url=([^&]+)/);
+                            if (urlMatch) {
+                                displayUrl = decodeURIComponent(urlMatch[1]);
+                                console.log('🔄 Extracted URL from Google redirect:', displayUrl);
+                            }
+                        } catch (e) {
+                            console.warn('⚠️ Failed to extract URL from Google redirect:', e);
+                        }
+                    }
+                    
+                    headerImageDiv.innerHTML = `<div style="text-align: center; margin-top: 10px;"><img src="${escapeHtml(displayUrl)}" alt="Meal Plan Image" style="max-width: 300px; max-height: 100px; width: auto; height: auto; object-fit: contain; border-radius: 5px; border: 1px solid #ddd; cursor: pointer; display: inline-block;" onerror="console.error('❌ Failed to load image:', this.src); this.style.display='none';" onload="console.log('✅ Image loaded successfully:', this.src);"></div>`;
+                    headerImageDiv.style.display = 'block';
+                } else {
+                    console.log('⚠️ No imageUrl found in meal plan notes');
+                    headerImageDiv.innerHTML = '';
+                    headerImageDiv.style.display = 'none';
+                }
+            }
             
             // Show meal categories
             document.getElementById('mealPlanDetails').innerHTML = '';
             document.getElementById('mealCategories').style.display = 'block';
             
             // Get recipe IDs
-            const recipeIds = plan.recipeIds || plan.RecipeIds || [];
+            const recipeIds = plan.recipeIds || [];
             
-            // Load recipe details (if available)
-            // For now, just show recipe IDs
+            // Load recipe details and render
             renderMealPlan(recipeIds, plan);
         }
 
         // Render meal plan
-        function renderMealPlan(recipeIds, plan) {
+        async function renderMealPlan(recipeIds, plan) {
             // Show action buttons when meal plan is selected
             document.getElementById('actionButtons').style.display = 'flex';
             
             // Clear existing items
-            document.getElementById('breakfastItems').innerHTML = '';
-            document.getElementById('lunchItems').innerHTML = '';
-            document.getElementById('dinnerItems').innerHTML = '';
+            document.getElementById('breakfastItems').innerHTML = '<p style="color: #999; padding: 20px; text-align: center;">Đang tải...</p>';
+            document.getElementById('lunchItems').innerHTML = '<p style="color: #999; padding: 20px; text-align: center;">Đang tải...</p>';
+            document.getElementById('dinnerItems').innerHTML = '<p style="color: #999; padding: 20px; text-align: center;">Đang tải...</p>';
 
             if (!recipeIds || recipeIds.length === 0) {
-                document.getElementById('mealCategories').innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: #999;">
-                        <p>Chưa có món ăn nào trong kế hoạch này</p>
-                    </div>
-                `;
+                document.getElementById('breakfastItems').innerHTML = 
+                    '<p style="color: #999; padding: 20px; text-align: center;">Chưa có món ăn nào</p>';
+                document.getElementById('lunchItems').innerHTML = '';
+                document.getElementById('dinnerItems').innerHTML = '';
                 updateMealStats(0, 0);
                 return;
             }
 
-            // For now, display recipe IDs
-            // In real implementation, would call API to get recipe details
-            recipeIds.forEach((recipeId, index) => {
+            // Load recipe details from API
+            try {
+                console.log('🔄 Loading recipe details for IDs:', recipeIds);
+                console.log('🔄 Recipe IDs type:', typeof recipeIds[0], 'Sample:', recipeIds[0]);
+                
+                // Filter and clean recipe IDs - remove any non-numeric prefixes/suffixes
+                const cleanedIds = recipeIds.map(id => {
+                    const str = String(id).trim();
+                    // Extract numeric part if ID contains numbers
+                    const numericMatch = str.match(/\d+/);
+                    if (numericMatch) {
+                        return numericMatch[0];
+                    }
+                    return str;
+                }).filter(id => id && id !== '');
+                
+                console.log('🔄 Cleaned recipe IDs:', cleanedIds);
+                
+                if (cleanedIds.length === 0) {
+                    console.warn('⚠️ No valid recipe IDs after cleaning');
+                    renderMealPlanFallback(recipeIds, plan);
+                    return;
+                }
+                
+                const idsParam = cleanedIds.join(',');
+                const response = await fetch(`/api/MealPlansApi/recipes?ids=${encodeURIComponent(idsParam)}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    console.error('❌ Failed to load recipe details:', response.status);
+                    // Fallback: show recipe IDs without images
+                    renderMealPlanFallback(recipeIds, plan);
+                    return;
+                }
+
+                const recipes = await response.json();
+                console.log('✅ Loaded recipe details:', recipes);
+
+                if (!recipes || recipes.length === 0) {
+                    console.warn('⚠️ No recipes found, using fallback');
+                    renderMealPlanFallback(recipeIds, plan);
+                    return;
+                }
+
+                // Clear loading messages
+                document.getElementById('breakfastItems').innerHTML = '';
+                document.getElementById('lunchItems').innerHTML = '';
+                document.getElementById('dinnerItems').innerHTML = '';
+
+                // Create a map of recipe ID to recipe data for quick lookup
+                const recipeMap = new Map();
+                recipes.forEach(recipe => {
+                    const recipeId = recipe.id?.toString() || recipe.Id?.toString() || '';
+                    if (recipeId) {
+                        // Store with both cleaned ID and original ID for lookup
+                        recipeMap.set(recipeId, recipe);
+                        // Also store with just numeric part for easier matching
+                        const numericMatch = recipeId.match(/(\d+)/);
+                        if (numericMatch && numericMatch[1] !== recipeId) {
+                            recipeMap.set(numericMatch[1], recipe);
+                        }
+                    }
+                });
+                
+                console.log('📋 Recipe map keys:', Array.from(recipeMap.keys()));
+
+                // Get mealType from plan notes or stored mealType
+                let mealType = 'breakfast'; // default
+                if (plan.mealType) {
+                    mealType = plan.mealType;
+                } else if (plan.notes) {
+                    const match = plan.notes.match(/mealType:(\w+)/);
+                    if (match) {
+                        mealType = match[1];
+                    }
+                }
+
+                // Remove duplicates from recipeIds before rendering
+                const uniqueRecipeIds = [...new Set(recipeIds.map(id => {
+                    const str = String(id).trim();
+                    // Extract numeric part if ID contains "Recipe ID: " or other prefixes
+                    const numericMatch = str.match(/(\d+)/);
+                    if (numericMatch) {
+                        return numericMatch[1];
+                    }
+                    return str.replace(/^Recipe ID:\s*/i, '').trim();
+                }))];
+                
+                console.log('🔄 Rendering unique recipe IDs:', uniqueRecipeIds);
+                console.log('🔄 Meal type:', mealType);
+
+                // Distribute recipes to the correct meal category based on mealType
+                uniqueRecipeIds.forEach((recipeId) => {
+                    // Try to find recipe by cleaned ID
+                    const recipe = recipeMap.get(recipeId.toString()) || null;
+                    const recipeTitle = recipe?.title || recipe?.Title || `Recipe #${recipeId}`;
+                    const recipeImage = recipe?.image || recipe?.Image || '';
+                    const readyInMinutes = recipe?.readyInMinutes || recipe?.ReadyInMinutes || 0;
+                    const servings = recipe?.servings || recipe?.Servings || 0;
+
+                    // Create image URL or placeholder
+                    let imageUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+                    if (recipeImage) {
+                        imageUrl = recipeImage.startsWith('http') ? recipeImage : `https://${recipeImage}`;
+                    }
+
+                    const mealItem = `
+                        <div class="meal-item">
+                            <div class="meal-checkbox">
+                                <input type="checkbox" id="recipe_${recipeId}" class="checkbox-input" onchange="updateMealStats()">
+                                <label for="recipe_${recipeId}" class="checkbox-label"></label>
+                            </div>
+                            <div class="meal-content">
+                                <h5 class="meal-name">${escapeHtml(recipeTitle)}</h5>
+                                <p class="meal-info">
+                                    ${readyInMinutes > 0 ? readyInMinutes + ' phút' : ''}
+                                    ${servings > 0 ? ' • ' + servings + ' phần' : ''}
+                                </p>
+                            </div>
+                            <div class="meal-image">
+                                <img src="${imageUrl}" alt="${escapeHtml(recipeTitle)}" 
+                                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';">
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add to the correct category based on mealType (only one category per meal plan)
+                    if (mealType === 'breakfast') {
+                        document.getElementById('breakfastItems').innerHTML += mealItem;
+                    } else if (mealType === 'lunch') {
+                        document.getElementById('lunchItems').innerHTML += mealItem;
+                    } else if (mealType === 'dinner') {
+                        document.getElementById('dinnerItems').innerHTML += mealItem;
+                    } else {
+                        // Fallback: add to breakfast if mealType is unknown
+                        console.warn('⚠️ Unknown mealType:', mealType, '- adding to breakfast');
+                        document.getElementById('breakfastItems').innerHTML += mealItem;
+                    }
+                });
+                
+                console.log('✅ Rendered recipes - Breakfast:', document.getElementById('breakfastItems').children.length, 
+                           'Lunch:', document.getElementById('lunchItems').children.length,
+                           'Dinner:', document.getElementById('dinnerItems').children.length);
+
+                // Show only the selected mealType category, hide others
+                const breakfastCategory = document.getElementById('breakfastCategory');
+                const lunchCategory = document.getElementById('lunchCategory');
+                const dinnerCategory = document.getElementById('dinnerCategory');
+                
+                // Hide all categories first
+                if (breakfastCategory) breakfastCategory.style.display = 'none';
+                if (lunchCategory) lunchCategory.style.display = 'none';
+                if (dinnerCategory) dinnerCategory.style.display = 'none';
+                
+                // Show only the selected mealType category
+                if (mealType === 'breakfast') {
+                    if (breakfastCategory) breakfastCategory.style.display = 'block';
+                    if (document.getElementById('breakfastItems').innerHTML === '') {
+                        document.getElementById('breakfastItems').innerHTML = 
+                            '<p style="color: #999; padding: 20px; text-align: center;">Chưa có món ăn</p>';
+                    }
+                } else if (mealType === 'lunch') {
+                    if (lunchCategory) lunchCategory.style.display = 'block';
+                    if (document.getElementById('lunchItems').innerHTML === '') {
+                        document.getElementById('lunchItems').innerHTML = 
+                            '<p style="color: #999; padding: 20px; text-align: center;">Chưa có món ăn</p>';
+                    }
+                } else if (mealType === 'dinner') {
+                    if (dinnerCategory) dinnerCategory.style.display = 'block';
+                    if (document.getElementById('dinnerItems').innerHTML === '') {
+                        document.getElementById('dinnerItems').innerHTML = 
+                            '<p style="color: #999; padding: 20px; text-align: center;">Chưa có món ăn</p>';
+                    }
+                }
+
+                updateMealStats(uniqueRecipeIds.length, 0);
+            } catch (error) {
+                console.error('❌ Error rendering meal plan:', error);
+                renderMealPlanFallback(recipeIds, plan);
+            }
+        }
+
+        // Fallback: render meal plan with just IDs (no images)
+        function renderMealPlanFallback(recipeIds, plan = null) {
+            document.getElementById('breakfastItems').innerHTML = '';
+            document.getElementById('lunchItems').innerHTML = '';
+            document.getElementById('dinnerItems').innerHTML = '';
+
+            // Get mealType from plan if available
+            let mealType = 'breakfast'; // default
+            if (plan) {
+                if (plan.mealType) {
+                    mealType = plan.mealType;
+                } else if (plan.notes) {
+                    const match = plan.notes.match(/mealType:(\w+)/);
+                    if (match) {
+                        mealType = match[1];
+                    }
+                }
+            }
+
+            // Remove duplicates from recipeIds
+            const uniqueRecipeIds = [...new Set(recipeIds.map(id => String(id).trim()))];
+            console.log('🔄 Render fallback - Unique recipe IDs:', uniqueRecipeIds);
+
+            uniqueRecipeIds.forEach((recipeId) => {
+                // Clean recipe ID - extract numeric part if it contains "Recipe ID: " prefix
+                let cleanedId = String(recipeId).trim();
+                const numericMatch = cleanedId.match(/(\d+)/);
+                if (numericMatch) {
+                    cleanedId = numericMatch[1];
+                }
+                // Remove "Recipe ID: " prefix if present
+                cleanedId = cleanedId.replace(/^Recipe ID:\s*/i, '').trim();
+                
                 const mealItem = `
                     <div class="meal-item">
                         <div class="meal-checkbox">
-                            <input type="checkbox" id="recipe_${recipeId}" class="checkbox-input" onchange="updateMealStats()">
-                            <label for="recipe_${recipeId}" class="checkbox-label"></label>
+                            <input type="checkbox" id="recipe_${escapeHtml(cleanedId)}" class="checkbox-input" onchange="updateMealStats()">
+                            <label for="recipe_${escapeHtml(cleanedId)}" class="checkbox-label"></label>
                         </div>
                         <div class="meal-content">
-                            <h5 class="meal-name">Recipe ${recipeId}</h5>
-                            <p class="meal-info">Recipe ID: ${recipeId}</p>
+                            <h5 class="meal-name">Recipe #${escapeHtml(cleanedId)}</h5>
+                            <p class="meal-info">Đang tải thông tin...</p>
                         </div>
                         <div class="meal-image">
-                            <img src="/images/recipes/default.jpg" alt="Recipe" onerror="this.src='/images/recipes/today-suggestion.jpg'">
+                            <div style="width:100%;height:100%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;">
+                                No Image
+                            </div>
                         </div>
                     </div>
                 `;
                 
-                // Distribute to categories (simple round-robin)
-                if (index % 3 === 0) {
+                // Add to the correct category based on mealType
+                if (mealType === 'breakfast') {
                     document.getElementById('breakfastItems').innerHTML += mealItem;
-                } else if (index % 3 === 1) {
+                } else if (mealType === 'lunch') {
                     document.getElementById('lunchItems').innerHTML += mealItem;
-                } else {
+                } else if (mealType === 'dinner') {
                     document.getElementById('dinnerItems').innerHTML += mealItem;
+                } else {
+                    // Fallback: add to breakfast if mealType is unknown
+                    document.getElementById('breakfastItems').innerHTML += mealItem;
                 }
             });
+            
+            // Show only the selected mealType category, hide others (fallback)
+            const breakfastCategory = document.getElementById('breakfastCategory');
+            const lunchCategory = document.getElementById('lunchCategory');
+            const dinnerCategory = document.getElementById('dinnerCategory');
+            
+            // Hide all categories first
+            if (breakfastCategory) breakfastCategory.style.display = 'none';
+            if (lunchCategory) lunchCategory.style.display = 'none';
+            if (dinnerCategory) dinnerCategory.style.display = 'none';
+            
+            // Show only the selected mealType category
+            if (mealType === 'breakfast') {
+                if (breakfastCategory) breakfastCategory.style.display = 'block';
+                if (document.getElementById('breakfastItems').innerHTML === '') {
+                    document.getElementById('breakfastItems').innerHTML = 
+                        '<p style="color: #999; padding: 20px; text-align: center;">Chưa có món ăn</p>';
+                }
+            } else if (mealType === 'lunch') {
+                if (lunchCategory) lunchCategory.style.display = 'block';
+                if (document.getElementById('lunchItems').innerHTML === '') {
+                    document.getElementById('lunchItems').innerHTML = 
+                        '<p style="color: #999; padding: 20px; text-align: center;">Chưa có món ăn</p>';
+                }
+            } else if (mealType === 'dinner') {
+                if (dinnerCategory) dinnerCategory.style.display = 'block';
+                if (document.getElementById('dinnerItems').innerHTML === '') {
+                    document.getElementById('dinnerItems').innerHTML = 
+                        '<p style="color: #999; padding: 20px; text-align: center;">Chưa có món ăn</p>';
+                }
+            }
 
-            updateMealStats(recipeIds.length, 0);
+            updateMealStats(uniqueRecipeIds.length, 0);
+        }
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // Update meal statistics
@@ -404,111 +1094,248 @@
             document.getElementById('caloriesCount').textContent = totalCalories.toLocaleString();
         }
 
-        // Add new meal
-        async function addMeal() {
+        // Hide header and navigation when modal opens
+        function hideHeaderAndNav() {
+            document.body.classList.add('modal-open');
+        }
+
+        // Show header and navigation when modal closes
+        function showHeaderAndNav() {
+            document.body.classList.remove('modal-open');
+        }
+
+        // Open add meal modal
+        function openAddMealModal() {
             if (!selectedDate) {
                 alert('Vui lòng chọn ngày trước!');
                 return;
             }
 
-            const mealPlanName = prompt('Tên kế hoạch bữa ăn:');
-            if (!mealPlanName) return;
-
-            const recipeIdsInput = prompt('Nhập Recipe IDs (phân cách bằng dấu phẩy):');
-            if (!recipeIdsInput) return;
-
-            const recipeIds = recipeIdsInput.split(',').map(id => id.trim()).filter(id => id);
-
-            const today = new Date();
-            const planDate = new Date(today.getFullYear(), today.getMonth(), selectedDate);
-
-            try {
-                const response = await fetch('/api/MealPlansApi', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        name: mealPlanName,
-                        recipeIds: recipeIds,
-                        date: planDate.toISOString(),
-                        notes: ''
-                    })
-                });
-
-                if (response.ok) {
-                    const newPlan = await response.json();
-                    mealPlans.push(newPlan);
-                    markDaysWithMealPlans();
-                    updateMealPlanForDay(selectedDate);
-                    console.log('✅ Created meal plan via CookMate API');
-                    alert('Đã tạo kế hoạch bữa ăn thành công!');
-                } else {
-                    const error = await response.json();
-                    alert('Lỗi: ' + (error.message || 'Không thể tạo kế hoạch'));
-                }
-            } catch (error) {
-                console.error('Error creating meal plan:', error);
-                alert('Có lỗi xảy ra khi tạo kế hoạch');
+            isEditMode = false;
+            document.getElementById('modalTitle').textContent = 'Thêm kế hoạch bữa ăn';
+            document.getElementById('mealPlanForm').reset();
+            // Set default meal type to breakfast
+            document.getElementById('mealPlanType').value = 'breakfast';
+            // Clear image preview
+            const previewDiv = document.getElementById('mealPlanImagePreview');
+            if (previewDiv) {
+                previewDiv.style.display = 'none';
             }
+            document.getElementById('mealPlanModal').style.display = 'block';
+            hideHeaderAndNav(); // Hide header and navigation
         }
 
-        // Edit meal plan
-        async function editMealPlan() {
+        // Open edit meal plan modal
+        function openEditMealPlanModal() {
             if (!selectedMealPlan) {
                 alert('Chưa có kế hoạch để sửa!');
                 return;
             }
 
-            const planId = selectedMealPlan.id || selectedMealPlan.Id;
-            const currentName = selectedMealPlan.name || selectedMealPlan.Name || '';
-            const currentRecipeIds = (selectedMealPlan.recipeIds || selectedMealPlan.RecipeIds || []).join(', ');
+            isEditMode = true;
+            document.getElementById('modalTitle').textContent = 'Sửa kế hoạch bữa ăn';
+            document.getElementById('mealPlanName').value = selectedMealPlan.name || '';
+            document.getElementById('mealPlanRecipeIds').value = (selectedMealPlan.recipeIds || []).join(', ');
+            
+            // Extract mealType, imageUrl, and userNotes from notes
+            // Format: "mealType:breakfast\n\nimageUrl:https://...\n\n[user notes]"
+            let mealType = 'breakfast'; // default
+            let imageUrl = '';
+            let userNotes = '';
+            
+            if (selectedMealPlan.mealType) {
+                mealType = selectedMealPlan.mealType;
+            }
+            
+            if (selectedMealPlan.notes) {
+                // Extract mealType
+                const mealTypeMatch = selectedMealPlan.notes.match(/mealType:(\w+)/);
+                if (mealTypeMatch) {
+                    mealType = mealTypeMatch[1];
+                }
+                
+                // Extract imageUrl
+                const imageUrlMatch = selectedMealPlan.notes.match(/imageUrl:(https?:\/\/[^\s\n]+)/);
+                if (imageUrlMatch) {
+                    imageUrl = imageUrlMatch[1];
+                }
+                
+                // Extract user notes (everything after imageUrl, or after mealType if no imageUrl)
+                // Remove mealType and imageUrl lines to get user notes
+                let cleanedNotes = selectedMealPlan.notes
+                    .replace(/mealType:\w+\n\n?/g, '')
+                    .replace(/imageUrl:https?:\/\/[^\s\n]+\n\n?/g, '')
+                    .trim();
+                
+                userNotes = cleanedNotes;
+            }
+            
+            document.getElementById('mealPlanType').value = mealType;
+            document.getElementById('mealPlanImageUrl').value = imageUrl;
+            document.getElementById('mealPlanNotes').value = userNotes;
+            updateImagePreview(imageUrl);
+            
+            document.getElementById('mealPlanModal').style.display = 'block';
+            hideHeaderAndNav(); // Hide header and navigation
+        }
 
-            const newName = prompt('Sửa tên kế hoạch:', currentName);
-            if (!newName || !newName.trim()) return;
+        // Close meal plan modal
+        function closeMealPlanModal() {
+            document.getElementById('mealPlanModal').style.display = 'none';
+            isEditMode = false;
+            showHeaderAndNav(); // Show header and navigation
+        }
 
-            const newRecipeIdsInput = prompt('Sửa Recipe IDs (phân cách bằng dấu phẩy):', currentRecipeIds);
-            if (newRecipeIdsInput === null) return;
 
-            const newRecipeIds = newRecipeIdsInput.split(',').map(id => id.trim()).filter(id => id);
-            const planDate = new Date(selectedMealPlan.date || selectedMealPlan.Date);
+        // Handle meal plan form submit
+        async function handleMealPlanSubmit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('mealPlanName').value.trim();
+            const mealType = document.getElementById('mealPlanType').value;
+            const imageUrl = document.getElementById('mealPlanImageUrl').value.trim();
+            const notes = document.getElementById('mealPlanNotes').value.trim();
+            const recipeIdsInput = document.getElementById('mealPlanRecipeIds').value.trim();
+            const recipeIds = recipeIdsInput.split(',').map(id => id.trim()).filter(id => id);
+
+            if (!name || recipeIds.length === 0 || !mealType) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+
+            if (!selectedDate) {
+                alert('Vui lòng chọn ngày!');
+                return;
+            }
+
+            const date = new Date(selectedDate + 'T00:00:00');
+
+            // Combine notes with mealType and imageUrl (format: "mealType:breakfast\n\nimageUrl:https://...\n\n[user notes]")
+            let combinedNotes = `mealType:${mealType}`;
+            if (imageUrl) {
+                combinedNotes += `\n\nimageUrl:${imageUrl}`;
+            }
+            if (notes) {
+                combinedNotes += '\n\n' + notes;
+            }
 
             try {
-                const response = await fetch('/api/MealPlansApi', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
+                let response;
+                if (isEditMode && selectedMealPlan) {
+                    // Validate plan ID
+                    const planId = selectedMealPlan.id || selectedMealPlan._id || selectedMealPlan._Id;
+                    if (!planId) {
+                        console.error('❌ Update failed: Meal plan ID is missing', selectedMealPlan);
+                        alert('Lỗi: Không tìm thấy ID của kế hoạch bữa ăn. Vui lòng thử lại.');
+                        return;
+                    }
+
+                    // Ensure date is valid
+                    if (!date || isNaN(date.getTime())) {
+                        alert('Lỗi: Ngày không hợp lệ!');
+                        return;
+                    }
+
+                    // Prepare request body
+                    const requestBody = {
                         mealPlanId: planId,
-                        name: newName.trim(),
-                        recipeIds: newRecipeIds,
-                        date: planDate.toISOString(),
-                        notes: selectedMealPlan.notes || selectedMealPlan.Notes || ''
-                    })
-                });
+                        name: name,
+                        recipeIds: recipeIds,
+                        date: date.toISOString(), // ISO 8601 format
+                        notes: combinedNotes
+                    };
+
+                    console.log('🔄 Updating meal plan:', requestBody);
+
+                    // Update existing meal plan
+                    response = await fetch('/api/MealPlansApi', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(requestBody)
+                    });
+                } else {
+                    // Create new meal plan
+                    response = await fetch('/api/MealPlansApi', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            name: name,
+                            recipeIds: recipeIds,
+                            date: date.toISOString(),
+                            notes: combinedNotes
+                        })
+                    });
+                }
 
                 if (response.ok) {
-                    const updatedPlan = await response.json();
-                    // Update local meal plans array
-                    const index = mealPlans.findIndex(p => (p.id || p.Id) === planId);
-                    if (index !== -1) {
-                        mealPlans[index] = updatedPlan;
+                    const mealPlan = await response.json();
+                    
+                    // Normalize meal plan ID
+                    if (!mealPlan.id && (mealPlan._id || mealPlan._Id)) {
+                        mealPlan.id = mealPlan._id || mealPlan._Id;
                     }
                     
-                    // Reload display
-                    updateMealPlanForDay(selectedDate);
-                    console.log('✅ Updated meal plan via CookMate API');
-                    alert('Đã sửa kế hoạch bữa ăn thành công!');
+                    // Store mealType in mealPlan object for easy access
+                    if (mealPlan.notes) {
+                        const match = mealPlan.notes.match(/mealType:(\w+)/);
+                        if (match) {
+                            mealPlan.mealType = match[1];
+                        }
+                    } else {
+                        mealPlan.mealType = mealType; // Use the one we just set
+                    }
+                    
+                    console.log('✅ ' + (isEditMode ? 'Updated' : 'Created') + ' meal plan:', mealPlan);
+                    
+                    // Reload all meal plans from API to get latest data
+                    console.log('🔄 Reloading meal plans after ' + (isEditMode ? 'update' : 'create') + '...');
+                    const reloadSuccess = await reloadMealPlans();
+                    
+                    if (reloadSuccess) {
+                        // Update selected date display if still selected
+                        if (selectedDate) {
+                            console.log('🔄 Updating display for selected date:', selectedDate);
+                            updateMealPlanForDay(selectedDate);
+                        }
+                        
+                        closeMealPlanModal(); // This will show header and navigation
+                        alert('Đã ' + (isEditMode ? 'sửa' : 'tạo') + ' kế hoạch bữa ăn thành công!');
+                    } else {
+                        console.warn('⚠️ Reload failed, using fallback update');
+                        // If reload failed, still update local array as fallback
+                        if (isEditMode) {
+                            const planId = selectedMealPlan.id || selectedMealPlan._id || selectedMealPlan._Id;
+                            const index = mealPlans.findIndex(p => {
+                                const pId = p.id || p._id || p._Id;
+                                return pId === planId;
+                            });
+                            if (index !== -1) {
+                                mealPlans[index] = mealPlan;
+                            }
+                        } else {
+                            mealPlans.push(mealPlan);
+                        }
+                        renderCalendar();
+                        if (selectedDate) {
+                            updateMealPlanForDay(selectedDate);
+                        }
+                        closeMealPlanModal();
+                        alert('Đã ' + (isEditMode ? 'sửa' : 'tạo') + ' kế hoạch bữa ăn thành công!');
+                    }
                 } else {
-                    const error = await response.json();
-                    alert('Lỗi: ' + (error.message || 'Không thể sửa kế hoạch'));
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    console.error('❌ API Error:', errorData);
+                    alert('Lỗi: ' + (errorData.message || 'Không thể ' + (isEditMode ? 'sửa' : 'tạo') + ' kế hoạch'));
                 }
             } catch (error) {
-                console.error('Error updating meal plan:', error);
-                alert('Có lỗi xảy ra khi sửa kế hoạch');
+                console.error('❌ Error ' + (isEditMode ? 'updating' : 'creating') + ' meal plan:', error);
+                alert('Có lỗi xảy ra khi ' + (isEditMode ? 'sửa' : 'tạo') + ' kế hoạch: ' + error.message);
             }
         }
 
@@ -519,31 +1346,51 @@
                 return;
             }
 
-            const planId = selectedMealPlan.id || selectedMealPlan.Id;
-            const planName = selectedMealPlan.name || selectedMealPlan.Name || 'kế hoạch này';
+            // Validate plan ID
+            const planId = selectedMealPlan.id || selectedMealPlan._id || selectedMealPlan._Id;
+            if (!planId) {
+                console.error('❌ Delete failed: Meal plan ID is missing', selectedMealPlan);
+                alert('Lỗi: Không tìm thấy ID của kế hoạch bữa ăn. Vui lòng thử lại.');
+                return;
+            }
+
+            const planName = selectedMealPlan.name || 'kế hoạch này';
+
+            // Hide header and navigation before showing confirm dialog
+            hideHeaderAndNav();
 
             if (!confirm(`Bạn có chắc muốn xóa "${planName}"?`)) {
+                showHeaderAndNav(); // Show again if cancelled
                 return;
             }
 
             try {
-                const response = await fetch(`/api/MealPlansApi/${planId}`, {
+                console.log('🗑️ Deleting meal plan:', { id: planId, name: planName });
+                console.log('🗑️ Delete URL:', `/api/MealPlansApi/${encodeURIComponent(planId)}`);
+                
+                const response = await fetch(`/api/MealPlansApi/${encodeURIComponent(planId)}`, {
                     method: 'DELETE',
-                    credentials: 'include'
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 });
 
+                const responseText = await response.text();
+                console.log('🗑️ Delete response status:', response.status);
+                console.log('🗑️ Delete response text:', responseText);
+
                 if (response.ok) {
-                    // Remove from local array
-                    mealPlans = mealPlans.filter(p => (p.id || p.Id) !== planId);
+                    console.log('✅ Deleted meal plan via CookMate API');
                     
-                    // Update calendar
-                    markDaysWithMealPlans();
+                    // Store deleted date before clearing
+                    const deletedDate = selectedDate;
                     
-                    // Clear display
+                    // Clear display first
                     document.getElementById('mealPlanDetails').innerHTML = `
                         <div class="empty-state" style="text-align: center; padding: 40px; color: #999;">
                             <p>Chưa có kế hoạch bữa ăn cho ngày này</p>
-                            <button class="btn btn-primary" onclick="addMeal()" style="margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="openAddMealModal()" style="margin-top: 20px;">
                                 Tạo kế hoạch mới
                             </button>
                         </div>
@@ -553,35 +1400,69 @@
                     document.getElementById('selectedMealPlanName').textContent = 'Chưa có kế hoạch';
                     document.getElementById('mealCount').textContent = '0';
                     document.getElementById('caloriesCount').textContent = '0';
+                    const headerImageDiv = document.getElementById('mealPlanHeaderImage');
+                    if (headerImageDiv) {
+                        headerImageDiv.innerHTML = '';
+                        headerImageDiv.style.display = 'none';
+                    }
                     selectedMealPlan = null;
                     
-                    // Remove active class from calendar day
-                    const calendarDays = document.querySelectorAll('.calendar-day');
-                    calendarDays.forEach(d => d.classList.remove('active'));
+                    // Don't clear selectedDate - keep it so user can see the empty state
+                    // selectedDate = null;
                     
-                    console.log('✅ Deleted meal plan via CookMate API');
+                    // Remove active class from calendar day
+                    document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+                    
+                    // Reload all meal plans from API to get latest data
+                    console.log('🔄 Reloading meal plans after delete...');
+                    const reloadSuccess = await reloadMealPlans();
+                    
+                    if (reloadSuccess) {
+                        console.log('✅ Meal plans reloaded successfully after delete');
+                        // Update display for the selected date (should now show empty state)
+                        if (selectedDate) {
+                            updateMealPlanForDay(selectedDate);
+                        }
+                    } else {
+                        console.warn('⚠️ Reload failed after delete, but deletion was successful');
+                    }
+                    
+                    showHeaderAndNav(); // Show header and navigation after deletion
                     alert('Đã xóa kế hoạch bữa ăn thành công!');
                 } else {
-                    const error = await response.json();
-                    alert('Lỗi: ' + (error.message || 'Không thể xóa kế hoạch'));
+                    let errorData;
+                    try {
+                        errorData = JSON.parse(responseText);
+                    } catch {
+                        errorData = { message: responseText || 'Unknown error' };
+                    }
+                    console.error('❌ Delete API Error:', response.status, errorData);
+                    showHeaderAndNav(); // Show header and navigation on error
+                    alert('Lỗi: ' + (errorData.message || 'Không thể xóa kế hoạch') + ' (Status: ' + response.status + ')');
                 }
             } catch (error) {
-                console.error('Error deleting meal plan:', error);
-                alert('Có lỗi xảy ra khi xóa kế hoạch');
+                console.error('❌ Error deleting meal plan:', error);
+                showHeaderAndNav(); // Show header and navigation on error
+                alert('Có lỗi xảy ra khi xóa kế hoạch: ' + error.message);
             }
         }
 
-        // Save meal plan
-        async function saveMealPlan() {
-            if (!selectedMealPlan) {
-                alert('Chưa có kế hoạch để lưu!');
-                return;
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('mealPlanModal');
+            if (event.target === modal) {
+                closeMealPlanModal(); // This will show header and navigation
             }
-
-            const completedMeals = document.querySelectorAll('.meal-item.completed').length;
-            const totalMeals = document.querySelectorAll('.meal-item').length;
-            
-            alert(`Đã lưu kế hoạch ăn uống! Bạn đã hoàn thành ${completedMeals}/${totalMeals} bữa ăn.`);
         }
+
+        // Also handle Escape key to close modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('mealPlanModal');
+                if (modal && modal.style.display === 'block') {
+                    closeMealPlanModal(); // This will show header and navigation
+                }
+            }
+        });
     </script>
 }

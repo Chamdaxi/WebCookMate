@@ -127,40 +127,31 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form id="ingredientForm">
+        <form id="ingredientForm" novalidate>
             <input type="hidden" id="ingredientId">
             <div class="form-grid">
                 <div class="form-group">
                     <label for="ingredientName">Tên Nguyên Liệu <span class="required">*</span></label>
-                    <input type="text" id="ingredientName" required>
+                    <input type="text" id="ingredientName" placeholder="Ví dụ: Táo, Thịt heo, Cà rốt">
                 </div>
                 <div class="form-group">
                     <label for="ingredientCategory">Danh Mục <span class="required">*</span></label>
-                    <select id="ingredientCategory" required>
+                    <select id="ingredientCategory">
                         <option value="">Chọn danh mục</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="ingredientQuantity">Số Lượng <span class="required">*</span></label>
-                    <input type="number" id="ingredientQuantity" step="0.01" min="0" required>
+                    <input type="number" id="ingredientQuantity" step="0.01" min="0.01" placeholder="Nhập số lượng">
                 </div>
                 <div class="form-group">
                     <label for="ingredientUnit">Đơn Vị <span class="required">*</span></label>
-                    <select id="ingredientUnit" required>
+                    <select id="ingredientUnit">
                         <option value="kg">Kilogram (kg)</option>
                         <option value="g">Gram (g)</option>
-                        <option value="lít">Lít</option>
+                        <option value="l">Lít (l)</option>
                         <option value="ml">Mililít (ml)</option>
-                        <option value="cái">Cái</option>
-                        <option value="củ">Củ</option>
-                        <option value="quả">Quả</option>
-                        <option value="trái">Trái</option>
-                        <option value="bó">Bó</option>
-                        <option value="gói">Gói</option>
-                        <option value="ổ">Ổ</option>
-                        <option value="lon">Lon</option>
-                        <option value="chai">Chai</option>
-                        <option value="hộp">Hộp</option>
+                        <option value="piece" selected>Cái/Quả/Trái/Củ/Bó/Gói/Ổ/Lon/Chai/Hộp (piece)</option>
                     </select>
                 </div>
                 <div class="form-group">

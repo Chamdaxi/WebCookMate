@@ -7,8 +7,11 @@
     var today = DateTime.Today;
     var todayMealPlans = mealPlans.Where(mp => {
         try {
-            var date = mp.Date;
-            return date.Date == today;
+            if (string.IsNullOrEmpty(mp.Date)) return false;
+            if (DateTime.TryParse(mp.Date, out var date)) {
+                return date.Date == today;
+            }
+            return false;
         } catch {
             return false;
         }

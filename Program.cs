@@ -8,8 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Base URL: https://cookm8.vercel.app
 // ================================
 
-// MVC
-builder.Services.AddControllersWithViews();
+// MVC with JSON camelCase serialization
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 // Session để lưu JWT token
 builder.Services.AddSession(options =>

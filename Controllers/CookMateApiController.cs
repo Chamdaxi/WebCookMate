@@ -373,9 +373,11 @@ namespace demo.Controllers
         /// Add new ingredient
         /// POST /api/ingredients
         /// </summary>
-        [HttpPost("ingredients")]
-        [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
-        public async Task<IActionResult> AddIngredient([FromBody] CreateIngredientRequest request)
+        // DEPRECATED: This endpoint is replaced by IngredientApiController
+        // [HttpPost("ingredients")]
+        // [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
+        [Obsolete("Use /api/IngredientApi instead")]
+        public async Task<IActionResult> AddIngredient_OLD([FromBody] CreateIngredientRequest request)
         {
             try
             {

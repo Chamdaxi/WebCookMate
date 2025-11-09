@@ -1,14 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using demo.Services;
+using System.Text.Json;
 
 namespace demo.Controllers
 {
-    /// <summary>
-    /// API Controller để gọi CookMate API cho Ingredients
-    /// Thay thế cho local database operations
-    /// </summary>
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class IngredientApiController : ControllerBase
@@ -16,173 +11,177 @@ namespace demo.Controllers
         private readonly CookMateApiService _cookMateApi;
         private readonly ILogger<IngredientApiController> _logger;
 
-        public IngredientApiController(
-            CookMateApiService cookMateApi,
-            ILogger<IngredientApiController> logger)
+        public IngredientApiController(CookMateApiService cookMateApi, ILogger<IngredientApiController> logger)
         {
             _cookMateApi = cookMateApi;
             _logger = logger;
         }
 
-        /// <summary>
-        /// GET: api/IngredientApi
-        /// Lấy tất cả ingredients từ CookMate API
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetIngredients()
         {
             try
             {
                 _logger.LogInformation("🔄 GET /api/IngredientApi called");
-                
                 var ingredients = await _cookMateApi.GetIngredientsAsync();
                 
                 if (ingredients == null)
                 {
                     _logger.LogWarning("⚠️ GetIngredientsAsync returned null");
-                    return StatusCode(500, new { message = "Failed to fetch ingredients from API", error = "Service returned null" });
+                    return StatusCode(500, new { message = "Không thể lấy danh sách nguyên liệu" });
                 }
 
                 _logger.LogInformation($"✅ Fetched {ingredients.Count} ingredients from CookMate API");
-                return Ok(ingredients);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger.LogWarning($"⚠️ Unauthorized: {ex.Message}");
-                return StatusCode(401, new { message = "Unauthorized", error = ex.Message });
+                
+                // Normalize ingredients - ensure Id is populated from _id if needed
+                var normalizedIngredients = ingredients.Select(ing => new
+                {
+                    id = ing.GetId(), // Use GetId() to get ID from any field
+                    name = ing.Name ?? "",
+                    categoryId = ing.CategoryId ?? "",
+                    quantity = ing.Quantity,
+                    unit = ing.Unit ?? "piece",
+                    expireDate = ing.ExpireDate ?? ing.ExpiryDate,
+                    expiryDate = ing.ExpireDate ?? ing.ExpiryDate, // Support both field names
+                    notes = ing.Notes ?? "",
+                    imageUrl = ing.ImageUrl ?? "",
+                    userId = ing.UserId ?? "",
+                    createdAt = ing.CreatedAt
+                }).ToList();
+                
+                _logger.LogInformation($"✅ Normalized {normalizedIngredients.Count} ingredients for response");
+                if (normalizedIngredients.Count > 0)
+                {
+                    _logger.LogInformation($"🔍 First normalized ingredient - id: '{normalizedIngredients[0].id}', name: '{normalizedIngredients[0].name}', categoryId: '{normalizedIngredients[0].categoryId}'");
+                }
+                
+                return Ok(normalizedIngredients);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"❌ Error getting ingredients from API: {ex.Message}");
-                _logger.LogError($"Stack trace: {ex.StackTrace}");
-                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+                _logger.LogError(ex, "Error getting ingredients");
+                return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
             }
         }
 
-        /// <summary>
-        /// POST: api/IngredientApi
-        /// Thêm ingredient mới qua CookMate API
-        /// </summary>
         [HttpPost]
         public async Task<IActionResult> AddIngredient([FromForm] AddIngredientRequest request)
         {
             try
             {
-                // Tạo FormData để upload (bao gồm image nếu có)
-                var formData = new MultipartFormDataContent();
-                formData.Add(new StringContent(request.CategoryId), "categoryId");
-                formData.Add(new StringContent(request.Name), "name");
-                formData.Add(new StringContent(request.Quantity.ToString()), "quantity");
-                formData.Add(new StringContent(request.Unit), "unit");
-                
-                if (request.ExpireDate.HasValue)
+                // Validate required fields
+                if (string.IsNullOrWhiteSpace(request.Name))
                 {
-                    formData.Add(new StringContent(request.ExpireDate.Value.ToString("o")), "expireDate");
+                    return BadRequest(new { message = "Tên nguyên liệu là bắt buộc" });
                 }
                 
-                if (!string.IsNullOrEmpty(request.Notes))
+                if (string.IsNullOrWhiteSpace(request.CategoryId))
                 {
-                    formData.Add(new StringContent(request.Notes), "notes");
+                    return BadRequest(new { message = "Danh mục là bắt buộc" });
                 }
-
-                // Upload image if provided
-                if (request.Image != null && request.Image.Length > 0)
+                
+                if (request.Quantity <= 0)
                 {
-                    var streamContent = new StreamContent(request.Image.OpenReadStream());
-                    streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(request.Image.ContentType);
-                    formData.Add(streamContent, "image", request.Image.FileName);
+                    return BadRequest(new { message = "Số lượng phải lớn hơn 0" });
+                }
+                
+                if (string.IsNullOrWhiteSpace(request.Unit))
+                {
+                    return BadRequest(new { message = "Đơn vị là bắt buộc" });
                 }
 
-                var ingredient = await _cookMateApi.AddIngredientAsync(formData);
-                
+                // Call API service
+                var ingredient = await _cookMateApi.AddIngredientAsync(
+                    categoryId: request.CategoryId,
+                    name: request.Name,
+                    quantity: request.Quantity,
+                    unit: request.Unit,
+                    expireDate: request.ExpireDate,
+                    notes: request.Notes,
+                    image: request.Image
+                );
+
                 if (ingredient == null)
                 {
-                    return StatusCode(500, new { message = "Failed to add ingredient" });
+                    return StatusCode(500, new { 
+                        message = "Không thể thêm nguyên liệu. Vui lòng thử lại sau.",
+                        error = "API returned null"
+                    });
                 }
 
-                _logger.LogInformation($"✅ Added ingredient: {ingredient.Name}");
                 return Ok(ingredient);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error adding ingredient");
-                return StatusCode(500, new { message = "Internal server error" });
+                return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
             }
         }
 
-        /// <summary>
-        /// PUT: api/IngredientApi
-        /// Cập nhật ingredient qua CookMate API
-        /// </summary>
         [HttpPut]
         public async Task<IActionResult> UpdateIngredient([FromForm] UpdateIngredientRequest request)
         {
             try
             {
-                var formData = new MultipartFormDataContent();
-                formData.Add(new StringContent(request.IngredientId), "ingredientId");
-                formData.Add(new StringContent(request.Name), "name");
-                formData.Add(new StringContent(request.CategoryId), "categoryId");
-                formData.Add(new StringContent(request.Quantity.ToString()), "quantity");
-                formData.Add(new StringContent(request.Unit), "unit");
-                
-                if (request.ExpireDate.HasValue)
+                if (string.IsNullOrWhiteSpace(request.IngredientId))
                 {
-                    formData.Add(new StringContent(request.ExpireDate.Value.ToString("o")), "expireDate");
-                }
-                
-                if (!string.IsNullOrEmpty(request.Notes))
-                {
-                    formData.Add(new StringContent(request.Notes), "notes");
+                    return BadRequest(new { message = "ID nguyên liệu là bắt buộc" });
                 }
 
-                if (request.Image != null && request.Image.Length > 0)
+                if (string.IsNullOrWhiteSpace(request.Name))
                 {
-                    var streamContent = new StreamContent(request.Image.OpenReadStream());
-                    streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(request.Image.ContentType);
-                    formData.Add(streamContent, "image", request.Image.FileName);
+                    return BadRequest(new { message = "Tên nguyên liệu là bắt buộc" });
                 }
 
-                var ingredient = await _cookMateApi.UpdateIngredientAsync(formData);
-                
+                // Call API service with individual parameters (uses raw multipart body)
+                var ingredient = await _cookMateApi.UpdateIngredientAsync(
+                    ingredientId: request.IngredientId,
+                    categoryId: request.CategoryId,
+                    name: request.Name,
+                    quantity: request.Quantity,
+                    unit: request.Unit,
+                    expireDate: request.ExpireDate,
+                    notes: request.Notes,
+                    image: request.Image
+                );
+
                 if (ingredient == null)
                 {
-                    return StatusCode(500, new { message = "Failed to update ingredient" });
+                    return StatusCode(500, new { message = "Không thể cập nhật nguyên liệu. Vui lòng thử lại sau." });
                 }
 
-                _logger.LogInformation($"✅ Updated ingredient: {ingredient.Name}");
                 return Ok(ingredient);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating ingredient");
-                return StatusCode(500, new { message = "Internal server error" });
+                return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
             }
         }
 
-        /// <summary>
-        /// DELETE: api/IngredientApi/{id}
-        /// Xóa ingredient qua CookMate API
-        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteIngredient(string id)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return BadRequest(new { message = "ID nguyên liệu là bắt buộc" });
+                }
+                
                 var success = await _cookMateApi.DeleteIngredientAsync(id);
                 
                 if (!success)
                 {
-                    return StatusCode(500, new { message = "Failed to delete ingredient" });
+                    return StatusCode(500, new { message = "Không thể xóa nguyên liệu. Vui lòng thử lại." });
                 }
 
-                _logger.LogInformation($"✅ Deleted ingredient: {id}");
-                return Ok(new { message = "Ingredient deleted successfully" });
+                return Ok(new { message = "Đã xóa nguyên liệu thành công" });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting ingredient");
-                return StatusCode(500, new { message = "Internal server error" });
+                return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
             }
         }
 
@@ -194,7 +193,7 @@ namespace demo.Controllers
             public string Name { get; set; } = "";
             public decimal Quantity { get; set; }
             public string Unit { get; set; } = "";
-            public DateTime? ExpireDate { get; set; }
+            public string? ExpireDate { get; set; }
             public string? Notes { get; set; }
             public IFormFile? Image { get; set; }
         }
@@ -202,11 +201,11 @@ namespace demo.Controllers
         public class UpdateIngredientRequest
         {
             public string IngredientId { get; set; } = "";
-            public string CategoryId { get; set; } = "";
+            public string? CategoryId { get; set; }
             public string Name { get; set; } = "";
             public decimal Quantity { get; set; }
             public string Unit { get; set; } = "";
-            public DateTime? ExpireDate { get; set; }
+            public string? ExpireDate { get; set; }
             public string? Notes { get; set; }
             public IFormFile? Image { get; set; }
         }
@@ -214,4 +213,3 @@ namespace demo.Controllers
         #endregion
     }
 }
-
