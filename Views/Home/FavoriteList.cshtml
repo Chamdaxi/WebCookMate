@@ -31,7 +31,7 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
             </svg>
-            <input type="text" placeholder="Tìm kiếm món yêu thích..." class="search-input">
+            <input type="text" placeholder="Tìm kiếm món yêu thích..." class="search-input" id="favoriteSearchInput">
         </div>
         <div class="filter-controls">
             <div class="filter-buttons">
@@ -48,6 +48,14 @@
                     <option value="rating">Sắp xếp theo đánh giá</option>
                     <option value="date">Sắp xếp theo ngày thêm</option>
                 </select>
+            </div>
+            <div class="add-favorite-controls">
+                <button class="add-favorite-btn" id="addFavoriteBtn" onclick="openAddFavoriteModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    Thêm món yêu thích
+                </button>
             </div>
         </div>
     </div>
@@ -66,7 +74,44 @@
         </div>
         <h3>Chưa có món yêu thích nào</h3>
         <p>Hãy khám phá và lưu những món ăn bạn thích!</p>
-        <a href="@Url.Action("Recipes", "Home")" class="explore-btn">Khám phá công thức</a>
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+            <button class="explore-btn" onclick="openAddFavoriteModal()" style="cursor: pointer; border: none; font-family: inherit;">
+                Thêm món yêu thích
+            </button>
+            <a href="@Url.Action("Recipes", "Home")" class="explore-btn" style="text-decoration: none; display: inline-block;">
+                Khám phá công thức
+            </a>
+        </div>
+    </div>
+
+    <!-- Add Favorite Modal -->
+    <div id="addFavoriteModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Thêm món yêu thích</h2>
+                <span class="close-modal" onclick="closeAddFavoriteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="recipeIdInput">Recipe ID:</label>
+                    <input type="text" id="recipeIdInput" placeholder="Nhập Recipe ID (ví dụ: 645872)" class="form-control">
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        💡 Bạn có thể tìm Recipe ID từ trang <a href="@Url.Action("Recipes", "Home")" target="_blank" style="color: #667eea;">Công thức</a>
+                    </small>
+                </div>
+                <div id="recipeIdError" style="display: none; color: #d32f2f; padding: 10px; background: #ffebee; border-radius: 5px; margin-top: 10px; font-size: 14px;">
+                    <!-- Error message will be displayed here -->
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button class="btn-add-favorite" onclick="closeAddFavoriteModal()" style="background: #6c757d;">
+                        Hủy
+                    </button>
+                    <button class="btn-add-favorite" onclick="addFavoriteByRecipeId()">
+                        Thêm vào yêu thích
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -185,6 +230,7 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            flex: 1;
         }
 
         .sort-controls {
@@ -466,6 +512,213 @@
             transform: translateY(-2px);
         }
 
+        /* Add Favorite Button */
+        .add-favorite-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .add-favorite-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .add-favorite-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .add-favorite-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            padding-top: 50px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @@keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .close-modal {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.2);
+            opacity: 0.8;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .recipe-search-result {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .recipe-search-result:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .recipe-search-result img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .recipe-search-result-info {
+            flex: 1;
+        }
+
+        .recipe-search-result-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .recipe-search-result-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .recipe-search-result-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-add-favorite {
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-favorite:hover {
+            background: #218838;
+        }
+
+        .btn-add-favorite:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .form-group small a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .form-group small a:hover {
+            text-decoration: underline;
+        }
+
         /* Responsive Design */
         @@media (max-width: 768px) {
             .favorite-list-container {
@@ -500,6 +753,18 @@
             .filter-controls {
                 flex-direction: column;
                 gap: 15px;
+                align-items: stretch;
+            }
+            
+            .add-favorite-controls {
+                margin-left: 0;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .add-favorite-btn {
+                width: 100%;
+                justify-content: center;
             }
 
             .filter-buttons {
@@ -538,6 +803,42 @@
             // Load favorites from API
             loadFavorites();
 
+            // Cache favorites in localStorage
+            function cacheFavorites(favorites) {
+                try {
+                    localStorage.setItem('cachedFavorites', JSON.stringify({
+                        data: favorites,
+                        timestamp: new Date().toISOString()
+                    }));
+                    console.log('✅ Cached favorites to localStorage');
+                } catch (e) {
+                    console.warn('⚠️ Could not cache favorites:', e);
+                }
+            }
+            
+            // Get cached favorites from localStorage
+            function getCachedFavorites() {
+                try {
+                    const cached = localStorage.getItem('cachedFavorites');
+                    if (cached) {
+                        const parsed = JSON.parse(cached);
+                        // Cache is valid for 24 hours
+                        const cacheAge = new Date() - new Date(parsed.timestamp);
+                        const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+                        if (cacheAge < maxAge) {
+                            console.log('✅ Found cached favorites in localStorage');
+                            return parsed.data;
+                        } else {
+                            console.log('⚠️ Cached favorites expired');
+                            localStorage.removeItem('cachedFavorites');
+                        }
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Could not read cached favorites:', e);
+                }
+                return null;
+            }
+            
             // Load favorites from API
             async function loadFavorites() {
                 try {
@@ -555,22 +856,69 @@
                         const errorText = await response.text();
                         console.error('❌ Failed to load favorites:', response.status, errorText);
                         
-                        // Handle Spoonacular limit error specifically
-                        if (response.status === 503) {
-                            let errorData;
-                            try {
-                                errorData = JSON.parse(errorText);
-                            } catch {
-                                errorData = { message: errorText };
-                            }
+                        // Check if it's a Spoonacular limit error FIRST (before parsing JSON)
+                        // This handles cases where error response might not be valid JSON
+                        const isSpoonacularLimit = response.status === 500 || 
+                                                  response.status === 503 || 
+                                                  errorText.includes('Spoonacular') || 
+                                                  errorText.includes('daily points limit') || 
+                                                  errorText.includes('points limit') ||
+                                                  errorText.includes('402');
+                        
+                        if (isSpoonacularLimit) {
+                            console.warn('⚠️ Spoonacular API limit detected - trying cached favorites');
                             
-                            if (errorData.code === 'SPOONACULAR_LIMIT') {
-                                showSpoonacularLimitMessage(errorData.details || errorData.message);
+                            // Try to load cached favorites
+                            const cachedFavorites = getCachedFavorites();
+                            if (cachedFavorites && cachedFavorites.length > 0) {
+                                console.log(`✅ Loaded ${cachedFavorites.length} cached favorites`);
+                                processFavoritesArray(cachedFavorites, true); // Pass isSpoonacularLimit = true
+                                showNotification('⚠️ Đang hiển thị favorites từ cache. Giới hạn API Spoonacular đã đạt (50 points/ngày). Giới hạn sẽ reset sau 24 giờ.', 'warning', 8000);
                                 return;
                             }
+                            
+                            // No cache available, show message
+                            showEmptyStateWithMessage('⚠️ Giới hạn API Spoonacular đã đạt (50 points/ngày). Favorites có thể đã được lưu nhưng không thể hiển thị chi tiết. Bạn vẫn có thể thêm favorites mới bằng button "Thêm món yêu thích". Giới hạn sẽ reset sau 24 giờ.');
+                            return;
                         }
                         
-                        throw new Error('Failed to load favorites: ' + response.status);
+                        // For non-200 responses, try to parse as JSON to get favorites data
+                        // Some APIs might return favorites even with error status
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            
+                            // Check if error response contains favorites array
+                            if (Array.isArray(errorData)) {
+                                console.log('✅ Found favorites array in error response');
+                                const favoritesArray = errorData;
+                                processFavoritesArray(favoritesArray);
+                                return;
+                            }
+                            
+                            // Check for favorites in nested properties
+                            const favoritesInError = errorData.favorites || errorData.data || errorData.items || errorData.results;
+                            if (Array.isArray(favoritesInError) && favoritesInError.length > 0) {
+                                console.log(`✅ Found ${favoritesInError.length} favorites in error response`);
+                                processFavoritesArray(favoritesInError);
+                                return;
+                            }
+                        } catch (parseError) {
+                            console.warn('⚠️ Could not parse error response as JSON:', parseError);
+                        }
+                        
+                        // If we can't parse or no favorites found, try cached favorites
+                        const cachedFavorites = getCachedFavorites();
+                        if (cachedFavorites && cachedFavorites.length > 0) {
+                            console.log(`✅ Loaded ${cachedFavorites.length} cached favorites as fallback`);
+                            processFavoritesArray(cachedFavorites);
+                            showNotification('⚠️ Đang hiển thị favorites từ cache. Dữ liệu có thể không cập nhật.', 'info', 5000);
+                            return;
+                        }
+                        
+                        // If we can't parse or no favorites found, show empty state
+                        console.warn('⚠️ No favorites found in error response, showing empty state');
+                        showEmptyState();
+                        return;
                     }
 
                     const result = await response.json();
@@ -578,51 +926,279 @@
                     
                     // Handle both array and wrapped object formats
                     let favoritesArray = [];
+                    let message = '';
+                    let isSpoonacularLimit = false;
+                    
                     if (Array.isArray(result)) {
                         favoritesArray = result;
                     } else if (result && typeof result === 'object') {
-                        favoritesArray = result.data || result.favorites || result.items || [];
+                        // Check if response has favorites array
+                        favoritesArray = result.favorites || result.data || result.items || [];
+                        
+                        // Check if Spoonacular limit message
+                        if (result.spoonacularLimit) {
+                            isSpoonacularLimit = true;
+                            message = result.message || 'Giới hạn API Spoonacular đã đạt. Favorites có thể đã được lưu nhưng không thể hiển thị chi tiết.';
+                            console.warn('⚠️ Spoonacular API limit detected:', message);
+                            
+                            // If no favorites and Spoonacular limit, try cache
+                            if (favoritesArray.length === 0) {
+                                const cachedFavorites = getCachedFavorites();
+                                if (cachedFavorites && cachedFavorites.length > 0) {
+                                    console.log(`✅ Loaded ${cachedFavorites.length} cached favorites`);
+                                    processFavoritesArray(cachedFavorites, true);
+                                    showNotification('⚠️ Đang hiển thị favorites từ cache. Giới hạn API Spoonacular đã đạt (50 points/ngày). Giới hạn sẽ reset sau 24 giờ.', 'warning', 8000);
+                                    return;
+                                }
+                                showEmptyStateWithMessage(message);
+                                return;
+                            }
+                        } else if (result.message && favoritesArray.length === 0) {
+                            // Show custom message if provided
+                            message = result.message;
+                            console.log('📋 Message from API:', message);
+                            showEmptyStateWithMessage(message);
+                            return;
+                        }
                     }
                     
                     console.log('✅ Loaded favorites:', favoritesArray.length);
+                    console.log('📋 Raw favorites array (first item):', favoritesArray.length > 0 ? favoritesArray[0] : 'empty');
+                    console.log('📋 Spoonacular limit:', isSpoonacularLimit);
                     
-                    // Map API response to UI format
-                    allFavorites = favoritesArray.map(fav => ({
-                        id: fav.id || fav._id || fav.favoriteId,
-                        recipeId: fav.recipeId || fav.recipe_id || fav.recipe?.id,
-                        recipeName: fav.recipeName || fav.recipe?.title || fav.recipe?.name || 'Recipe',
+                    if (favoritesArray.length === 0) {
+                        console.log('⚠️ No favorites found - showing empty state');
+                        showEmptyState();
+                        return;
+                    }
+                    
+                    // Cache favorites for future use (when Spoonacular limit occurs)
+                    cacheFavorites(favoritesArray);
+                    
+                    // Process favorites array
+                    processFavoritesArray(favoritesArray, isSpoonacularLimit);
+                    
+                } catch (error) {
+                    console.error('❌ Error loading favorites:', error);
+                    // Try to load cached favorites on error
+                    const cachedFavorites = getCachedFavorites();
+                    if (cachedFavorites && cachedFavorites.length > 0) {
+                        console.log(`✅ Loaded ${cachedFavorites.length} cached favorites on error`);
+                        processFavoritesArray(cachedFavorites);
+                        showNotification('⚠️ Đang hiển thị favorites từ cache do lỗi kết nối.', 'info', 5000);
+                    } else {
+                        showEmptyState();
+                    }
+                }
+            }
+            
+            // Process favorites array and render
+            function processFavoritesArray(favoritesArray, isSpoonacularLimit = false) {
+                // Show warning message if Spoonacular limit but still have favorites
+                if (isSpoonacularLimit) {
+                    console.warn('⚠️ Spoonacular limit warning - showing favorites with limited details');
+                    showNotification('⚠️ Giới hạn API Spoonacular đã đạt (50 points/ngày). Một số chi tiết có thể không đầy đủ. Giới hạn sẽ reset sau 24 giờ.', 'warning', 8000);
+                }
+                
+                // Map API response to UI format
+                allFavorites = favoritesArray.map(fav => {
+                    const recipeId = fav.recipeId || fav.recipe_id || fav.recipe?.id || '';
+                    return {
+                        id: fav.id || fav._id || fav.favoriteId || '',
+                        recipeId: recipeId,
+                        recipeName: fav.recipeName || fav.recipe?.title || fav.recipe?.name || (recipeId ? `Recipe #${recipeId}` : 'Recipe'),
                         recipeCategory: fav.recipeCategory || fav.recipe?.category || 'lunch',
                         rating: fav.rating || fav.recipe?.rating || 4.5,
                         cookingTime: fav.cookingTime || fav.recipe?.readyInMinutes || fav.recipe?.cookingTime || 30,
                         image: fav.image || fav.recipe?.image || fav.recipeImage || '',
-                        addedAt: fav.addedAt || fav.createdAt || fav.dateAdded || new Date().toISOString()
-                    }));
-                    
-                    filteredFavorites = [...allFavorites];
-                    
-                    console.log('✅ Mapped favorites:', allFavorites.length);
-                    renderFavorites();
-                    updateStats();
-                } catch (error) {
-                    console.error('❌ Error loading favorites:', error);
+                        addedAt: fav.addedAt || fav.createdAt || fav.dateAdded || new Date().toISOString(),
+                        difficulty: fav.difficulty || fav.recipe?.difficulty || 'easy',
+                        recipeDescription: fav.recipeDescription || fav.recipe?.description || fav.recipe?.summary || 'Món ăn ngon'
+                    };
+                });
+                
+                console.log('✅ Mapped favorites:', allFavorites.length);
+                if (allFavorites.length > 0) {
+                    console.log('📋 Sample favorite:', JSON.stringify(allFavorites[0], null, 2));
+                    console.log('📋 All favorites recipeIds:', allFavorites.map(f => f.recipeId).join(', '));
+                }
+                
+                // Check if we have any favorites with recipeId
+                const favoritesWithRecipeId = allFavorites.filter(f => f.recipeId && f.recipeId !== '');
+                console.log(`📊 Favorites with recipeId: ${favoritesWithRecipeId.length}/${allFavorites.length}`);
+                
+                if (allFavorites.length === 0) {
+                    console.log('⚠️ No favorites to display - showing empty state');
                     showEmptyState();
+                    return;
+                }
+                
+                // Always render favorites first (even if only have recipeId)
+                filteredFavorites = [...allFavorites];
+                renderFavorites();
+                updateStats();
+                
+                // Then try to fetch recipe details for favorites that only have recipeId
+                // Skip if Spoonacular limit to avoid further API calls
+                if (!isSpoonacularLimit && favoritesWithRecipeId.length > 0) {
+                    console.log(`🔄 Attempting to fetch recipe details for ${favoritesWithRecipeId.length} favorites...`);
+                    fetchRecipeDetailsForFavorites().then(() => {
+                        console.log('✅ Recipe details fetch completed - re-rendering...');
+                        // Re-render after fetching details
+                        filteredFavorites = [...allFavorites];
+                        renderFavorites();
+                        updateStats();
+                        // Update cache with new details
+                        cacheFavorites(favoritesArray);
+                    }).catch(error => {
+                        console.warn('⚠️ Could not fetch recipe details, but favorites are still displayed:', error);
+                    });
+                } else if (isSpoonacularLimit) {
+                    console.log('⚠️ Skipping recipe details fetch due to Spoonacular limit');
+                } else {
+                    console.log('⚠️ No recipeIds found in favorites - skipping recipe details fetch');
+                }
+            }
+
+            // Fetch recipe details for favorites that only have recipeId
+            async function fetchRecipeDetailsForFavorites() {
+                // Find favorites that need recipe details (only have recipeId, no name/image)
+                const favoritesNeedingDetails = allFavorites.filter(fav => 
+                    fav.recipeId && (fav.recipeName.startsWith('Recipe #') || !fav.image)
+                );
+                
+                if (favoritesNeedingDetails.length === 0) {
+                    console.log('✅ All favorites already have details');
+                    return;
+                }
+                
+                console.log(`🔄 Fetching recipe details for ${favoritesNeedingDetails.length} favorites...`);
+                
+                try {
+                    // Get unique recipe IDs and clean them (remove "Recipe #" prefix if present)
+                    const recipeIds = [...new Set(favoritesNeedingDetails.map(f => {
+                        let id = f.recipeId;
+                        // Extract numeric part if ID contains non-numeric characters
+                        const numericMatch = id.match(/\d+/);
+                        if (numericMatch) {
+                            return numericMatch[0];
+                        }
+                        return id;
+                    }).filter(id => id && id !== ''))];
+                    
+                    if (recipeIds.length === 0) {
+                        console.warn('⚠️ No valid recipe IDs to fetch');
+                        return;
+                    }
+                    
+                    console.log(`📤 Requesting recipe details for IDs: ${recipeIds.join(', ')}`);
+                    
+                    // Fetch recipe details from API
+                    const idsParam = recipeIds.join(',');
+                    const response = await fetch(`/api/MealPlansApi/recipes?ids=${encodeURIComponent(idsParam)}`, {
+                        method: 'GET',
+                        credentials: 'include'
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.warn(`⚠️ Failed to fetch recipe details: ${response.status} - ${errorText}`);
+                        // Don't throw - just log and continue with basic info
+                        return;
+                    }
+                    
+                    const recipes = await response.json();
+                    console.log(`✅ Fetched ${recipes?.length || 0} recipe details`);
+                    
+                    if (!recipes || recipes.length === 0) {
+                        console.warn('⚠️ No recipes returned from API');
+                        return;
+                    }
+                    
+                    // Create a map of recipeId to recipe data (support both string and int IDs)
+                    const recipeMap = new Map();
+                    recipes.forEach(recipe => {
+                        const recipeId = (recipe.id?.toString() || recipe.Id?.toString() || '').trim();
+                        if (recipeId) {
+                            recipeMap.set(recipeId, recipe);
+                            // Also map by numeric part for easier matching
+                            const numericMatch = recipeId.match(/\d+/);
+                            if (numericMatch && numericMatch[0] !== recipeId) {
+                                recipeMap.set(numericMatch[0], recipe);
+                            }
+                        }
+                    });
+                    
+                    console.log(`📋 Recipe map keys: ${Array.from(recipeMap.keys()).join(', ')}`);
+                    
+                    // Update favorites with recipe details
+                    let updatedCount = 0;
+                    allFavorites.forEach(fav => {
+                        if (!fav.recipeId) return;
+                        
+                        // Try to find recipe by ID (exact match or numeric part)
+                        let recipe = recipeMap.get(fav.recipeId);
+                        if (!recipe) {
+                            const numericMatch = fav.recipeId.match(/\d+/);
+                            if (numericMatch) {
+                                recipe = recipeMap.get(numericMatch[0]);
+                            }
+                        }
+                        
+                        if (recipe) {
+                            if (fav.recipeName.startsWith('Recipe #') || !fav.recipeName) {
+                                fav.recipeName = recipe.title || recipe.Title || fav.recipeName;
+                                updatedCount++;
+                            }
+                            if (!fav.image) {
+                                fav.image = recipe.image || recipe.Image || fav.image;
+                            }
+                            if (!fav.cookingTime || fav.cookingTime === 30) {
+                                fav.cookingTime = recipe.readyInMinutes || recipe.ReadyInMinutes || fav.cookingTime;
+                            }
+                            if (!fav.rating || fav.rating === 4.5) {
+                                fav.rating = recipe.rating || recipe.Rating || fav.rating;
+                            }
+                            if (!fav.recipeDescription || fav.recipeDescription === 'Món ăn ngon') {
+                                fav.recipeDescription = recipe.summary || recipe.Summary || recipe.description || recipe.Description || fav.recipeDescription;
+                            }
+                        } else {
+                            console.warn(`⚠️ Recipe not found for ID: ${fav.recipeId}`);
+                        }
+                    });
+                    
+                    console.log(`✅ Updated ${updatedCount} favorites with recipe details`);
+                    
+                    // Re-render if we updated any favorites
+                    if (updatedCount > 0) {
+                        filteredFavorites = [...allFavorites];
+                        renderFavorites();
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching recipe details:', error);
+                    // Don't throw - continue with basic info
                 }
             }
 
             // Render favorites
             function renderFavorites() {
+                console.log(`🎨 Rendering ${filteredFavorites.length} favorites...`);
+                
                 if (filteredFavorites.length === 0) {
+                    console.log('⚠️ No favorites to render - showing empty state');
                     showEmptyState();
                     return;
                 }
 
                 favoritesGrid.style.display = 'grid';
                 emptyState.style.display = 'none';
+                
+                console.log('✅ Rendering favorites grid with', filteredFavorites.length, 'items');
 
                 favoritesGrid.innerHTML = filteredFavorites.map(fav => `
-                    <div class="favorite-card" data-category="${fav.recipeCategory}" data-rating="${fav.rating}" data-time="${fav.cookingTime}" data-date="${fav.addedAt}" data-id="${fav.id}">
+                    <div class="favorite-card" data-category="${fav.recipeCategory}" data-rating="${fav.rating}" data-time="${fav.cookingTime}" data-date="${fav.addedAt}" data-id="${fav.id}" data-recipe-id="${fav.recipeId}">
                         <div class="card-image">
-                            <img src="${getRecipeImage(fav)}" alt="${fav.recipeName}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop'">
+                            <img src="${getRecipeImage(fav)}" alt="${escapeHtml(fav.recipeName)}" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';">
                             <div class="card-overlay">
                                 <button class="quick-action-btn" title="Xem chi tiết">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -659,13 +1235,13 @@
                         </div>
                         <div class="card-content">
                             <div class="card-header">
-                                <h3>${fav.recipeName}</h3>
+                                <h3>${escapeHtml(fav.recipeName)}</h3>
                                 <div class="rating">
                                     <span class="stars">${'★'.repeat(Math.floor(fav.rating))}${'☆'.repeat(5-Math.floor(fav.rating))}</span>
                                     <span class="rating-text">${fav.rating.toFixed(1)}</span>
                                 </div>
                             </div>
-                            <p class="card-description">${fav.recipeDescription || 'Món ăn ngon'}</p>
+                            <p class="card-description">${escapeHtml(fav.recipeDescription || 'Món ăn ngon')}</p>
                             <div class="card-meta">
                                 <span class="cooking-time">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -790,12 +1366,21 @@
 
             async function removeFromFavorites(favoriteId, card) {
                 const title = card.querySelector('h3').textContent;
+                const recipeId = card.getAttribute('data-recipe-id') || card.getAttribute('data-id');
+                
+                if (!recipeId) {
+                    console.error('❌ RecipeId not found in card');
+                    showNotification('Không tìm thấy ID công thức. Vui lòng thử lại!', 'error');
+                    return;
+                }
+                
                 if (!confirm(`Bạn có chắc muốn xóa "${title}" khỏi danh sách yêu thích?`)) {
                     return;
                 }
 
                 try {
-                    const response = await fetch(`/api/FavoriteApi/${favoriteId}`, {
+                    console.log(`🔄 Deleting favorite - RecipeId: ${recipeId}`);
+                    const response = await fetch(`/api/FavoriteApi/recipe/${encodeURIComponent(recipeId)}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -804,6 +1389,8 @@
                     });
 
                     if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('❌ Failed to delete favorite:', response.status, errorText);
                         throw new Error('Failed to remove favorite');
                     }
 
@@ -814,9 +1401,11 @@
                     
                     setTimeout(() => {
                         // Remove from arrays
-                        allFavorites = allFavorites.filter(f => f.id !== favoriteId);
-                        filteredFavorites = filteredFavorites.filter(f => f.id !== favoriteId);
+                        allFavorites = allFavorites.filter(f => f.id !== favoriteId && f.recipeId !== recipeId);
+                        filteredFavorites = filteredFavorites.filter(f => f.id !== favoriteId && f.recipeId !== recipeId);
                         
+                        // Clear cache and update
+                        localStorage.removeItem('cachedFavorites');
                         renderFavorites();
                         updateStats();
                     }, 300);
@@ -833,31 +1422,192 @@
             }
 
             function showEmptyState() {
+                console.log('📭 Showing empty state');
                 emptyState.style.display = 'block';
                 favoritesGrid.style.display = 'none';
-                statNumber.textContent = '0';
+                if (statNumber) {
+                    statNumber.textContent = '0';
+                }
+            }
+
+            function showEmptyStateWithMessage(message) {
+                console.log('📭 Showing empty state with message:', message);
+                emptyState.style.display = 'block';
+                favoritesGrid.style.display = 'none';
+                if (statNumber) {
+                    statNumber.textContent = '0';
+                }
+                // Update empty state message
+                const emptyStateP = emptyState.querySelector('p');
+                if (emptyStateP) {
+                    emptyStateP.textContent = message;
+                }
             }
 
             function showSpoonacularLimitMessage(message) {
-                // Hide grid and show custom message
-                favoritesGrid.style.display = 'none';
-                emptyState.style.display = 'block';
+                // This function is kept for backward compatibility but may not be used
+                // Instead, we show empty state which is more user-friendly
+                showEmptyState();
+            }
+
+            // Add Favorite Modal Functions
+            function openAddFavoriteModal() {
+                console.log('🔄 Opening add favorite modal');
+                const modal = document.getElementById('addFavoriteModal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                    // Hide header and nav when modal is open
+                    hideHeaderAndNav();
+                    // Focus on input
+                    setTimeout(() => {
+                        const input = document.getElementById('recipeIdInput');
+                        if (input) input.focus();
+                    }, 100);
+                }
+            }
+
+            function closeAddFavoriteModal() {
+                console.log('🔄 Closing add favorite modal');
+                const modal = document.getElementById('addFavoriteModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                    // Show header and nav when modal is closed
+                    showHeaderAndNav();
+                    // Clear input and error
+                    const input = document.getElementById('recipeIdInput');
+                    const errorDiv = document.getElementById('recipeIdError');
+                    if (input) input.value = '';
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                        errorDiv.innerHTML = '';
+                    }
+                }
+            }
+
+            function hideHeaderAndNav() {
+                const header = document.querySelector('header');
+                const nav = document.querySelector('nav');
+                if (header) header.style.display = 'none';
+                if (nav) nav.style.display = 'none';
+            }
+
+            function showHeaderAndNav() {
+                const header = document.querySelector('header');
+                const nav = document.querySelector('nav');
+                if (header) header.style.display = '';
+                if (nav) nav.style.display = '';
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                const modal = document.getElementById('addFavoriteModal');
+                if (event.target == modal) {
+                    closeAddFavoriteModal();
+                }
+            }
+
+            // Allow Enter key to submit
+            const recipeIdInput = document.getElementById('recipeIdInput');
+            if (recipeIdInput) {
+                recipeIdInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addFavoriteByRecipeId();
+                    }
+                });
+            }
+
+            async function addFavoriteByRecipeId() {
+                const input = document.getElementById('recipeIdInput');
+                const errorDiv = document.getElementById('recipeIdError');
                 
-                // Update empty state content
-                const emptyStateHTML = `
-                    <div class="empty-icon" style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
-                    <h3 style="color: #f59e0b; margin-bottom: 15px;">Giới hạn API đã đạt</h3>
-                    <p style="font-size: 16px; line-height: 1.6; max-width: 600px; margin: 0 auto 30px;">
-                        ${message || 'Món yêu thích của bạn đã được lưu nhưng không thể hiển thị chi tiết do giới hạn API Spoonacular. Vui lòng thử lại sau (giới hạn sẽ reset vào ngày mai).'}
-                    </p>
-                    <div style="padding: 20px; background: #fef3c7; border-radius: 10px; max-width: 500px; margin: 0 auto;">
-                        <p style="margin: 0; font-size: 14px; color: #92400e;">
-                            <strong>💡 Gợi ý:</strong> Bạn vẫn có thể thêm món yêu thích mới từ trang Recipes. Các món đã thêm sẽ được lưu và sẽ hiển thị đầy đủ khi API limit reset.
-                        </p>
-                    </div>
-                `;
-                emptyState.innerHTML = emptyStateHTML;
-                statNumber.textContent = '?';
+                if (!input) {
+                    console.error('❌ Recipe ID input not found');
+                    return;
+                }
+
+                const recipeId = input.value.trim();
+                
+                if (!recipeId || recipeId === '') {
+                    if (errorDiv) {
+                        errorDiv.style.display = 'block';
+                        errorDiv.innerHTML = '<p>⚠️ Vui lòng nhập Recipe ID</p>';
+                    }
+                    input.focus();
+                    return;
+                }
+
+                // Clear previous error
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                    errorDiv.innerHTML = '';
+                }
+
+                console.log(`🔄 Adding favorite by RecipeId: ${recipeId}`);
+                
+                try {
+                    // Disable button while processing
+                    const submitBtn = document.querySelector('.btn-add-favorite:last-child');
+                    const originalText = submitBtn ? submitBtn.textContent : '';
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Đang thêm...';
+                    }
+
+                    const response = await fetch('/api/FavoriteApi', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ recipeId: recipeId }),
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('❌ Failed to add favorite:', response.status, errorText);
+                        let errorMessage = 'Failed to add favorite';
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            errorMessage = errorData.message || errorData.error || errorMessage;
+                        } catch {
+                            errorMessage = errorText.substring(0, 100);
+                        }
+                        throw new Error(errorMessage);
+                    }
+
+                    const favorite = await response.json();
+                    console.log('✅ Added favorite:', favorite);
+
+                    showNotification(`Đã thêm Recipe ID "${recipeId}" vào yêu thích!`, 'success');
+                    
+                    // Clear input
+                    input.value = '';
+                    
+                    // Reload favorites
+                    await loadFavorites();
+                    
+                    // Close modal after a short delay
+                    setTimeout(() => {
+                        closeAddFavoriteModal();
+                    }, 1500);
+
+                } catch (error) {
+                    console.error('❌ Error adding favorite:', error);
+                    if (errorDiv) {
+                        errorDiv.style.display = 'block';
+                        errorDiv.innerHTML = `<p>⚠️ Có lỗi xảy ra: ${escapeHtml(error.message)}</p>`;
+                    }
+                    showNotification(`Có lỗi xảy ra: ${error.message}`, 'error');
+                } finally {
+                    // Re-enable button
+                    const submitBtn = document.querySelector('.btn-add-favorite:last-child');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Thêm vào yêu thích';
+                    }
+                }
             }
 
             function getDifficultyText(difficulty) {
@@ -871,6 +1621,9 @@
 
             function getRecipeImage(fav) {
                 // If recipe has an image, use it
+                if (fav.image && fav.image.trim() !== '') {
+                    return fav.image;
+                }
                 if (fav.recipeImage && fav.recipeImage.trim() !== '') {
                     return fav.recipeImage;
                 }
@@ -881,10 +1634,16 @@
                     'lunch': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop',
                     'dinner': 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop',
                     'snack': 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=300&fit=crop',
-                    'default': 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop'
+                    'default': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4='
                 };
                 
                 return foodImages[fav.recipeCategory] || foodImages.default;
+            }
+            
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             }
 
             function showLoading() {
@@ -908,7 +1667,7 @@
                 }
             }
 
-            function showNotification(message, type = 'info') {
+            function showNotification(message, type = 'info', duration = 3000) {
                 // Create notification element
                 const notification = document.createElement('div');
                 notification.className = `notification notification-${type}`;
@@ -946,7 +1705,7 @@
                     notification.style.transform = 'translateX(0)';
                 }, 100);
                 
-                // Remove after 3 seconds
+                // Remove after duration
                 setTimeout(() => {
                     notification.style.transform = 'translateX(400px)';
                     setTimeout(() => {
@@ -954,7 +1713,7 @@
                             document.body.removeChild(notification);
                         }
                     }, 300);
-                }, 3000);
+                }, duration);
             }
         });
     </script>
