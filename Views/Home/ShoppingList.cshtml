@@ -5,6 +5,224 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/shoppinglist.css" asp-append-version="true" />
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 40px;
+            border: none;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #2c3e50;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        .recipe-search-section {
+            margin-bottom: 20px;
+        }
+        
+        .recipe-search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .recipe-results {
+            max-height: 400px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .recipe-card {
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .recipe-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .recipe-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .recipe-card h4 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .recipe-card p {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .recipe-ingredients {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .add-to-cart-btn:hover {
+            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+        
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @@keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 }
 
 <!-- Main Content -->
@@ -25,8 +243,15 @@
                         <option value="spices">Gia vị</option>
                         <option value="other">Khác</option>
                     </select>
+                    <button class="add-item-btn" onclick="openRecipeSearchModal()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        Tìm món ăn
+                    </button>
                 </div>
-                <button class="add-item-btn" onclick="addNewItem()">
+                <button class="add-item-btn" onclick="openAddItemModal()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -39,7 +264,7 @@
         <!-- Quick Stats -->
         <div class="quick-stats">
             <div class="stat-item">
-                <span class="stat-number" id="totalItems">3</span>
+                <span class="stat-number" id="totalItems">0</span>
                 <span class="stat-label">Tổng items</span>
             </div>
             <div class="stat-item">
@@ -47,7 +272,7 @@
                 <span class="stat-label">Đã hoàn thành</span>
             </div>
             <div class="stat-item">
-                <span class="stat-number" id="remainingItems">3</span>
+                <span class="stat-number" id="remainingItems">0</span>
                 <span class="stat-label">Còn lại</span>
             </div>
         </div>
@@ -57,31 +282,59 @@
             <!-- Items will be loaded from API -->
         </div>
 
-        <!-- Empty State (hidden by default) -->
+        <!-- Empty State -->
         <div class="empty-state" id="emptyState" style="display: none; text-align: center; padding: 40px;">
-            <p style="color: #999; font-size: 16px;">Chưa có item nào trong danh sách mua sắm</p>
-            <button class="add-item-btn" onclick="addNewItem()" style="margin-top: 20px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 80px; height: 80px; margin: 0 auto 20px; opacity: 0.5;">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                <line x1="12" y1="11" x2="12" y2="17"></line>
+                <line x1="9" y1="14" x2="15" y2="14"></line>
+            </svg>
+            <h3 style="color: #666; margin-bottom: 10px;">Chưa có items nào</h3>
+            <p style="color: #999; margin-bottom: 20px;">Thêm items mới hoặc tìm kiếm món ăn để bắt đầu!</p>
+            <button class="add-item-btn" onclick="openAddItemModal()" style="margin-top: 20px;">
                 Thêm item đầu tiên
             </button>
         </div>
+    </div>
+</div>
 
-
-        <!-- Pagination -->
-        <div class="pagination">
-            <button class="pagination-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15,18 9,12 15,6"></polyline>
-                </svg>
-            </button>
-            <button class="pagination-btn active">1</button>
-            <button class="pagination-btn">2</button>
-            <button class="pagination-btn">3</button>
-            <button class="pagination-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="9,18 15,12 9,6"></polyline>
-                </svg>
-            </button>
+<!-- Add/Edit Item Modal -->
+<div id="itemModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Thêm Item Mới</h3>
+            <button class="close" onclick="closeItemModal()">&times;</button>
         </div>
+        <form id="itemForm" onsubmit="handleItemSubmit(event)">
+            <div class="form-group">
+                <label for="itemName">Tên Item *</label>
+                <input type="text" id="itemName" name="name" required placeholder="Ví dụ: Hành tây, Thịt bò...">
+            </div>
+            <div class="form-group">
+                <label for="itemNotes">Ghi chú</label>
+                <textarea id="itemNotes" name="notes" placeholder="Ghi chú về item này (tùy chọn)"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeItemModal()">Hủy</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Thêm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Recipe Search Modal -->
+<div id="recipeSearchModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tìm kiếm món ăn</h3>
+            <button class="close" onclick="closeRecipeSearchModal()">&times;</button>
+        </div>
+        <div class="recipe-search-section">
+            <input type="text" id="recipeSearchInput" class="recipe-search-input" placeholder="Nhập tên món ăn hoặc nguyên liệu..." onkeypress="if(event.key === 'Enter') searchRecipes()">
+            <button class="add-item-btn" onclick="searchRecipes()" style="width: 100%;">Tìm kiếm</button>
+        </div>
+        <div id="recipeResults" class="recipe-results"></div>
     </div>
 </div>
 
@@ -125,19 +378,21 @@
             
             container.innerHTML = shoppingItems.map((item, index) => {
                 const isCompleted = item.status === 'completed' || item.status === 'draft';
-                const itemId = item.id || item._id || `item_${index}`;
+                const itemId = item.id || item._id || item.Id || `item_${index}`;
+                const itemName = item.name || item.Name || 'Unnamed';
+                const itemNotes = item.notes || item.Notes || '';
                 
                 return `
-                    <div class="shopping-item ${isCompleted ? 'completed' : ''}" data-item-id="${itemId}" data-category="${getCategoryFromName(item.name)}">
+                    <div class="shopping-item ${isCompleted ? 'completed' : ''}" data-item-id="${itemId}" data-category="${getCategoryFromName(itemName)}">
                         <div class="item-checkbox">
                             <input type="checkbox" id="checkbox_${itemId}" class="checkbox-input" ${isCompleted ? 'checked' : ''} onchange="toggleItemStatus('${itemId}')">
                             <label for="checkbox_${itemId}" class="checkbox-label"></label>
                         </div>
                         <div class="item-content">
                             <div class="item-info">
-                                <h5 class="item-name">${escapeHtml(item.name || 'Unnamed')}</h5>
-                                <span class="item-category">${getCategoryFromName(item.name)}</span>
-                                ${item.notes ? `<p class="item-notes">${escapeHtml(item.notes)}</p>` : ''}
+                                <h5 class="item-name">${escapeHtml(itemName)}</h5>
+                                <span class="item-category">${getCategoryFromName(itemName)}</span>
+                                ${itemNotes ? `<p class="item-notes">${escapeHtml(itemNotes)}</p>` : ''}
                             </div>
                         </div>
                         <div class="item-actions">
@@ -199,15 +454,11 @@
 
             // Search functionality
             const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', function() {
-                filterItems();
-            });
+            searchInput.addEventListener('input', filterItems);
 
             // Category filter functionality
             const categoryFilter = document.getElementById('categoryFilter');
-            categoryFilter.addEventListener('change', function() {
-                filterItems();
-            });
+            categoryFilter.addEventListener('change', filterItems);
         });
 
         // Update statistics
@@ -244,7 +495,7 @@
 
         // Toggle item status (active/completed)
         async function toggleItemStatus(itemId) {
-            const item = shoppingItems.find(i => (i.id || i._id) === itemId);
+            const item = shoppingItems.find(i => (i.id || i._id || i.Id) === itemId);
             if (!item) return;
 
             const newStatus = item.status === 'active' ? 'completed' : 'active';
@@ -258,8 +509,8 @@
                     credentials: 'include',
                     body: JSON.stringify({
                         shoppingItemId: itemId,
-                        name: item.name,
-                        notes: item.notes || '',
+                        name: item.name || item.Name,
+                        notes: item.notes || item.Notes || '',
                         status: newStatus
                     })
                 });
@@ -283,77 +534,104 @@
             }
         }
 
-        // Add new item function
-        async function addNewItem() {
-            const itemName = prompt('Nhập tên item:');
-            if (!itemName || !itemName.trim()) return;
+        // Modal functions
+        function openAddItemModal() {
+            editingItemId = null;
+            document.getElementById('modalTitle').textContent = 'Thêm Item Mới';
+            document.getElementById('itemForm').reset();
+            document.getElementById('submitBtn').textContent = 'Thêm';
+            document.getElementById('itemModal').style.display = 'block';
+        }
 
-            const notes = prompt('Ghi chú (tùy chọn):') || '';
+        function openEditItemModal(itemId) {
+            const item = shoppingItems.find(i => (i.id || i._id || i.Id) === itemId);
+            if (!item) return;
+
+            editingItemId = itemId;
+            document.getElementById('modalTitle').textContent = 'Sửa Item';
+            document.getElementById('itemName').value = item.name || item.Name || '';
+            document.getElementById('itemNotes').value = item.notes || item.Notes || '';
+            document.getElementById('submitBtn').textContent = 'Cập nhật';
+            document.getElementById('itemModal').style.display = 'block';
+        }
+
+        function closeItemModal() {
+            document.getElementById('itemModal').style.display = 'none';
+            editingItemId = null;
+            document.getElementById('itemForm').reset();
+        }
+
+        // Handle form submit
+        async function handleItemSubmit(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('itemName').value.trim();
+            const notes = document.getElementById('itemNotes').value.trim();
+
+            if (!name) {
+                alert('Vui lòng nhập tên item');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang xử lý...';
 
             try {
-                const response = await fetch('/api/ShoppingListApi', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        name: itemName.trim(),
-                        notes: notes.trim(),
-                        status: 'active'
-                    })
-                });
+                let response;
+                if (editingItemId) {
+                    // Update existing item
+                    response = await fetch('/api/ShoppingListApi', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            shoppingItemId: editingItemId,
+                            name: name,
+                            notes: notes,
+                            status: shoppingItems.find(i => (i.id || i._id || i.Id) === editingItemId)?.status || 'active'
+                        })
+                    });
+                } else {
+                    // Add new item
+                    response = await fetch('/api/ShoppingListApi', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            name: name,
+                            notes: notes,
+                            status: 'active'
+                        })
+                    });
+                }
 
                 if (response.ok) {
-                    const newItem = await response.json();
-                    console.log('✅ Added shopping item via CookMate API');
+                    console.log('✅ ' + (editingItemId ? 'Updated' : 'Added') + ' shopping item via CookMate API');
+                    closeItemModal();
                     await loadShoppingItems(); // Reload to get updated list
+                    showNotification((editingItemId ? 'Đã cập nhật' : 'Đã thêm') + ' item thành công!', 'success');
                 } else {
                     const error = await response.json();
-                    alert('Lỗi: ' + (error.message || 'Không thể thêm item'));
+                    alert('Lỗi: ' + (error.message || 'Không thể ' + (editingItemId ? 'cập nhật' : 'thêm') + ' item'));
                 }
             } catch (error) {
-                console.error('Error adding item:', error);
-                alert('Có lỗi xảy ra khi thêm item');
+                console.error('Error ' + (editingItemId ? 'updating' : 'adding') + ' item:', error);
+                alert('Có lỗi xảy ra khi ' + (editingItemId ? 'cập nhật' : 'thêm') + ' item');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
             }
         }
 
         // Edit item function
-        async function editItem(itemId) {
-            const item = shoppingItems.find(i => (i.id || i._id) === itemId);
-            if (!item) return;
-
-            const newName = prompt('Sửa tên item:', item.name || '');
-            if (!newName || !newName.trim() || newName === item.name) return;
-
-            const newNotes = prompt('Sửa ghi chú:', item.notes || '') || '';
-
-            try {
-                const response = await fetch('/api/ShoppingListApi', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        shoppingItemId: itemId,
-                        name: newName.trim(),
-                        notes: newNotes.trim(),
-                        status: item.status || 'active'
-                    })
-                });
-
-                if (response.ok) {
-                    console.log('✅ Updated shopping item via CookMate API');
-                    await loadShoppingItems(); // Reload
-                } else {
-                    const error = await response.json();
-                    alert('Lỗi: ' + (error.message || 'Không thể sửa item'));
-                }
-            } catch (error) {
-                console.error('Error updating item:', error);
-                alert('Có lỗi xảy ra khi sửa item');
-            }
+        function editItem(itemId) {
+            openEditItemModal(itemId);
         }
 
         // Delete item function
@@ -369,6 +647,7 @@
                 if (response.ok) {
                     console.log('✅ Deleted shopping item via CookMate API');
                     await loadShoppingItems(); // Reload
+                    showNotification('Đã xóa item thành công!', 'success');
                 } else {
                     const error = await response.json();
                     alert('Lỗi: ' + (error.message || 'Không thể xóa item'));
@@ -380,56 +659,167 @@
         }
 
         // Edit notes function
-        async function editNotes(itemId) {
-            const item = shoppingItems.find(i => (i.id || i._id) === itemId);
+        function editNotes(itemId) {
+            const item = shoppingItems.find(i => (i.id || i._id || i.Id) === itemId);
             if (!item) return;
 
-            const newNotes = prompt('Sửa ghi chú:', item.notes || '') || '';
-            if (newNotes === item.notes) return;
+            openEditItemModal(itemId);
+        }
 
-            try {
-                const response = await fetch('/api/ShoppingListApi', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        shoppingItemId: itemId,
-                        name: item.name,
-                        notes: newNotes.trim(),
-                        status: item.status || 'active'
-                    })
-                });
+        // Recipe Search Modal functions
+        function openRecipeSearchModal() {
+            document.getElementById('recipeSearchModal').style.display = 'block';
+        }
 
-                if (response.ok) {
-                    console.log('✅ Updated notes via CookMate API');
-                    await loadShoppingItems(); // Reload
-                } else {
-                    const error = await response.json();
-                    alert('Lỗi: ' + (error.message || 'Không thể sửa ghi chú'));
-                }
-            } catch (error) {
-                console.error('Error updating notes:', error);
-                alert('Có lỗi xảy ra khi sửa ghi chú');
+        function closeRecipeSearchModal() {
+            document.getElementById('recipeSearchModal').style.display = 'none';
+            document.getElementById('recipeResults').innerHTML = '';
+            document.getElementById('recipeSearchInput').value = '';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const itemModal = document.getElementById('itemModal');
+            const recipeModal = document.getElementById('recipeSearchModal');
+            if (event.target == itemModal) {
+                closeItemModal();
+            }
+            if (event.target == recipeModal) {
+                closeRecipeSearchModal();
             }
         }
 
-        // Pagination functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const paginationBtns = document.querySelectorAll('.pagination-btn');
-            
-            paginationBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Remove active class from all buttons
-                    paginationBtns.forEach(b => b.classList.remove('active'));
-                    
-                    // Add active class to clicked button (if it's a number)
-                    if (!isNaN(this.textContent.trim())) {
-                        this.classList.add('active');
-                    }
+        // Search Recipes using RecipesApi
+        async function searchRecipes() {
+            const query = document.getElementById('recipeSearchInput').value.trim();
+            if (!query) {
+                alert('Vui lòng nhập từ khóa tìm kiếm');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('recipeResults');
+            resultsDiv.innerHTML = '<p style="text-align: center; padding: 20px;">Đang tìm kiếm...</p>';
+
+            try {
+                const response = await fetch(`/api/RecipesApi/search?query=${encodeURIComponent(query)}&limit=10`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
                 });
-            });
-        });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.recipes && data.recipes.length > 0) {
+                    resultsDiv.innerHTML = '';
+                    data.recipes.forEach(recipe => {
+                        const recipeCard = document.createElement('div');
+                        recipeCard.className = 'recipe-card';
+                        const ingredients = recipe.ingredients || recipe.extendedIngredients?.map(ing => ing.name || ing.Name || '') || [];
+                        recipeCard.innerHTML = `
+                            ${recipe.image || recipe.Image ? `<img src="${recipe.image || recipe.Image}" alt="${recipe.name || recipe.title}" onerror="this.style.display='none'">` : ''}
+                            <h4>${escapeHtml(recipe.name || recipe.title || recipe.Title || 'Recipe')}</h4>
+                            <p>${escapeHtml((recipe.description || recipe.summary || recipe.Summary || '').substring(0, 100))}...</p>
+                            <div class="recipe-ingredients">
+                                <strong>Nguyên liệu:</strong> ${ingredients.length > 0 ? ingredients.slice(0, 5).join(', ') : 'Không có'}${ingredients.length > 5 ? '...' : ''}
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addRecipeIngredientsToShoppingList('${recipe.id || recipe.Id || ''}', '${escapeHtml(recipe.name || recipe.title || 'Recipe').replace(/'/g, "\\'")}', ${JSON.stringify(ingredients)})">
+                                Thêm nguyên liệu vào danh sách
+                            </button>
+                        `;
+                        resultsDiv.appendChild(recipeCard);
+                    });
+                } else {
+                    resultsDiv.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">Không tìm thấy món ăn nào</p>';
+                }
+            } catch (error) {
+                console.error('Error searching recipes:', error);
+                resultsDiv.innerHTML = '<p style="text-align: center; padding: 20px; color: #f44336;">Có lỗi xảy ra khi tìm kiếm</p>';
+            }
+        }
+
+        // Add Recipe Ingredients to Shopping List
+        async function addRecipeIngredientsToShoppingList(recipeId, recipeName, ingredients) {
+            if (!ingredients || ingredients.length === 0) {
+                alert('Món ăn này không có nguyên liệu');
+                return;
+            }
+
+            if (!confirm(`Thêm tất cả ${ingredients.length} nguyên liệu của "${recipeName}" vào danh sách mua sắm?`)) {
+                return;
+            }
+
+            try {
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const ingredient of ingredients) {
+                    try {
+                        const response = await fetch('/api/ShoppingListApi', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify({
+                                name: ingredient,
+                                notes: `Từ món: ${recipeName}`,
+                                status: 'active'
+                            })
+                        });
+
+                        if (response.ok) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
+                    } catch (err) {
+                        failCount++;
+                    }
+                }
+
+                if (successCount > 0) {
+                    showNotification(`Đã thêm ${successCount} nguyên liệu vào danh sách!`, 'success');
+                    closeRecipeSearchModal();
+                    await loadShoppingItems(); // Reload shopping list
+                } else {
+                    alert('Không thể thêm nguyên liệu vào danh sách');
+                }
+            } catch (error) {
+                console.error('Error adding to shopping list:', error);
+                alert('Có lỗi xảy ra khi thêm vào danh sách');
+            }
+        }
+
+        // Notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10001;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
     </script>
 }
