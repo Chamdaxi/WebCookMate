@@ -56,6 +56,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Đăng ký Email Service
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
+// Đăng ký CookMate API Service
+builder.Services.AddHttpClient<ICookMateApiService, CookMateApiService>();
+
 var app = builder.Build();
 
 // Cấu hình pipeline

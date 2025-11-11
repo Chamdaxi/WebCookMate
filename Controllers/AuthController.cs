@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using demo.Models;
 using demo.Data;
 using demo.Services;
@@ -11,12 +12,14 @@ namespace demo.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly ICookMateApiService _apiService;
 
-        public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender)
+        public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, ICookMateApiService apiService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _apiService = apiService;
         }
 
         [HttpGet]
@@ -38,6 +41,14 @@ namespace demo.Controllers
             if (user == null)
             {
                 TempData["Error"] = "Email hoặc mật khẩu không đúng";
+                return View();
+            }
+
+            // Kiểm tra tài khoản đã bị xóa
+            if (user.IsDeleted)
+            {
+                TempData["Error"] = "Tài khoản của bạn đã bị xóa. Vui lòng khôi phục tài khoản để tiếp tục sử dụng.";
+                TempData["DeletedEmail"] = email;
                 return View();
             }
 
@@ -303,6 +314,120 @@ namespace demo.Controllers
         public IActionResult TestRecovery()
         {
             return View();
+        }
+
+        // Xóa tài khoản (soft delete)
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Soft delete - chỉ đánh dấu là đã xóa
+            user.DeletedAt = DateTime.Now;
+            var result = await _userManager.UpdateAsync(user);
+            
+            if (result.Succeeded)
+            {
+                await _signInManager.SignOutAsync();
+                TempData["Success"] = "Tài khoản của bạn đã được xóa. Bạn có thể khôi phục tài khoản trong vòng 30 ngày.";
+                return RedirectToAction("Login");
+            }
+
+            TempData["Error"] = "Không thể xóa tài khoản. Vui lòng thử lại.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Yêu cầu khôi phục tài khoản
+        [HttpGet]
+        public IActionResult RequestAccountRecovery()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RequestAccountRecovery(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                TempData["Error"] = "Vui lòng nhập email";
+                return View();
+            }
+
+            // Gọi API từ cookm8.vercel.app để yêu cầu khôi phục tài khoản
+            var apiResponse = await _apiService.RequestAccountRecoveryAsync(email);
+            
+            if (apiResponse.Success)
+            {
+                // Lưu email vào session để sử dụng ở bước verify
+                HttpContext.Session.SetString("AccountRecoveryEmail", email);
+                TempData["Success"] = apiResponse.Message;
+                return RedirectToAction("VerifyAccountRecoveryOTP");
+            }
+            else
+            {
+                TempData["Error"] = apiResponse.Message;
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult VerifyAccountRecoveryOTP()
+        {
+            var email = HttpContext.Session.GetString("AccountRecoveryEmail");
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("RequestAccountRecovery");
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyAccountRecoveryOTP(string otp)
+        {
+            var email = HttpContext.Session.GetString("AccountRecoveryEmail");
+
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "Phiên đã hết hạn. Vui lòng yêu cầu khôi phục lại.";
+                return RedirectToAction("RequestAccountRecovery");
+            }
+
+            if (string.IsNullOrWhiteSpace(otp))
+            {
+                TempData["Error"] = "Vui lòng nhập mã OTP";
+                return View();
+            }
+
+            // Gọi API từ cookm8.vercel.app để xác minh OTP và khôi phục tài khoản
+            var apiResponse = await _apiService.VerifyAccountRecoveryOTPAsync(email, otp);
+            
+            if (apiResponse.Success)
+            {
+                // Nếu API trả về thành công, cập nhật local database
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user != null && user.IsDeleted)
+                {
+                    // Restore account - remove DeletedAt
+                    user.DeletedAt = null;
+                    await _userManager.UpdateAsync(user);
+                }
+
+                // Clear session
+                HttpContext.Session.Remove("AccountRecoveryEmail");
+
+                TempData["Success"] = apiResponse.Message;
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                TempData["Error"] = apiResponse.Message;
+                return View();
+            }
         }
     }
 }

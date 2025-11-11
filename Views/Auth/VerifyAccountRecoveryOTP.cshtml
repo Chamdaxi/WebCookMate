@@ -1,0 +1,80 @@
+@{
+    ViewData["Title"] = "Xác thực OTP khôi phục tài khoản";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CookMate</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body { margin:0; padding:0; background:#E0CEC8; min-height:100vh; display:flex; align-items:center; justify-content:center; font-family: Inter, sans-serif; }
+        .box { background:#fff; border-radius:20px; padding:40px; width:100%; max-width:460px; border:2px solid #090808; box-shadow:0 4px 4px rgba(0,0,0,.25); text-align:center; }
+        .title { font-size:24px; font-weight:700; margin:0 0 8px; color:#2c3e50; }
+        .subtitle { color:#7f8c8d; margin:0 0 20px; }
+        .email { background:#f8f9fa; padding:12px; border-radius:10px; margin-bottom:20px; font-weight:500; }
+        .otp { display:flex; gap:12px; justify-content:center; margin-bottom:20px; }
+        .otp input { width:50px; height:50px; border:2px solid #e0e0e0; border-radius:10px; text-align:center; font-size:22px; }
+        .otp input:focus { border-color:#007bff; outline:none; }
+        .btn { width:100%; padding:12px; background:#007bff; color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
+        .btn:hover { background:#0056b3; }
+        .error { background:#ffebee; color:#c62828; padding:12px; border-radius:8px; margin-bottom:16px; font-size:14px; }
+        .success { background:#e8f5e8; color:#2e7d32; padding:12px; border-radius:8px; margin-bottom:16px; font-size:14px; }
+        .back { position:absolute; top:20px; left:20px; background:#fff; border:2px solid #090808; border-radius:20px; padding:8px 16px; text-decoration:none; color:#000; box-shadow:0 4px 4px rgba(0,0,0,.25); }
+    </style>
+</head>
+<body>
+    <a class="back" href="@Url.Action("RequestAccountRecovery","Auth")">← Quay lại</a>
+    <div class="box">
+        <h1 class="title">Xác thực OTP</h1>
+        <p class="subtitle">Nhập mã 6 chữ số đã gửi đến email để khôi phục tài khoản</p>
+        <div class="email">@Context.Session.GetString("AccountRecoveryEmail")</div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="error">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="success">@TempData["Success"]</div>
+        }
+
+        <form id="otpForm" method="post" action="@Url.Action("VerifyAccountRecoveryOTP","Auth")">
+            <div class="otp">
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+            </div>
+            <input type="hidden" name="otp" id="otpValue" />
+            <button class="btn" type="submit">Khôi phục tài khoản</button>
+        </form>
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll('.otp input');
+        const otpValue = document.getElementById('otpValue');
+        inputs[0].focus();
+        inputs.forEach((el, idx) => {
+            el.addEventListener('input', e => {
+                if (!/^\d$/.test(e.target.value)) { e.target.value = ''; return; }
+                if (idx < inputs.length - 1) inputs[idx + 1].focus();
+            });
+            el.addEventListener('keydown', e => {
+                if (e.key === 'Backspace' && !e.target.value && idx > 0) inputs[idx - 1].focus();
+            });
+        });
+        document.getElementById('otpForm').addEventListener('submit', e => {
+            const code = Array.from(inputs).map(i => i.value).join('');
+            if (code.length !== 6) { e.preventDefault(); alert('Vui lòng nhập đủ 6 số'); return; }
+            otpValue.value = code;
+        });
+    </script>
+</body>
+</html>
+

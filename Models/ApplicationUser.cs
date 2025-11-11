@@ -6,5 +6,8 @@ namespace demo.Models
     {
         public string? FullName { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? DeletedAt { get; set; }
+        
+        public bool IsDeleted => DeletedAt != null;
     }
 }
