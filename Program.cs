@@ -55,6 +55,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
+        // Xóa database cũ nếu có và tạo lại với schema mới
+        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
         
         // Seed dữ liệu mẫu nếu chưa có
@@ -169,6 +171,72 @@ using (var scope = app.Services.CreateScope())
             };
             
             context.ShoppingItems.AddRange(sampleItems);
+            context.SaveChanges();
+        }
+        
+        // Seed recipes mẫu nếu chưa có
+        if (!context.Recipes.Any())
+        {
+            var sampleRecipes = new List<demo.Models.Recipe>
+            {
+                new demo.Models.Recipe
+                {
+                    Name = "Phở Bò",
+                    Description = "Phở bò truyền thống Việt Nam với nước dùng đậm đà, thịt bò mềm và bánh phở tươi ngon",
+                    ImageUrl = "/images/recipes/phobo.jpeg",
+                    Category = "Món chính",
+                    CookingTime = 60,
+                    Difficulty = "Medium",
+                    Ingredients = "[\"Bánh phở\", \"Thịt bò\", \"Hành tây\", \"Rau thơm\", \"Gia vị phở\", \"Quế\", \"Hồi\", \"Gừng\"]",
+                    CreatedAt = DateTime.Now.AddDays(-5)
+                },
+                new demo.Models.Recipe
+                {
+                    Name = "Bánh Mì",
+                    Description = "Bánh mì thịt nướng giòn rụm với pate thơm, thịt nướng đậm đà và rau củ tươi ngon",
+                    ImageUrl = "/images/recipes/banhmi.jpg",
+                    Category = "Món chính",
+                    CookingTime = 20,
+                    Difficulty = "Easy",
+                    Ingredients = "[\"Bánh mì\", \"Thịt nướng\", \"Pate\", \"Rau củ\", \"Gia vị\", \"Ớt\", \"Ngò\"]",
+                    CreatedAt = DateTime.Now.AddDays(-3)
+                },
+                new demo.Models.Recipe
+                {
+                    Name = "Cơm Tấm",
+                    Description = "Cơm tấm sườn nướng thơm lừng với sườn heo nướng vàng, trứng ốp la, bì, chả",
+                    ImageUrl = "/images/recipes/Comtam.jpg",
+                    Category = "Món chính",
+                    CookingTime = 45,
+                    Difficulty = "Medium",
+                    Ingredients = "[\"Cơm tấm\", \"Sườn nướng\", \"Trứng\", \"Bì\", \"Chả\", \"Dưa chua\", \"Nước mắm pha\"]",
+                    CreatedAt = DateTime.Now.AddDays(-7)
+                },
+                new demo.Models.Recipe
+                {
+                    Name = "Kho Quẹt",
+                    Description = "Kho quẹt tôm thịt đậm đà, béo ngậy với tôm tươi và thịt ba chỉ, ăn kèm cơm nóng",
+                    ImageUrl = "/images/recipes/Khoquet.webp",
+                    Category = "Món ăn kèm",
+                    CookingTime = 40,
+                    Difficulty = "Easy",
+                    Ingredients = "[\"Tôm\", \"Thịt ba chỉ\", \"Nước mắm\", \"Đường\", \"Tỏi\", \"Ớt\", \"Hành lá\"]",
+                    CreatedAt = DateTime.Now.AddDays(-2)
+                },
+                new demo.Models.Recipe
+                {
+                    Name = "Bún Bò Huế",
+                    Description = "Bún bò Huế cay nồng với nước dùng đậm đà, thịt bò mềm, chả cua và rau sống",
+                    ImageUrl = "/images/recipes/today-suggestion.jpg",
+                    Category = "Món chính",
+                    CookingTime = 90,
+                    Difficulty = "Hard",
+                    Ingredients = "[\"Bún\", \"Thịt bò\", \"Chả cua\", \"Rau sống\", \"Hành tây\", \"Sả\", \"Ớt\", \"Mắm ruốc\"]",
+                    CreatedAt = DateTime.Now.AddDays(-1)
+                }
+            };
+            
+            context.Recipes.AddRange(sampleRecipes);
             context.SaveChanges();
         }
     }

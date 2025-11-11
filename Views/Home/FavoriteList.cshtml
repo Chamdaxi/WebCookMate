@@ -20,147 +20,104 @@
                     </svg>
                 </div>
             </div>
-            <div class="sort-button">
-                <span class="sort-text">Sort: Newest</span>
-                <svg class="sort-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
+            <div class="favorites-controls">
+                <div class="search-favorites-box">
+                    <form method="get" action="@Url.Action("FavoriteList", "Home")" class="search-form">
+                        <input type="text" name="searchQuery" class="search-favorites-input" 
+                               placeholder="Tìm kiếm món yêu thích..." 
+                               value="@ViewBag.SearchQuery">
+                        <button type="submit" class="search-favorites-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                <div class="sort-dropdown">
+                    <form method="get" action="@Url.Action("FavoriteList", "Home")" class="sort-form">
+                        @if (!string.IsNullOrEmpty(ViewBag.SearchQuery))
+                        {
+                            <input type="hidden" name="searchQuery" value="@ViewBag.SearchQuery">
+                        }
+                        <select name="sortBy" class="sort-select" onchange="this.form.submit()">
+                            <option value="newest" @(ViewBag.SortBy == "newest" ? "selected" : "")>Mới nhất</option>
+                            <option value="mostfavorited" @(ViewBag.SortBy == "mostfavorited" ? "selected" : "")>Được yêu thích nhiều nhất</option>
+                            <option value="mostreacted" @(ViewBag.SortBy == "mostreacted" ? "selected" : "")>Nhiều cảm xúc nhất</option>
+                            <option value="name" @(ViewBag.SortBy == "name" ? "selected" : "")>Tên A-Z</option>
+                        </select>
+                    </form>
+                </div>
             </div>
         </div>
 
         <!-- Favorite Items Grid -->
         <div class="favorite-items-grid">
-            <!-- Breakfast Item -->
-            <div class="favorite-item" data-recipe-id="banhmi">
-                <div class="favorite-image">
-                    <img src="~/images/recipes/banhmi.jpg" alt="Banh mi">
-                    <div class="favorite-overlay">
-                        <button class="favorite-action-btn remove-favorite" onclick="removeFavorite('banhmi')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </button>
+            @if (ViewBag.Favorites != null && ((IEnumerable<dynamic>)ViewBag.Favorites).Any())
+            {
+                @foreach (var item in ViewBag.Favorites)
+                {
+                    var favorite = item.Favorite;
+                    var recipe = item.Recipe;
+                    <div class="favorite-item" data-recipe-id="@recipe.Id">
+                        <div class="favorite-image">
+                            <img src="@(recipe.ImageUrl ?? "/images/recipes/today-suggestion.jpg")" alt="@recipe.Name">
+                            <div class="favorite-overlay">
+                                <button class="favorite-action-btn remove-favorite" onclick="removeFavorite(@recipe.Id, this)">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="favorite-content">
+                            <h3 class="favorite-title">@recipe.Name</h3>
+                            <p class="favorite-subtitle">@(recipe.Description ?? "Không có mô tả")</p>
+                            <div class="favorite-meta">
+                                @if (recipe.CookingTime.HasValue)
+                                {
+                                    <span class="cooking-time">@recipe.CookingTime phút</span>
+                                }
+                                @if (!string.IsNullOrEmpty(recipe.Difficulty))
+                                {
+                                    <span class="difficulty">@recipe.Difficulty</span>
+                                }
+                                @if (!string.IsNullOrEmpty(recipe.Category))
+                                {
+                                    <span class="category">@recipe.Category</span>
+                                }
+                            </div>
+                            <div class="favorite-stats">
+                                <span class="stat-badge">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                    </svg>
+                                    @item.FavoriteCount
+                                </span>
+                                <span class="stat-badge">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                    </svg>
+                                    @item.ReactionCount
+                                </span>
+                                <span class="stat-badge">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    @item.CommentCount
+                                </span>
+                            </div>
+                        </div>
                     </div>
+                }
+            }
+            else
+            {
+                <div class="empty-favorites">
+                    <p>Bạn chưa có món ăn yêu thích nào</p>
+                    <a href="@Url.Action("Index", "Home")" class="browse-recipes-btn">Khám phá món ăn</a>
                 </div>
-                <div class="favorite-content">
-                    <h3 class="favorite-title">Breakfast</h3>
-                    <p class="favorite-subtitle">Banh mi</p>
-                    <div class="favorite-meta">
-                        <span class="cooking-time">15 min</span>
-                        <span class="difficulty">Easy</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lunch Item -->
-            <div class="favorite-item" data-recipe-id="pho">
-                <div class="favorite-image">
-                    <img src="~/images/recipes/phobo.jpeg" alt="Pho">
-                    <div class="favorite-overlay">
-                        <button class="favorite-action-btn remove-favorite" onclick="removeFavorite('pho')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="favorite-content">
-                    <h3 class="favorite-title">Lunch</h3>
-                    <p class="favorite-subtitle">Pho</p>
-                    <div class="favorite-meta">
-                        <span class="cooking-time">30 min</span>
-                        <span class="difficulty">Medium</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dinner Item -->
-            <div class="favorite-item" data-recipe-id="comtam">
-                <div class="favorite-image">
-                    <img src="~/images/recipes/Comtam.jpg" alt="Com tam">
-                    <div class="favorite-overlay">
-                        <button class="favorite-action-btn remove-favorite" onclick="removeFavorite('comtam')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="favorite-content">
-                    <h3 class="favorite-title">Dinner</h3>
-                    <p class="favorite-subtitle">Com tam</p>
-                    <div class="favorite-meta">
-                        <span class="cooking-time">25 min</span>
-                        <span class="difficulty">Easy</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Snack Item -->
-            <div class="favorite-item" data-recipe-id="khoquet">
-                <div class="favorite-image">
-                    <img src="~/images/recipes/Khoquet.webp" alt="Kho quet">
-                    <div class="favorite-overlay">
-                        <button class="favorite-action-btn remove-favorite" onclick="removeFavorite('khoquet')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="favorite-content">
-                    <h3 class="favorite-title">Snack</h3>
-                    <p class="favorite-subtitle">Kho quet</p>
-                    <div class="favorite-meta">
-                        <span class="cooking-time">35 min</span>
-                        <span class="difficulty">Medium</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dessert Item -->
-            <div class="favorite-item" data-recipe-id="today-suggestion">
-                <div class="favorite-image">
-                    <img src="~/images/recipes/today-suggestion.jpg" alt="Vietnamese Curry">
-                    <div class="favorite-overlay">
-                        <button class="favorite-action-btn remove-favorite" onclick="removeFavorite('today-suggestion')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="favorite-content">
-                    <h3 class="favorite-title">Dessert</h3>
-                    <p class="favorite-subtitle">Vietnamese Curry</p>
-                    <div class="favorite-meta">
-                        <span class="cooking-time">45 min</span>
-                        <span class="difficulty">Hard</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Soup Item -->
-            <div class="favorite-item" data-recipe-id="phobo">
-                <div class="favorite-image">
-                    <img src="~/images/recipes/phobo.jpeg" alt="Pho Bo">
-                    <div class="favorite-overlay">
-                        <button class="favorite-action-btn remove-favorite" onclick="removeFavorite('phobo')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="favorite-content">
-                    <h3 class="favorite-title">Soup</h3>
-                    <p class="favorite-subtitle">Pho Bo</p>
-                    <div class="favorite-meta">
-                        <span class="cooking-time">40 min</span>
-                        <span class="difficulty">Hard</span>
-                    </div>
-                </div>
-            </div>
+            }
         </div>
     </div>
 
@@ -188,24 +145,43 @@
 
 @section Scripts {
     <script>
-        function removeFavorite(recipeId) {
+        async function removeFavorite(recipeId, buttonElement) {
             if (confirm('Bạn có chắc muốn xóa món ăn này khỏi danh sách yêu thích?')) {
-                const favoriteItem = document.querySelector(`[data-recipe-id="${recipeId}"]`);
-                if (favoriteItem) {
-                    // Animation để xóa item
-                    favoriteItem.style.transform = 'scale(0.8)';
-                    favoriteItem.style.opacity = '0';
+                try {
+                    const response = await fetch('@Url.Action("RemoveFromFavorites", "Home")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `recipeId=${recipeId}`
+                    });
                     
-                    setTimeout(() => {
-                        favoriteItem.remove();
-                        
-                        // Kiểm tra nếu không còn item nào
-                        const remainingItems = document.querySelectorAll('.favorite-item');
-                        if (remainingItems.length === 0) {
-                            const grid = document.querySelector('.favorite-items-grid');
-                            grid.innerHTML = '<div class="empty-favorites"><p>Không có món ăn yêu thích nào</p></div>';
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const favoriteItem = buttonElement.closest('.favorite-item');
+                        if (favoriteItem) {
+                            // Animation để xóa item
+                            favoriteItem.style.transform = 'scale(0.8)';
+                            favoriteItem.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                favoriteItem.remove();
+                                
+                                // Kiểm tra nếu không còn item nào
+                                const remainingItems = document.querySelectorAll('.favorite-item');
+                                if (remainingItems.length === 0) {
+                                    const grid = document.querySelector('.favorite-items-grid');
+                                    grid.innerHTML = '<div class="empty-favorites"><p>Bạn chưa có món ăn yêu thích nào</p><a href="@Url.Action("Index", "Home")" class="browse-recipes-btn">Khám phá món ăn</a></div>';
+                                }
+                            }, 300);
                         }
-                    }, 300);
+                    } else {
+                        alert(data.message || 'Có lỗi xảy ra');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi xóa khỏi danh sách yêu thích');
                 }
             }
         }

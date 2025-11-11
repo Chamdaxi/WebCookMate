@@ -38,6 +38,122 @@
     </div>
 </div>
 
+<!-- Most Favorited Recipes Section -->
+<div class="recipes-section">
+    <div class="recipes-header">
+        <h2 class="section-title">Món Ăn Được Yêu Thích Nhất</h2>
+        <div class="search-recipes-box">
+            <input type="text" id="searchRecipesInput" class="search-recipes-input" placeholder="Tìm kiếm món ăn được yêu thích...">
+            <button class="search-recipes-btn" onclick="searchMostFavoritedRecipes()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <div class="recipes-grid" id="recipesGrid">
+        @if (ViewBag.MostFavoritedRecipes != null)
+        {
+            @foreach (var item in ViewBag.MostFavoritedRecipes)
+            {
+                var recipe = item.Recipe;
+                <div class="recipe-card" data-recipe-id="@recipe.Id">
+                    <div class="recipe-image">
+                        <img src="@(recipe.ImageUrl ?? "/images/recipes/today-suggestion.jpg")" alt="@recipe.Name">
+                        <div class="recipe-overlay">
+                            <button class="recipe-favorite-btn @(item.IsFavorited ? "favorited" : "")" 
+                                    onclick="toggleFavorite(@recipe.Id, this)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="@(item.IsFavorited ? "currentColor" : "none")" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="recipe-content">
+                        <h3 class="recipe-title">@recipe.Name</h3>
+                        <p class="recipe-description">@(recipe.Description ?? "Không có mô tả")</p>
+                        <div class="recipe-meta">
+                            @if (recipe.CookingTime != null)
+                            {
+                                <span class="recipe-time">@recipe.CookingTime phút</span>
+                            }
+                            @if (!string.IsNullOrEmpty(recipe.Difficulty))
+                            {
+                                <span class="recipe-difficulty">@recipe.Difficulty</span>
+                            }
+                            @if (!string.IsNullOrEmpty(recipe.Category))
+                            {
+                                <span class="recipe-category">@recipe.Category</span>
+                            }
+                        </div>
+                        <div class="recipe-stats">
+                            <span class="stat-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                <span id="favorite-count-@recipe.Id">@item.FavoriteCount</span>
+                            </span>
+                            <span class="stat-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                                <span id="reaction-count-@recipe.Id">@item.ReactionCount</span>
+                            </span>
+                            <span class="stat-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                <span id="comment-count-@recipe.Id">@item.CommentCount</span>
+                            </span>
+                        </div>
+                        <div class="recipe-actions">
+                            <div class="reaction-buttons">
+                                <button class="reaction-btn @(item.UserReaction?.Type == "like" ? "active" : "")" 
+                                        onclick="toggleReaction(@recipe.Id, 'like', this)" title="Thích">
+                                    👍
+                                </button>
+                                <button class="reaction-btn @(item.UserReaction?.Type == "love" ? "active" : "")" 
+                                        onclick="toggleReaction(@recipe.Id, 'love', this)" title="Yêu thích">
+                                    ❤️
+                                </button>
+                                <button class="reaction-btn @(item.UserReaction?.Type == "wow" ? "active" : "")" 
+                                        onclick="toggleReaction(@recipe.Id, 'wow', this)" title="Wow">
+                                    😮
+                                </button>
+                                <button class="reaction-btn @(item.UserReaction?.Type == "haha" ? "active" : "")" 
+                                        onclick="toggleReaction(@recipe.Id, 'haha', this)" title="Haha">
+                                    😂
+                                </button>
+                            </div>
+                            <button class="comment-btn" onclick="showComments(@recipe.Id)">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                Bình luận
+                            </button>
+                        </div>
+                        <div class="comments-section" id="comments-@recipe.Id" style="display: none;">
+                            <div class="comments-list" id="comments-list-@recipe.Id"></div>
+                            <div class="comment-input-box">
+                                <input type="text" id="comment-input-@recipe.Id" class="comment-input" placeholder="Viết bình luận...">
+                                <button class="comment-submit-btn" onclick="addComment(@recipe.Id)">Gửi</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="no-recipes">
+                <p>Chưa có món ăn nào được yêu thích</p>
+            </div>
+        }
+    </div>
+</div>
+
 <!-- Meal Plan Today -->
 <div class="meal-plan-section">
     <h2 class="section-title">Meal Plan Today</h2>
@@ -133,6 +249,350 @@
                     this.style.transform = 'translateY(0)';
                 });
             });
+        });
+
+        // Toggle Favorite
+        async function toggleFavorite(recipeId, button) {
+            try {
+                const response = await fetch('@Url.Action("AddToFavorites", "Home")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `recipeId=${recipeId}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (button.classList.contains('favorited')) {
+                        // Remove favorite
+                        const removeResponse = await fetch('@Url.Action("RemoveFromFavorites", "Home")', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `recipeId=${recipeId}`
+                        });
+                        const removeData = await removeResponse.json();
+                        if (removeData.success) {
+                            button.classList.remove('favorited');
+                            button.querySelector('svg').setAttribute('fill', 'none');
+                            updateFavoriteCount(recipeId, -1);
+                        }
+                    } else {
+                        button.classList.add('favorited');
+                        button.querySelector('svg').setAttribute('fill', 'currentColor');
+                        updateFavoriteCount(recipeId, 1);
+                    }
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi thêm vào yêu thích');
+            }
+        }
+
+        function updateFavoriteCount(recipeId, change) {
+            const countElement = document.getElementById(`favorite-count-${recipeId}`);
+            if (countElement) {
+                const currentCount = parseInt(countElement.textContent) || 0;
+                countElement.textContent = Math.max(0, currentCount + change);
+            }
+        }
+
+        // Toggle Reaction
+        async function toggleReaction(recipeId, reactionType, button) {
+            try {
+                const response = await fetch('@Url.Action("ToggleReaction", "Home")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `recipeId=${recipeId}&reactionType=${reactionType}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Remove active class from all reaction buttons
+                    const allButtons = button.parentElement.querySelectorAll('.reaction-btn');
+                    allButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    if (data.isAdded) {
+                        button.classList.add('active');
+                        updateReactionCount(recipeId, 1);
+                    } else {
+                        updateReactionCount(recipeId, -1);
+                    }
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi thả cảm xúc');
+            }
+        }
+
+        function updateReactionCount(recipeId, change) {
+            const countElement = document.getElementById(`reaction-count-${recipeId}`);
+            if (countElement) {
+                const currentCount = parseInt(countElement.textContent) || 0;
+                countElement.textContent = Math.max(0, currentCount + change);
+            }
+        }
+
+        // Show Comments
+        async function showComments(recipeId) {
+            const commentsSection = document.getElementById(`comments-${recipeId}`);
+            const commentsList = document.getElementById(`comments-list-${recipeId}`);
+            
+            if (commentsSection.style.display === 'none') {
+                commentsSection.style.display = 'block';
+                
+                // Load comments
+                try {
+                    const response = await fetch(`@Url.Action("GetComments", "Home")?recipeId=${recipeId}`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.comments) {
+                        commentsList.innerHTML = '';
+                        if (data.comments.length === 0) {
+                            commentsList.innerHTML = '<p class="no-comments">Chưa có bình luận nào</p>';
+                        } else {
+                            data.comments.forEach(comment => {
+                                const commentDiv = document.createElement('div');
+                                commentDiv.className = 'comment-item';
+                                commentDiv.innerHTML = `
+                                    <div class="comment-header">
+                                        <strong>${comment.userName}</strong>
+                                        <span class="comment-time">${formatDate(comment.createdAt)}</span>
+                                    </div>
+                                    <div class="comment-content">${escapeHtml(comment.content)}</div>
+                                `;
+                                commentsList.appendChild(commentDiv);
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading comments:', error);
+                }
+            } else {
+                commentsSection.style.display = 'none';
+            }
+        }
+
+        // Add Comment
+        async function addComment(recipeId) {
+            const input = document.getElementById(`comment-input-${recipeId}`);
+            const content = input.value.trim();
+            
+            if (!content) {
+                alert('Vui lòng nhập nội dung bình luận');
+                return;
+            }
+            
+            try {
+                const response = await fetch('@Url.Action("AddComment", "Home")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `recipeId=${recipeId}&content=${encodeURIComponent(content)}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    input.value = '';
+                    updateCommentCount(recipeId, 1);
+                    
+                    // Add comment to list
+                    const commentsList = document.getElementById(`comments-list-${recipeId}`);
+                    if (commentsList.querySelector('.no-comments')) {
+                        commentsList.innerHTML = '';
+                    }
+                    
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment-item';
+                    commentDiv.innerHTML = `
+                        <div class="comment-header">
+                            <strong>${data.comment.userName}</strong>
+                            <span class="comment-time">Vừa xong</span>
+                        </div>
+                        <div class="comment-content">${escapeHtml(data.comment.content)}</div>
+                    `;
+                    commentsList.insertBefore(commentDiv, commentsList.firstChild);
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi thêm bình luận');
+            }
+        }
+
+        function updateCommentCount(recipeId, change) {
+            const countElement = document.getElementById(`comment-count-${recipeId}`);
+            if (countElement) {
+                const currentCount = parseInt(countElement.textContent) || 0;
+                countElement.textContent = Math.max(0, currentCount + change);
+            }
+        }
+
+        // Search Most Favorited Recipes
+        async function searchMostFavoritedRecipes() {
+            const query = document.getElementById('searchRecipesInput').value.trim();
+            const recipesGrid = document.getElementById('recipesGrid');
+            
+            if (!query) {
+                // Reload all recipes
+                window.location.reload();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`@Url.Action("GetMostFavoritedRecipes", "Home")?limit=50`);
+                const data = await response.json();
+                
+                if (data.success && data.recipes) {
+                    const filteredRecipes = data.recipes.filter(r => 
+                        r.name.toLowerCase().includes(query.toLowerCase()) ||
+                        (r.description && r.description.toLowerCase().includes(query.toLowerCase())) ||
+                        (r.category && r.category.toLowerCase().includes(query.toLowerCase()))
+                    );
+                    
+                    recipesGrid.innerHTML = '';
+                    if (filteredRecipes.length === 0) {
+                        recipesGrid.innerHTML = '<div class="no-recipes"><p>Không tìm thấy món ăn nào</p></div>';
+                    } else {
+                        filteredRecipes.forEach(recipe => {
+                            const recipeCard = createRecipeCard(recipe);
+                            recipesGrid.appendChild(recipeCard);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error searching recipes:', error);
+            }
+        }
+
+        function createRecipeCard(recipe) {
+            const card = document.createElement('div');
+            card.className = 'recipe-card';
+            card.setAttribute('data-recipe-id', recipe.id);
+            card.innerHTML = `
+                <div class="recipe-image">
+                    <img src="${recipe.imageUrl || '/images/recipes/today-suggestion.jpg'}" alt="${recipe.name}">
+                    <div class="recipe-overlay">
+                        <button class="recipe-favorite-btn ${recipe.isFavorited ? 'favorited' : ''}" 
+                                onclick="toggleFavorite(${recipe.id}, this)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="${recipe.isFavorited ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="recipe-content">
+                    <h3 class="recipe-title">${escapeHtml(recipe.name)}</h3>
+                    <p class="recipe-description">${escapeHtml(recipe.description || 'Không có mô tả')}</p>
+                    <div class="recipe-meta">
+                        ${recipe.cookingTime ? `<span class="recipe-time">${recipe.cookingTime} phút</span>` : ''}
+                        ${recipe.difficulty ? `<span class="recipe-difficulty">${recipe.difficulty}</span>` : ''}
+                        ${recipe.category ? `<span class="recipe-category">${recipe.category}</span>` : ''}
+                    </div>
+                    <div class="recipe-stats">
+                        <span class="stat-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            <span id="favorite-count-${recipe.id}">${recipe.favoriteCount}</span>
+                        </span>
+                        <span class="stat-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            <span id="reaction-count-${recipe.id}">${recipe.reactionCount}</span>
+                        </span>
+                        <span class="stat-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span id="comment-count-${recipe.id}">${recipe.commentCount}</span>
+                        </span>
+                    </div>
+                    <div class="recipe-actions">
+                        <div class="reaction-buttons">
+                            <button class="reaction-btn ${recipe.userReaction === 'like' ? 'active' : ''}" 
+                                    onclick="toggleReaction(${recipe.id}, 'like', this)" title="Thích">👍</button>
+                            <button class="reaction-btn ${recipe.userReaction === 'love' ? 'active' : ''}" 
+                                    onclick="toggleReaction(${recipe.id}, 'love', this)" title="Yêu thích">❤️</button>
+                            <button class="reaction-btn ${recipe.userReaction === 'wow' ? 'active' : ''}" 
+                                    onclick="toggleReaction(${recipe.id}, 'wow', this)" title="Wow">😮</button>
+                            <button class="reaction-btn ${recipe.userReaction === 'haha' ? 'active' : ''}" 
+                                    onclick="toggleReaction(${recipe.id}, 'haha', this)" title="Haha">😂</button>
+                        </div>
+                        <button class="comment-btn" onclick="showComments(${recipe.id})">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Bình luận
+                        </button>
+                    </div>
+                    <div class="comments-section" id="comments-${recipe.id}" style="display: none;">
+                        <div class="comments-list" id="comments-list-${recipe.id}"></div>
+                        <div class="comment-input-box">
+                            <input type="text" id="comment-input-${recipe.id}" class="comment-input" placeholder="Viết bình luận...">
+                            <button class="comment-submit-btn" onclick="addComment(${recipe.id})">Gửi</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Vừa xong';
+            if (minutes < 60) return `${minutes} phút trước`;
+            if (hours < 24) return `${hours} giờ trước`;
+            if (days < 7) return `${days} ngày trước`;
+            return date.toLocaleDateString('vi-VN');
+        }
+
+        // Allow Enter key to submit comment
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.comment-input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const recipeId = this.id.replace('comment-input-', '');
+                        addComment(parseInt(recipeId));
+                    }
+                });
+            });
+
+            // Allow Enter key to search
+            const searchInput = document.getElementById('searchRecipesInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchMostFavoritedRecipes();
+                    }
+                });
+            }
         });
     </script>
 }
