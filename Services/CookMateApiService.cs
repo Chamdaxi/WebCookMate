@@ -1575,11 +1575,50 @@ namespace demo.Services
 
         public class Recipe
         {
-            public int Id { get; set; }
-            public string Title { get; set; } = "";
-            public string Image { get; set; } = "";
-            public int ReadyInMinutes { get; set; }
-            public int Servings { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("id")]
+            public int? Id { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("title")]
+            public string? Title { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("image")]
+            public string? Image { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("readyInMinutes")]
+            public int? ReadyInMinutes { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("servings")]
+            public int? Servings { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("summary")]
+            public string? Summary { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("spoonacularScore")]
+            public double? SpoonacularScore { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("dishTypes")]
+            public List<string>? DishTypes { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("extendedIngredients")]
+            public List<ExtendedIngredient>? ExtendedIngredients { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("instructions")]
+            public string? Instructions { get; set; }
+        }
+        
+        public class ExtendedIngredient
+        {
+            [System.Text.Json.Serialization.JsonPropertyName("id")]
+            public int? Id { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("name")]
+            public string? Name { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("amount")]
+            public double? Amount { get; set; }
+            
+            [System.Text.Json.Serialization.JsonPropertyName("unit")]
+            public string? Unit { get; set; }
         }
 
         public class Favorite
