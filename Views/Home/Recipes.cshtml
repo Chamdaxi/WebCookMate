@@ -207,44 +207,114 @@ document.addEventListener('DOMContentLoaded', function() {
     
     favoriteManager = new FavoriteManager(showNotification);
     
-    // Load recipes from API (ViewBag) or use sample data as fallback
+    // Load recipes from API
     let recipes = [];
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMore = true;
     
-    // Try to load from ViewBag (API data)
-    @if (ViewBag.Recipes != null)
-    {
-        <text>
-        const apiRecipes = @Html.Raw(Json.Serialize(ViewBag.Recipes));
-        if (apiRecipes && apiRecipes.length > 0) {
-            // Map API format to UI format
-            recipes = apiRecipes.map(recipe => ({
-                id: recipe.id || recipe.Id,
-                name: recipe.title || recipe.Title || 'Recipe',
-                category: 'lunch', // Default category
-                difficulty: 'medium', // Default difficulty
-                time: recipe.readyInMinutes || recipe.ReadyInMinutes || 30,
-                rating: 4.5, // Default rating
-                image: recipe.image || recipe.Image || '/images/recipes/default.jpg',
-                description: recipe.summary || recipe.Summary || 'Delicious recipe',
-                ingredients: [], // API might not have ingredients
-                tags: recipe.tags || recipe.Tags || ['Recipe']
-            }));
-            console.log('✅ Loaded ' + recipes.length + ' recipes from CookMate API');
-        } else {
-            // Fallback to sample data
-            recipes = getSampleRecipes();
-            console.log('⚠️ No API data, using sample recipes');
+    // Load recipes from API
+    async function loadRecipesFromAPI(reset = false) {
+        if (isLoading) return;
+        
+        if (reset) {
+            currentPage = 1;
+            recipes = [];
+            hasMore = true;
         }
-        </text>
+        
+        isLoading = true;
+        const loadingSpinner = document.getElementById('recipesGrid');
+        if (loadingSpinner && reset) {
+            loadingSpinner.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Đang tải công thức...</div>';
+        }
+        
+        try {
+            const searchTerm = document.getElementById('searchInput')?.value || '';
+            const category = document.getElementById('categoryFilter')?.value || '';
+            const difficulty = document.getElementById('difficultyFilter')?.value || '';
+            const time = document.getElementById('timeFilter')?.value || '';
+            
+            // Build query params
+            const params = new URLSearchParams({
+                page: currentPage.toString(),
+                limit: '20'
+            });
+            
+            if (searchTerm) params.append('search', searchTerm);
+            if (category) params.append('category', category);
+            if (difficulty) params.append('difficulty', difficulty);
+            if (time) params.append('maxTime', time);
+            
+            const response = await fetch(`/api/RecipesApi?${params.toString()}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Loaded recipes from API:', data);
+            
+            if (data.recipes && data.recipes.length > 0) {
+                // Map API format to UI format
+                const newRecipes = data.recipes.map(recipe => ({
+                    id: recipe.id || recipe.Id || '',
+                    name: recipe.name || recipe.title || recipe.Title || 'Recipe',
+                    category: recipe.category || 'lunch',
+                    difficulty: recipe.difficulty || 'medium',
+                    time: recipe.time || recipe.readyInMinutes || recipe.ReadyInMinutes || 30,
+                    rating: recipe.rating || recipe.SpoonacularScore || 4.5,
+                    image: recipe.image || recipe.Image || '/images/recipes/default.jpg',
+                    description: recipe.description || recipe.summary || recipe.Summary || 'Delicious recipe',
+                    ingredients: recipe.ingredients || recipe.extendedIngredients?.map(ing => ing.name || ing.Name || '') || [],
+                    tags: recipe.tags || recipe.Tags || recipe.dishTypes || ['Recipe']
+                }));
+                
+                if (reset) {
+                    recipes = newRecipes;
+                } else {
+                    recipes = [...recipes, ...newRecipes];
+                }
+                
+                hasMore = data.hasMore !== false && newRecipes.length >= 20;
+                currentPage++;
+                
+                console.log(`✅ Loaded ${newRecipes.length} recipes (Total: ${recipes.length})`);
+            } else {
+                hasMore = false;
+                if (reset) {
+                    recipes = [];
+                    console.log('⚠️ No recipes found');
+                }
+            }
+            
+            renderRecipes();
+            updateResultsCount();
+            updateLoadMoreButton();
+        } catch (error) {
+            console.error('❌ Error loading recipes:', error);
+            if (reset) {
+                // Fallback to sample data on error
+                recipes = getSampleRecipes();
+                console.log('⚠️ Using sample recipes as fallback');
+                renderRecipes();
+                updateResultsCount();
+                updateLoadMoreButton();
+            }
+            showNotification('Có lỗi xảy ra khi tải công thức', 'error');
+        } finally {
+            isLoading = false;
+        }
     }
-    else
-    {
-        <text>
-        // Fallback to sample data
-        recipes = getSampleRecipes();
-        console.log('⚠️ No API data, using sample recipes');
-        </text>
-    }
+    
+    // Initial load
+    loadRecipesFromAPI(true);
     
     function getSampleRecipes() {
         return [
@@ -395,59 +465,54 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
     }
 
-    let filteredRecipes = [...recipes];
+    let filteredRecipes = [];
     let displayedCount = 8;
 
-    // Initialize
-    renderRecipes();
-    updateResultsCount();
+    // Initialize - loadRecipesFromAPI(true) will be called after DOMContentLoaded
 
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function() {
-        filterRecipes();
+    // Debounce function for search
+    let searchTimeout;
+    function debounceSearch(func, delay) {
+        return function(...args) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+    
+    // Search functionality - reload from API
+    document.getElementById('searchInput').addEventListener('input', debounceSearch(function() {
+        loadRecipesFromAPI(true);
+    }, 500));
+
+    // Filter functionality - reload from API
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+        loadRecipesFromAPI(true);
+    });
+    document.getElementById('difficultyFilter').addEventListener('change', function() {
+        loadRecipesFromAPI(true);
+    });
+    document.getElementById('timeFilter').addEventListener('change', function() {
+        loadRecipesFromAPI(true);
     });
 
-    // Filter functionality
-    document.getElementById('categoryFilter').addEventListener('change', filterRecipes);
-    document.getElementById('difficultyFilter').addEventListener('change', filterRecipes);
-    document.getElementById('timeFilter').addEventListener('change', filterRecipes);
-
-    // Sort functionality
+    // Sort functionality - client-side sort
     document.getElementById('sortSelect').addEventListener('change', function() {
         sortRecipes();
         renderRecipes();
     });
 
-    // Load more functionality
+    // Load more functionality - load next page from API
     document.getElementById('loadMoreBtn').addEventListener('click', function() {
-        displayedCount += 4;
-        renderRecipes();
-        updateLoadMoreButton();
+        if (!isLoading && hasMore) {
+            loadRecipesFromAPI(false);
+        }
     });
-
-    function filterRecipes() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const category = document.getElementById('categoryFilter').value;
-        const difficulty = document.getElementById('difficultyFilter').value;
-        const time = document.getElementById('timeFilter').value;
-
-        filteredRecipes = recipes.filter(recipe => {
-            const matchesSearch = recipe.name.toLowerCase().includes(searchTerm) ||
-                                 recipe.description.toLowerCase().includes(searchTerm) ||
-                                 recipe.ingredients.some(ing => ing.toLowerCase().includes(searchTerm)) ||
-                                 recipe.tags.some(tag => tag.toLowerCase().includes(searchTerm));
-            
-            const matchesCategory = !category || recipe.category === category;
-            const matchesDifficulty = !difficulty || recipe.difficulty === difficulty;
-            const matchesTime = !time || recipe.time <= parseInt(time);
-
-            return matchesSearch && matchesCategory && matchesDifficulty && matchesTime;
-        });
-
-        displayedCount = 8;
-        renderRecipes();
-        updateResultsCount();
-        updateLoadMoreButton();
+    
+    // Client-side filtering (for additional filtering after API load)
+    let filteredRecipes = [];
+    function applyClientSideFilters() {
+        filteredRecipes = [...recipes];
+        // Additional client-side filtering can be added here if needed
     }
 
     function sortRecipes() {
@@ -479,7 +544,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderRecipes() {
         const grid = document.getElementById('recipesGrid');
-        const recipesToShow = filteredRecipes.slice(0, displayedCount);
+        // Use recipes directly (already filtered by API)
+        applyClientSideFilters();
+        const recipesToShow = (filteredRecipes.length > 0 ? filteredRecipes : recipes).slice(0, displayedCount);
         
         grid.innerHTML = recipesToShow.map(recipe => `
             <div class="recipe-card" data-id="${recipe.id}" style="cursor: pointer;">
@@ -692,16 +759,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateResultsCount() {
+        const totalRecipes = filteredRecipes.length > 0 ? filteredRecipes.length : recipes.length;
+        const showing = Math.min(displayedCount, totalRecipes);
         document.getElementById('resultsCount').textContent = 
-            `Hiển thị ${Math.min(displayedCount, filteredRecipes.length)} trong ${filteredRecipes.length} công thức`;
+            `Hiển thị ${showing} trong ${totalRecipes} công thức`;
     }
 
     function updateLoadMoreButton() {
         const loadMoreBtn = document.getElementById('loadMoreBtn');
-        if (displayedCount >= filteredRecipes.length) {
+        const totalRecipes = filteredRecipes.length > 0 ? filteredRecipes.length : recipes.length;
+        if (displayedCount >= totalRecipes && !hasMore) {
             loadMoreBtn.style.display = 'none';
         } else {
             loadMoreBtn.style.display = 'block';
+            loadMoreBtn.textContent = isLoading ? 'Đang tải...' : 'Tải thêm';
+            loadMoreBtn.disabled = isLoading || !hasMore;
         }
     }
     
